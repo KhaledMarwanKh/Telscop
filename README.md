@@ -1,2 +1,2 @@
 # Telscop
-This is project for Bokking courses online on Teachers
+This is project for Booking courses online on Teachers

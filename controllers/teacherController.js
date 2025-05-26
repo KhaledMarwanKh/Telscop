@@ -72,7 +72,7 @@ exports.login_teacher=catchasync(async(req,res,next)=>{
   if(!teacher){
 return next(new appError("invalid credentials",404))
   }
-  const correct = await teacher.correctpassword(password, teacher.password);
+  const correct = await teacher.correctpassword(password);
 if(correct){
   createSendToken(teacher,201,res)
 }

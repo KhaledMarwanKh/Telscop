@@ -1,21 +1,22 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
-
-const teacherSchema =new mongoose.Schema({
-  name:{
-    type:String,
-    required:true
+const teacherSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
   },
-  email:{
-    type:String,
-    required :true,
-    unique:true
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    validate: [validator.isEmail, "Please provide a valid email"]
   },
-  password :{
-    type:String,
-    required:true
+  password: {
+    type: String,
+    required: true
   },
   passwordConfirm: {
     type: String,
@@ -27,71 +28,79 @@ const teacherSchema =new mongoose.Schema({
       message: "passwords are not the same",
     },
   },
-  image:{
-    type :String,
-    required:false
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      required: true
+    }
   },
-  subject:{
-    type:String,
-    required:true
+  image: {
+    type: String,
+    required: false
   },
-  degree :{
-    type:String,
-    required:true
+  subject: {
+    type: String,
+    required: true
   },
-experience:{
-  type:String,
-  required:true
-}
-  ,
-  about :{
-    type:String,
-    required:true
+  degree: {
+    type: String,
+    required: true
   },
-  available:{
-    type:Boolean,
-    default:true
+  experience: {
+    type: Number, 
+    required: true
   },
-  gender:{
-    type:String,
-    default:'not selected'
+  about: {
+    type: String,
+    required: true
   },
-  address:{
-    type:Object,
-    required:true
+  available: {
+    type: Boolean,
+    default: true
+  },
+  gender: {
+    type: String,
+    default: 'not selected'
+  },
+  address: {
+    city: { type: String, required: true },
+    street: String,
+    region: String,
+    zip: String
   },
   slots_booked:{
     type:Object,
     default:{}
   },
-  date:{
-    type:Date,
-    required:true
-  },
-  price:{
-    type:Number,
-    required:true
+  price: {
+    type: Number,
+    required: true
   }
-},{manimize:false}
-)
+}, {
+  timestamps: true // ← to add createdAt و updatedAt
+});
 
 teacherSchema.pre("save", async function (next) {
-  // delete only when password actuly modified
+
   if (!this.isModified("password")) return next();
-  //hash password
-  this.password = await bcrypt.hash(this.password, 12);
-  //delete password confirm after check our password
+
+  // encoded password
+    this.password = await bcrypt.hash(this.password, 12);
+
+ //delete after save
   this.passwordConfirm = undefined;
+
   next();
 });
-teacherSchema.methods.correctpassword = async function (
-  candidatepassword,
-  userpassword,
-) {
-  // copmare use it for verfy from (password encoded) and (password login)
-  return await bcrypt.compare(candidatepassword, userpassword);
+
+teacherSchema.methods.correctPassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-const teacherModel=mongoose.model('teacher',teacherSchema)
-
-module.exports=teacherModel
+const Teacher = mongoose.model("Teacher", teacherSchema);
+module.exports = Teacher;

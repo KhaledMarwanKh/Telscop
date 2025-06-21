@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
 const authTeacher = require("../middlewares/authTeacher");
+const upload =require('../middlewares/multer')
 
 const teacherFiles = upload.fields([
   { name: 'profileImage', maxCount: 1 },
@@ -30,7 +31,7 @@ router.post(
 router.post(
   "/cancel-appointments",
   authTeacher.authteacher,
-  teacherController.appointmentcancelled
+  teacherController.appointmentCancelled
 );
 router.get(
   "/dashboard",

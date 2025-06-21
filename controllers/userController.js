@@ -6,7 +6,7 @@ const teacherModel = require("../models/teacherModel");
 const appointmentModel =require("../models/appointmentModel")
 const cloudinary= require('cloudinary').v2
 const apiFeatures =require('../utils/apiFeatures')
-
+const sendEmail =require('../utils/email')
 const createSendToken = (nuser, statusCode, res) => {
   const token = generatetoken(nuser);
   const cookieOption = {
@@ -155,6 +155,28 @@ exports.appointment = catchasync(async (req, res, next) => {
     success: true,
     message: "Appointment Booked"
   });
+
+  const teacherInfo = await teacherModel.findById(teacherId);
+const studentInfo = await userModel.findById(userid);
+if(teacherInfo.email){
+await sendEmail.sendEmail2({
+  email: teacherInfo.email, // ← تأكد أن الحقل موجود في سكيمتك
+  subject: "📚 تم حجز درس جديد",
+  html: `
+    <p>مرحبًا ${teacherInfo.name}،</p>
+    <p>لقد قام الطالب <strong>${studentInfo.name}</strong> بحجز درس لديك.</p>
+    <ul>
+      <li><strong>التاريخ:</strong> ${slotDate}</li>
+      <li><strong>الوقت:</strong> ${slotTime}</li>
+      <li><strong>السعر:</strong> ${teacherInfo.price} ل.س</li>
+    </ul>
+    <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
+    <hr>
+    <p>منصة تيليسكوب للخدمات التعليمية</p>
+  `,
+  text: `تم حجز درس جديد من الطالب ${studentInfo.name} بتاريخ ${slotDate}، الساعة ${slotTime}. السعر: ${teacherInfo.price} ل.س.`
+});
+}
 });
 
 // api to get user appointments for my appointment page

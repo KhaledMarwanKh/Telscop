@@ -23,8 +23,7 @@ const createSendToken = (nuser, statusCode, res) => {
   nuser.password = undefined;
   res.status(statusCode).json({
     status: "success",
-    token,
-    data: nuser,
+    token
   });
 };
 
@@ -33,7 +32,7 @@ const generatetoken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-
+//--------------------------
 exports.loginAdmin = catchasync(async(req,res,next)=>{
 const {email,password} =req.body
 if(email ===process.env.ADMIN_EMAIL&&password===process.env.ADMIN_PASSWORD){
@@ -47,7 +46,6 @@ else{
 
 )
 //---------------------------
-// تجلب عدد الدروس لكل استاذ مع الدخل الذي جققه الاستاذ // تم التأكد
 exports.statsByTeacher = catchasync(async (req, res, next) => {
   const stats = await appointmentModel.aggregate([
     {
@@ -61,7 +59,7 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
         _id: "$teacherId",
         lessons: { $sum: 1 },
         totalRevenue: { $sum: "$price" },
-        uniqueStudents: { $addToSet: "$iserId" } 
+        uniqueStudents: { $addToSet: "$userId" } 
       }
     },
     {
@@ -96,10 +94,10 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
 //api to get number treacher for each class
 exports.teacherByClass =catchasync(async(req,res,next)=>{
   const classCount = await teacherModel.aggregate([
-    { $unwind: "$class" }, 
+    { $unwind: "$Class" }, 
     { 
       $group: {
-        _id: "$class",      
+        _id: "$Class",      
         teacherCount: { $sum: 1 } 
       }
     },
@@ -272,7 +270,7 @@ exports.adminAppointments=catchasync(async(req,res,next)=>{
 
 // api to get all students
 exports.allStudents = catchasync(async(req,res,next)=>{
-
+const filterClass =req.query.filterClass
   const studentLessons = await appointmentModel.aggregate([
     { $match: { isCompleted: true } },//1
     {
@@ -299,7 +297,7 @@ exports.allStudents = catchasync(async(req,res,next)=>{
         name: "$studentData.name",
         email: "$studentData.email",
         class:"$studentData.Class",
-        address:"$sudentData.address",
+        address:"$studentData.address",
         lessonsCount: 1
       }
     },//6
@@ -308,8 +306,8 @@ exports.allStudents = catchasync(async(req,res,next)=>{
   
   res.status(200).json({
     status: "success",
-    result:data.length,
-    data:students,
+    result:studentLessons.length,
+    data:studentLessons,
   });
 })
 //-----------------------
@@ -350,7 +348,9 @@ exports.allActivateTeachers = catchasync(async(req,res,next)=>{
 exports.cancelAppointment =catchasync(async(req,res,next)=>{
 const {appointmentId} =req.body
 const appointmentData =  await appointmentModel.findById(appointmentId)
-
+if(!appointmentData){
+return next(new appError("this appointment not found",404))  
+}
 await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
 
 const {teacherId,slotDate,slotTime}=appointmentData

@@ -85,10 +85,11 @@ exports.authUser = catchasync(async (req, res, next) => {
   
     // 3) Send it to user's email
     try {
-      await sendEmail3({
+      await sendEmail.sendEmail2({
         email: nuser.email,
         subject: "Your password reset code (valid for 10 minutes)",
         message: `Your password reset code is: <strong>${resetCode}</strong>. It will expire in 10 minutes.`,
+        html: `<p>Your password reset code is: <strong>${resetCode}</strong>. It will expire in 10 minutes.</p>`,
       });
       res.status(200).json({
         status: "success",

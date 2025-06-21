@@ -7,6 +7,7 @@ const apiFeatures = require("./../utils/apiFeatures");
 const cloudinary = require("cloudinary").v2;
 const fs = require('fs');
 const { findByIdAndUpdate } = require("../models/userModel");
+const sendEmail =require('../utils/email')
 
 const createSendToken = (nuser, statusCode, res) => {
   const token = generatetoken(nuser);
@@ -152,7 +153,7 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
   });
 });
 
-// api to mark appointment copmpete
+// api to mark appointment complete
 exports.appointmentComplete = catchasync(async (req, res, next) => {
   const { teacherId, appointmentId } = req.body;
 
@@ -185,7 +186,7 @@ exports.appointmentComplete = catchasync(async (req, res, next) => {
     message: "Appointment marked as completed and slot released.",
   });
 });
-// api to canclled appointment copmpete
+// api to canclled appointment 
 
 exports.appointmentCancelled = catchasync(async (req, res, next) => {
   const { teacherId, appointmentId } = req.body;
@@ -217,7 +218,27 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Appointment cancelled and slot released.",
+    
   });
+  const student = await userModel.findById(appointmentData.userId);
+
+  await sendEmail.sendEmail2({
+    email: student.email,
+    subject: "❌ تم إلغاء موعد الدرس",
+    html: `
+      <p>مرحبًا ${student.name}،</p>
+      <p>نأسف لإبلاغك بأن أستاذ <strong>${teacher.name}</strong> قد قام بإلغاء حجز الدرس التالي:</p>
+      <ul>
+        <li><strong>التاريخ:</strong> ${appointmentData.slotDate.toDateString()}</li>
+        <li><strong>الوقت:</strong> ${appointmentData.slotTime}</li>
+      </ul>
+      <p>يرجى حجز موعد جديد في الوقت المناسب لك.</p>
+      <hr>
+      <p>منصة تيليسكوب للخدمات التعليمية</p>
+    `,
+    text: `تم إلغاء موعد درسك مع الأستاذ ${teacher.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`
+  });
+  
 });
 
 // api to dashboard for teacher
@@ -279,42 +300,3 @@ exports.updateTeacherProfile = catchasync(async (req, res, next) => {
     message: "profile updated",
   });
 });
-// //api to acceptable automatic  all appointments 
-// exports.acceptAutoApointments = catchasync(async (req, res, next) => {
-//   const { teacherId, status } = req.body;
-
-//   const updateAppointments = await teacherModel.findByIdAndUpdate(
-//     teacherId,
-//     { automaticAccept: status },
-//     { new: true }
-//   );
-
-//   if (!updateAppointments) {
-//     return next(new appError("The teacher was not found", 404));
-//   }
-
-//   res.status(200).json({
-//     success: true,
-//     message: `Automatic appointment acceptance has been ${status ? 'enabled' : 'disabled'} successfully.`,
-//   });
-// });
-
-// //api to accept appointment
-// exports.acceptApointments = catchasync(async (req, res, next) => {
-//   const { teacherId, userId } = req.body;
-
-//   const appointment = await appointmentModel.findOneAndUpdate(
-//     { teacherId: teacherId, userId: userId },
-//     { status: true },
-//     { new: true }
-//   );
-
-//   if (!appointment) {
-//     return next(new appError("Appointment not found", 404));
-//   }
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Appointment accepted successfully",
-//   });
-// });

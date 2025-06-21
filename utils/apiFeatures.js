@@ -23,7 +23,7 @@ class apiFeatures {
       const sortby = this.querystring.sort.split(",").join(" ");
       this.query = this.query.sort(sortby);
     } else {
-      this.query = this.query.sort("cratedAt");
+      this.query = this.query.sort("createdAt");
     }
     return this
   }

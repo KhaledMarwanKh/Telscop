@@ -80,18 +80,15 @@ exports.authUser = catchasync(async (req, res, next) => {
     }
   
     // 2) Generate the random reset token
-    const resetToken = nuser.createPasswordResetToken();
+    const resetCode = nuser.createPasswordResetCode();
     await nuser.save({ validateBeforeSave: false });
   
     // 3) Send it to user's email
-    const resetUrl = `${req.protocol}://${req.get("host")}/api//user/resetPassword/${resetToken}`;
-    const message = `forget your password ? submit a patch requiest with your new password and password confirm to 
-  :${resetUrl}.\nif you didn't forget your password please ignore this email !!`;
     try {
-      await sendEmail.sendEmail2({
+      await sendEmail3({
         email: nuser.email,
-        subject: "your password reset token (valid for 10 min)",
-        message: message,
+        subject: "Your password reset code (valid for 10 minutes)",
+        message: `Your password reset code is: <strong>${resetCode}</strong>. It will expire in 10 minutes.`,
       });
       res.status(200).json({
         status: "success",
@@ -107,22 +104,20 @@ exports.authUser = catchasync(async (req, res, next) => {
 // api for reset password
 exports.resetPassword = catchasync(async (req, res, next) => {
   // 1) Get user based on the token
-  const hashedtoken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  const { email, code, password, passwordConfirm } = req.body;
   const cuser = await userModel.findOne({
-    passwordresettoken: hashedtoken,
-    passwordresetExpired: { $gt: Date.now() },
+    email:email,
+    resetCode: code,
+    resetCodeExpires: { $gt: Date.now() },
   });
   // 2) If token has not expired, and there is user, set the new password
   if (!cuser) {
     return next(new appError("token is invalid or has expired", 400));
   }
-  cuser.password = req.body.password;
-  cuser.passwordConfirm = req.body.passwordConfirm;
-  cuser.passwordresettoken = undefined;
-  cuser.passwordresetExpired = undefined;
+  cuser.password = password;
+  cuser.passwordConfirm =passwordConfirm;
+  cuser.resetCode = undefined;
+  cuser.resetCodeExpires = undefined;
   await cuser.save();
   // 4) Log the user in, send JWT
   createSendToken(cuser, 200, res);

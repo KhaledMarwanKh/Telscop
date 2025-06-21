@@ -43,6 +43,19 @@ const teacherSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  certificates: {
+    type: [String],
+    validate: [arr => arr.length > 0, "At least one certificate is required"],
+    required: true
+  },  
+  idImage:{
+    type:String,
+    required:true
+  },
+  Class:{
+    type:[Number],
+    required:true
+  },
   subject: {
     type: String,
     required: true
@@ -63,27 +76,75 @@ const teacherSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  activate:{
+    type:Boolean,
+    default:false
+  },
+  automaticAccept:{
+    type:Boolean,
+    default:false
+  },
+  checkAdmin:{
+    type:Boolean,
+    default:false
+  },
   gender: {
     type: String,
     default: 'not selected'
+  },
+  phone:{
+type:String,
+required:true
   },
   address: {
     city: { type: String, required: true },
     street: String,
     region: String,
-    zip: String
   },
   slots_booked:{
     type:Object,
     default:{}
   },
+  availableTimes: [
+    {
+      day: {
+        type: String,
+        enum: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
+        required: true
+      },
+      slots: {
+        type: [String], 
+        required: true
+      }
+    }
+  ],
   price: {
     type: Number,
     required: true
-  }
+  },
+  passwordChangedAt: {
+    type: Date,
+  },
+  resetCode: String,
+  resetCodeExpires: Date
 }, {
   timestamps: true // ← to add createdAt و updatedAt
 });
+teacherSchema.index({ location: '2dsphere' });
+
+teacherSchema.methods.changedPasswordAfter = function (jwttimetamp) {
+  if (this.passwordChangedAt) {
+    // the time that user do change password
+    const changedtimetamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10,
+    );
+    return changedtimetamp > jwttimetamp;
+  }
+  // false means password not changed
+  return false;
+};
+
 
 teacherSchema.pre("save", async function (next) {
 
@@ -100,6 +161,14 @@ teacherSchema.pre("save", async function (next) {
 
 teacherSchema.methods.correctPassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+teacherSchema.methods.createPasswordResetCode = function () {
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString(); 
+
+  this.resetCode = resetCode;
+  this.resetCodeExpires = Date.now() + 10 * 60 * 1000; 
+
+  return resetCode;
 };
 
 const Teacher = mongoose.model("Teacher", teacherSchema);

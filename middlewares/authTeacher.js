@@ -34,12 +34,12 @@ exports.authteacher = catchasync(async (req, res, next) => {
     );
   }
 
-//  check if user changed password after the token was issued
-  // if (currentuser.changedPasswordAfter(decode.iat)) {
-  //   return next(
-  //     new appError("user recently changee password!! please log in again", 401),
-  //   );
-  // }
+ //check if user changed password after the token was issued
+  if (currentuser.changedPasswordAfter(decode.iat)) {
+    return next(
+      new appError("user recently changee password!! please log in again", 401),
+    );
+  }
   req.body.teacherId =decode.id;
   //Grant acces to protcted route
 

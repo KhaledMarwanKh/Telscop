@@ -3,35 +3,25 @@ const validator = require("validator");
 const bcrypt = require("bcryptjs");
 
 const appointmentSchema =new mongoose.Schema({
-  userId :{
-    type:String,
-    required:true
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  teacherId:{
-    type:String,
-    required:true
+  teacherId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Teacher',
+    required: true
   },
   slotDate:{
-    type:String,
+    type:Date,
     required:true
   },
   slotTime:{
     type:String,
     required:true
   },
-  userData:{
-    type:Object,
-    required:true
-  },
-  teacherData:{
-    type:Object,
-    required:true
-  },
-  amount:{
-    type:Number,
-    required:true
-  },
-  date:{
+  price:{
     type:Number,
     required:true
   },
@@ -39,15 +29,13 @@ const appointmentSchema =new mongoose.Schema({
     type:Boolean,
     default:false
   },
-  payment:{
-    type:Boolean,
-    default:false
-  },
   isCompleted:{
     type:Boolean,
     default:false
   }
-})
+},
+{timestamps:true}
+)
 
 const appointmentModel=mongoose.model('appointment',appointmentSchema)
 

@@ -5,6 +5,8 @@ const AppError = require("../utils/appError");
 const teacherModel = require("../models/teacherModel");
 const appointmentModel =require("../models/appointmentModel")
 const cloudinary= require('cloudinary').v2
+const apiFeatures =require('../utils/apiFeatures')
+
 const createSendToken = (nuser, statusCode, res) => {
   const token = generatetoken(nuser);
   const cookieOption = {
@@ -25,7 +27,7 @@ const createSendToken = (nuser, statusCode, res) => {
 
 const generatetoken = (id) =>
   jwt.sign(
-    { email: id.email, password: id.password },
+    { email: id.email },
     process.env.JWT_SECRET_KEY,
     {
       expiresIn: process.env.JWT_EXPIRES_IN,
@@ -91,64 +93,101 @@ res.status(200).json({
 });
 
 //api for create appointment
-exports.appointment =catchasync(async(req,res,next)=>{
-  const{userid,teacherId,slotDate,slotTime} =req.body
+exports.appointment = catchasync(async (req, res, next) => {
+  const { userid, teacherId, slotDate, slotTime } = req.body;
 
-  const teacherData = await teacherModel.findById(teacherId).select('-password')
+  const teacherData = await teacherModel.findById(teacherId).select('-password');
+  if (!teacherData || !teacherData.available) {
+    return next(new AppError("Teacher is not available", 400));
+  }
 
-  if(!teacherData.available){
-    return next(new AppError("teacher is not available",400));
-  }
-  let slots_booked =teacherData.slots_booked
-  if(slots_booked[slotDate]){
-    if(slots_booked[slotDate].includes(slotTime))
-      return next(new AppError("Slot not available", 400));
-    else{
-      slots_booked[slotDate].push(slotTime)
-    }
-  }
-  else{
-    slots_booked[slotDate]=[]
-    slots_booked[slotDate].push(slotTime)
-  }
-  const userData =await userModel.findById(userid).select('-password')
+  const dateObj = new Date(slotDate);
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayName = dayNames[dateObj.getDay()];
 
-  delete teacherData.slots_booked
-  const appointmentData ={userId:userid,
-    teacherId,
-    userData,
-    teacherData,
-    amount:teacherData.price,
-    slotDate,
+  
+  const availableDay = teacherData.availableTimes.find(item => item.day === dayName);
+  if (!availableDay) {
+    return next(new AppError(`Teacher has no available times on ${dayName}`, 400));
+  }
+
+  const slots_booked = teacherData.slots_booked || {};
+  const booked = slots_booked[slotDate] || []
+
+  const isAvailable = availableDay.slots.includes(slotTime) && !booked.includes(slotTime);
+  if (!isAvailable) {
+    return next(new AppError("Slot not available", 400));
+  }
+
+  // 
+  const existingAppointment = await appointmentModel.findOne({
+    userId: userid,
+    slotDate: new Date(slotDate),
     slotTime,
-    date:Date.now()
+    cancelled: false
+  });
+
+  if (existingAppointment) {
+    return next(new AppError("You already have an appointment at this time", 400));
   }
 
-    const newAppointment =await appointmentModel.create(appointmentData)
-    const x = await teacherModel.findByIdAndUpdate(
-      teacherId,
-      { $set: { slots_booked: slots_booked } }, // تحديث فقط slots_booked
-      { new: true }
+  // update 
+  if (!slots_booked[slotDate]) slots_booked[slotDate] = [];
+  slots_booked[slotDate].push(slotTime);
+
+  const appointmentData = {
+    userId: userid,
+    teacherId,
+    price: teacherData.price,
+    slotDate: new Date(slotDate),
+    slotTime
+  };
+
+  await appointmentModel.create(appointmentData);
+
+  await teacherModel.findByIdAndUpdate(
+    teacherId,
+    { slots_booked },
+    { new: true }
   );
-res.status(201).json({
-  success:true,
-  message:"Appointment Booked"
-})
-})
+
+  res.status(201).json({
+    success: true,
+    message: "Appointment Booked"
+  });
+});
 
 // api to get user appointments for my appointment page
-exports.listAppointment =catchasync(async(req,res,next)=>{
+exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
   const {userid}=req.body
-  const list = await appointmentModel.find({ userId: userid ,cancelled:false });
+  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:false,isCompleted:false});
   res.status(200).json({
     success:true,
     data: list
-  })
+}).populate('teacherId', 'name subject image')
+
+})
+exports.listCompletedAppointment =catchasync(async(req,res,next)=>{
+  const {userid}=req.body
+  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:false,isCompleted:true });
+  res.status(200).json({
+    success:true,
+    data: list
+}).populate('teacherId', 'name subject image')
+
+})
+exports.listcancelledAppointment =catchasync(async(req,res,next)=>{
+  const {userid}=req.body
+  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:true,isCompleted:false });
+  res.status(200).json({
+    success:true,
+    data: list
+}).populate('teacherId','name subject image')
 
 })
 // api to cancle  appointment
 exports.cancleAppointment =catchasync(async(req,res,next)=>{
-  const {userid,appointmentId} =req.body
+const {userid,appointmentId} =req.body
 const appointmentData =  await appointmentModel.findById(appointmentId)
 if(appointmentData.userId!==userid){
   return next(new AppError("unauthorized action"))
@@ -167,3 +206,73 @@ res.status(200).json({
   message:"Appoinrment cancelled"
 })
 })
+// api to get teacher
+exports.getTeacher = catchasync(async (req, res, next) => {
+  const { teacherId } = req.params;
+
+  const teacher = await teacherModel.findById(teacherId).select('-password');
+
+  if (!teacher) {
+    return next(new AppError("Teacher not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: teacher
+  });
+});
+//api to get all teachers with filltering
+exports.getAllTeachers = catchasync(async (req, res, next) => {
+  const features = new apiFeatures(teacherModel.find({ activate: true }), req.query)
+    .filter()
+    .sorting()
+    .limitField()
+    .pagination();
+
+  const teachers = await features.query;
+
+  res.status(200).json({
+    status: "success",
+    results: teachers.length,
+    data: teachers
+  });
+});
+//api for get nearest teachers 
+exports.getNearestTeachersForStudent = catchasync(async (req, res, next) => {
+  const { studentId, maxDistanceKm  } = req.body;
+
+  const student = await userModel.findById(studentId);
+  if (!student || !student.location || !student.location.coordinates) {
+    return next(new appError('Student location not found', 404));
+  }
+
+  const [lng, lat] = student.location.coordinates;
+  const maxDistanceMeters = maxDistanceKm * 1000;
+
+  let query = teacherModel.find({
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [lng, lat],
+        },
+        $maxDistance: maxDistanceMeters,
+      },
+    },
+    activate: true,
+  });
+
+  const features = new apiFeatures(query, req.query) 
+    .filter()
+    .sorting()
+    .limitField()
+    .pagination();
+
+  const nearbyTeachers = await features.query;
+
+  res.status(200).json({
+    status: "success",
+    count: nearbyTeachers.length,
+    data: nearbyTeachers
+  });
+});

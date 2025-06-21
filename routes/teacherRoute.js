@@ -2,6 +2,13 @@ const express = require("express");
 const router = express.Router();
 const teacherController = require("../controllers/teacherController");
 const authTeacher = require("../middlewares/authTeacher");
+
+const teacherFiles = upload.fields([
+  { name: 'profileImage', maxCount: 1 },
+  { name: 'idImage', maxCount: 1 },
+  { name: 'certificates', maxCount: 5 }
+]);
+
 router.post(
   "/change-availablity",
   authTeacher.authteacher,
@@ -9,6 +16,7 @@ router.post(
 );
 router.get("/list-teachers", teacherController.listTeachers);
 router.post("/login-teacher", teacherController.login_teacher);
+router.post("/signup-teacher", teacherFiles,teacherController.signup_teacher);
 router.post(
   "/appointments",
   authTeacher.authteacher,

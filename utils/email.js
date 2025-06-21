@@ -1,4 +1,6 @@
 const nodemailer =require('nodemailer')
+require('dotenv').config();
+const { Resend } = require('resend');
 
 // const sendEmail =async(options)=>{
 //   //1) Create transporter 
@@ -55,4 +57,28 @@ console.log(process.env.USER_NAME)
 
 }
 
-module.exports  ={sendEmail2}
+
+
+const sendEmail3 = async (option) => {
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  try {
+    const data = await resend.emails.send({
+      from: '"Telescope for IT Services" <onboarding@resend.dev>',
+      to: [option.email],
+      subject: option.subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h1 style="color: #4a90e2;">مرحباً بك!</h1>
+          <p>${option.message}</p>
+        </div>
+      `,
+    });
+
+    console.log('📨 Response');
+  } catch (error) {
+    console.error('❌ failed:', error?.message || error);
+  }
+};
+
+module.exports = { sendEmail3 };

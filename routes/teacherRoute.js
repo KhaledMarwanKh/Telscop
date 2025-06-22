@@ -15,6 +15,7 @@ router.post(
   authTeacher.authteacher,
   teacherController.changeAvailablity
 );
+router.post('/logout',authTeacher.authteacher,teacherController.logout)
 router.get("/list-teachers", teacherController.listTeachers);
 router.post("/login-teacher", teacherController.login_teacher);
 router.post("/signup-teacher", teacherFiles,teacherController.signup_teacher);

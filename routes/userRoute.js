@@ -6,7 +6,7 @@ const upload =require('../middlewares/multer')
 
 router.post('/register',userController.signup)
 router.post('/login',userController.login)
-router.post('/login',authUser.authUser,userController.logout)
+router.post('/logout',authUser.authUser,userController.logout)
 router.get('/get-profile',authUser.authUser,userController.getProfile)
 router.post('/updateProfile',upload.single('image'),authUser.authUser,userController.updateProfile)
 router.post('/book-appointment',authUser.authUser,userController.appointment)

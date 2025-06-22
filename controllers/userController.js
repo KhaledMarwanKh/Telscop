@@ -41,7 +41,7 @@ const generatetoken = (id) =>
   
     res.status(200).json({
       status: 'success',
-      message: 'تم تسجيل الخروج'
+      message: 'logout successfly'
     });
   };
 exports.signup = catchasync(async (req, res, next) => {

@@ -6,6 +6,7 @@ const { authAdmin } = require('../middlewares/authAdmin');
 
 // Auth
 router.post('/login-admin', adminController.loginAdmin);
+router.post('/logout',authAdmin,adminController.logout)
 
 // Teacher Management
 router.get('/all-activate-teachers', authAdmin, adminController.allActivateTeachers);

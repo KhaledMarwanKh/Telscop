@@ -124,7 +124,17 @@ exports.signup_teacher = catchasync(async (req, res, next) => {
   createSendToken(teacher, 201, res);
 });
 
+exports.logout = (req, res,next) => {
+  res.cookie('jwt', 'loggedout', {
+    httpOnly: true,
+    expires: new Date(Date.now() + 10 * 1000)
+  });
 
+  res.status(200).json({
+    status: 'success',
+    message: 'logout successfly'
+  });
+};
 // api for teacher login
 exports.login_teacher = catchasync(async (req, res, next) => {
   const { email, password } = req.body;

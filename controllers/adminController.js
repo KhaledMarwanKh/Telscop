@@ -33,7 +33,17 @@ const createSendToken = (adminEmail, statusCode, res) => {
     token,
   });
 };
+exports.logout = (req, res,next) => {
+  res.cookie('jwt', 'loggedout', {
+    httpOnly: true,
+    expires: new Date(Date.now() + 10 * 1000)
+  });
 
+  res.status(200).json({
+    status: 'success',
+    message: 'logout successfly'
+  });
+};
 exports.loginAdmin = catchasync(async (req, res, next) => {
   const { email, password } = req.body;
 

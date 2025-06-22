@@ -1,0 +1,57 @@
+[
+  {
+    "userId": "685808252c256d8ae57b3902",
+    "teacherId": "6857d00ffb9da17b0d8d2c55",
+    "slotDate": "2025-06-25T10:00:00.000Z",
+    "slotTime": "10:00",
+    "price": 11400,
+    "cancelled": false,
+    "isCompleted": false,
+    "createdAt": "2025-06-22T12:00:00.000Z",
+    "updatedAt": "2025-06-22T12:00:00.000Z"
+  },
+  {
+    "userId": "685808252c256d8ae57b390b",
+    "teacherId": "6857d00ffb9da17b0d8d2c5e",
+    "slotDate": "2025-06-26T11:00:00.000Z",
+    "slotTime": "11:00",
+    "price": 12600,
+    "cancelled": false,
+    "isCompleted": true,
+    "createdAt": "2025-06-22T12:00:00.000Z",
+    "updatedAt": "2025-06-22T12:00:00.000Z"
+  },
+  {
+    "userId": "685808252c256d8ae57b390c",
+    "teacherId": "6857d00ffb9da17b0d8d2c61",
+    "slotDate": "2025-06-27T12:00:00.000Z",
+    "slotTime": "12:00",
+    "price": 13000,
+    "cancelled": false,
+    "isCompleted": false,
+    "createdAt": "2025-06-22T12:00:00.000Z",
+    "updatedAt": "2025-06-22T12:00:00.000Z"
+  },
+  {
+    "userId": "685808252c256d8ae57b38fe",
+    "teacherId": "6857d00ffb9da17b0d8d2c64",
+    "slotDate": "2025-06-25T10:00:00.000Z",
+    "slotTime": "10:00",
+    "price": 13400,
+    "cancelled": true,
+    "isCompleted": false,
+    "createdAt": "2025-06-22T12:00:00.000Z",
+    "updatedAt": "2025-06-22T12:00:00.000Z"
+  },
+  {
+    "userId": "685808252c256d8ae57b38fd",
+    "teacherId": "6857d00ffb9da17b0d8d2c67",
+    "slotDate": "2025-06-28T11:00:00.000Z",
+    "slotTime": "11:00",
+    "price": 13800,
+    "cancelled": false,
+    "isCompleted": true,
+    "createdAt": "2025-06-22T12:00:00.000Z",
+    "updatedAt": "2025-06-22T12:00:00.000Z"
+  }
+]

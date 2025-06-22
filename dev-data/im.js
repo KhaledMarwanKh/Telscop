@@ -1,6 +1,8 @@
 const mongoose =require('mongoose')
 const dotenv=require('dotenv')
 const teacherModel =require('../models/teacherModel')
+const userModel =require('../models/userModel')
+const appointmentModel =require('../models/appointmentModel')
 
 const fs =require('fs')
 const { dirname } = require('path')
@@ -11,11 +13,11 @@ mongoose.connect(process.env.DATABASE)
   console.log("success to connect on database")
 })
 
-let teachers =JSON.parse(fs.readFileSync(`${__dirname}/teachers_homs_realistic.json`,'utf-8'))
+let teachers =JSON.parse(fs.readFileSync(`${__dirname}/appointments.json`,'utf-8'))
 
 const import_data = async ()=>{
   try{
-  await teacherModel.create(teachers,{validateBeforeSave:false})
+  await appointmentModel.create(teachers,{validateBeforeSave:false})
  console.log("successful") 
   }
   catch(err){
@@ -25,7 +27,7 @@ const import_data = async ()=>{
 
 }
 const delete_all_data = async ()=>{
-try{  await teacherModel.deleteMany()
+try{  await appointmentModel.deleteMany()
 
     console.log('data is deleted')
 }

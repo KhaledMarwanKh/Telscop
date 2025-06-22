@@ -1,0 +1,422 @@
+[
+  {
+    "name": "علي الأحمد",
+    "email": "user1@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 1",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 8,
+    "gender": "ذكر",
+    "phone": "0930000000"
+  },
+  {
+    "name": "رنا يوسف",
+    "email": "user2@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 2",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 9,
+    "gender": "أنثى",
+    "phone": "0930000001"
+  },
+  {
+    "name": "محمد خليل",
+    "email": "user3@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 3",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 10,
+    "gender": "ذكر",
+    "phone": "0930000002"
+  },
+  {
+    "name": "سارة ديوب",
+    "email": "user4@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 4",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 11,
+    "gender": "أنثى",
+    "phone": "0930000003"
+  },
+  {
+    "name": "يزن الجاسم",
+    "email": "user5@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 5",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 12,
+    "gender": "ذكر",
+    "phone": "0930000004"
+  },
+  {
+    "name": "نور سليم",
+    "email": "user6@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 6",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 8,
+    "gender": "أنثى",
+    "phone": "0930000005"
+  },
+  {
+    "name": "خالد عبيد",
+    "email": "user7@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 7",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 9,
+    "gender": "ذكر",
+    "phone": "0930000006"
+  },
+  {
+    "name": "لمى حسن",
+    "email": "user8@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 8",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 10,
+    "gender": "أنثى",
+    "phone": "0930000007"
+  },
+  {
+    "name": "أحمد زين",
+    "email": "user9@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 9",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 11,
+    "gender": "ذكر",
+    "phone": "0930000008"
+  },
+  {
+    "name": "جوري العبدالله",
+    "email": "user10@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 10",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 12,
+    "gender": "أنثى",
+    "phone": "0930000009"
+  },
+  {
+    "name": "حسن الشيخ",
+    "email": "user11@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 11",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 8,
+    "gender": "ذكر",
+    "phone": "0930000010"
+  },
+  {
+    "name": "مها حمود",
+    "email": "user12@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 12",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 9,
+    "gender": "أنثى",
+    "phone": "0930000011"
+  },
+  {
+    "name": "عماد الخلف",
+    "email": "user13@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 13",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 10,
+    "gender": "ذكر",
+    "phone": "0930000012"
+  },
+  {
+    "name": "ريم فاضل",
+    "email": "user14@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 14",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 11,
+    "gender": "أنثى",
+    "phone": "0930000013"
+  },
+  {
+    "name": "زياد عيسى",
+    "email": "user15@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 15",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 12,
+    "gender": "ذكر",
+    "phone": "0930000014"
+  },
+  {
+    "name": "ديمة درويش",
+    "email": "user16@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 16",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 8,
+    "gender": "أنثى",
+    "phone": "0930000015"
+  },
+  {
+    "name": "عمار الترك",
+    "email": "user17@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 17",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 9,
+    "gender": "ذكر",
+    "phone": "0930000016"
+  },
+  {
+    "name": "هالة خليل",
+    "email": "user18@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 18",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 10,
+    "gender": "أنثى",
+    "phone": "0930000017"
+  },
+  {
+    "name": "فادي كنعان",
+    "email": "user19@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 19",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 11,
+    "gender": "ذكر",
+    "phone": "0930000018"
+  },
+  {
+    "name": "نسرين الزين",
+    "email": "user20@example.com",
+    "password": "password123",
+    "passwordConfirm": "password123",
+    "address": {
+      "city": "حمص",
+      "street": "شارع رقم 20",
+      "region": "الانشاءات"
+    },
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.7136,
+        34.7345
+      ]
+    },
+    "Class": 12,
+    "gender": "أنثى",
+    "phone": "0930000019"
+  }
+]

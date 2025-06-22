@@ -8,43 +8,42 @@ const teacherModel = require('../models/teacherModel');
 const appointmentModel =require("../models/appointmentModel");
 const userModel = require('../models/userModel');
 const apiFeatures =require('../utils/apiFeatures')
+const generatetoken = (email) =>
+  jwt.sign({email: email }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 
-const createSendToken = (nuser, statusCode, res) => {
-  const token = generatetoken(nuser);
+const createSendToken = (adminEmail, statusCode, res) => {
+  const token = generatetoken(adminEmail);
+
   const cookieOption = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     secure: false,
     httpOnly: true,
   };
+
   if (process.env.NODE_ENV === "production") cookieOption.secure = true;
+
   res.cookie("jwt", token, cookieOption);
-  nuser.password = undefined;
+
   res.status(statusCode).json({
     status: "success",
-    token
+    token,
   });
 };
 
-const generatetoken = (id) =>
-  jwt.sign({ email:id.email}, process.env.JWT_SECRET_KEY, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+exports.loginAdmin = catchasync(async (req, res, next) => {
+  const { email, password } = req.body;
 
-//--------------------------
-exports.loginAdmin = catchasync(async(req,res,next)=>{
-const {email,password} =req.body
-if(email ===process.env.ADMIN_EMAIL&&password===process.env.ADMIN_PASSWORD){
-  createSendToken(email,201, res);
+  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    createSendToken(email, 201, res);
+  } else {
+    return next(new appError("Invalid email or password", 400));
+  }
+});
 
-}
-else{
-  return next(new appError('invalid email or password',400))
-}
-}
-
-)
 //---------------------------
 exports.statsByTeacher = catchasync(async (req, res, next) => {
   const stats = await appointmentModel.aggregate([
@@ -281,47 +280,60 @@ exports.adminAppointments = catchasync(async (req, res, next) => {
 //------------------------
 
 // api to get all students
-exports.allStudents = catchasync(async(req,res,next)=>{
-const filterClass =req.query.filterClass
-  const studentLessons = await appointmentModel.aggregate([
-    { $match: { isCompleted: true } },//1
+exports.allStudents = catchasync(async (req, res, next) => {
+  const filterClass = req.query.filterClass;
+
+  const studentLessons = await userModel.aggregate([
+
     {
-      $group: {
-        _id: "$userId", // ← الحقل الصحيح
-        lessonsCount: { $sum: 1 }
+      $match: {
+        Class: { $exists: true }  // نتأكد فقط أن لديه صف دراسي (طالما هو طالب)
       }
-    },//2
+    },
+    ...(filterClass
+      ? [{ $match: { Class: Number(filterClass) } }]
+      : []),
     {
       $lookup: {
-        from: "users",
+        from: "appointments",
         localField: "_id",
-        foreignField: "_id",
-        as: "studentData"
+        foreignField: "userId",
+        as: "appointments"
       }
-    },//3
-    { $unwind: "$studentData" },//4
-    ...(filterClass
-      ? [{ $match: { "studentData.Class": Number(filterClass) } }]
-      : []),//5
+    },
+    {
+      $addFields: {
+        lessonsCount: {
+          $size: {
+            $filter: {
+              input: "$appointments",
+              as: "appt",
+              cond: { $eq: ["$$appt.isCompleted", true] }
+            }
+          }
+        }
+      }
+    },
     {
       $project: {
-        _id: 0,
-        name: "$studentData.name",
-        email: "$studentData.email",
-        class:"$studentData.Class",
-        address:"$studentData.address",
+        _id: 1,
+        name: 1,
+        email: 1,
+        class: "$Class",
+        address: 1,
         lessonsCount: 1
       }
-    },//6
-    { $sort: { lessonsCount: -1 } }//7
+    },
+    { $sort: { lessonsCount: -1 } }
   ]);
-  
+
   res.status(200).json({
     status: "success",
-    result:studentLessons.length,
-    data:studentLessons,
+    result: studentLessons.length,
+    data: studentLessons,
   });
-})
+});
+
 //-----------------------
 exports.studentsByClass = catchasync(async (req, res, next) => {
   const stats = await userModel.aggregate([

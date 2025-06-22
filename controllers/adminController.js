@@ -253,19 +253,31 @@ exports.adminCurrentAppointments=catchasync(async(req,res,next)=>{
   })
 })
 //------------------------
-exports.adminAppointments=catchasync(async(req,res,next)=>{
+exports.adminAppointments = catchasync(async (req, res, next) => {
+  const query = appointmentModel.find({ cancelled: false })
+    .populate({
+      path: 'userId',
+      select: 'name Class'
+    })
+    .populate({
+      path: 'teacherId',
+      select: 'name subject '
+    });
 
-  const features = new apiFeatures(await appointmentModel.find({cancelled:false}),req.query)
-      .filter()
-      .sorting()
-      .limitField()
-      .pagination();
-    const appointments = await features.query;
-     res.status(200).json({
-    success:true,
-    data:appointments
-  })
-})
+  const features = new apiFeatures(query, req.query)
+    .filter()
+    .sorting()
+    .limitField()
+    .pagination();
+
+  const appointments = await features.query;
+
+  res.status(200).json({
+    success: true,
+    results: appointments.length,
+    data: appointments
+  });
+});
 //------------------------
 
 // api to get all students

@@ -33,7 +33,17 @@ const generatetoken = (id) =>
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
-
+  exports.logout = (req, res,next) => {
+    res.cookie('jwt', 'loggedout', {
+      httpOnly: true,
+      expires: new Date(Date.now() + 10 * 1000)
+    });
+  
+    res.status(200).json({
+      status: 'success',
+      message: 'تم تسجيل الخروج'
+    });
+  };
 exports.signup = catchasync(async (req, res, next) => {
   const newuser = await userModel.create(req.body);
   createSendToken(newuser, 201, res);
@@ -178,6 +188,88 @@ await sendEmail.sendEmail2({
 });
 }
 });
+exports.updateAppointment = catchasync(async (req, res, next) => {
+  const { appointmentId, newSlotDate, newSlotTime } = req.body;
+  const userId = req.body.userid;
+
+  const appointment = await appointmentModel.findById(appointmentId);
+  if (!appointment || appointment.userId.toString() !== userId) {
+    return next(new AppError("Appointment not found or not yours", 404));
+  }
+
+  const teacherData = await teacherModel.findById(appointment.teacherId).select('-password');
+  if (!teacherData || !teacherData.available) {
+    return next(new AppError("Teacher is not available", 400));
+  }
+
+  const dateObj = new Date(newSlotDate);
+  const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const dayName = dayNames[dateObj.getDay()];
+
+  const availableDay = teacherData.availableTimes.find(item => item.day === dayName);
+  if (!availableDay) {
+    return next(new AppError(`Teacher has no available times on ${dayName}`, 400));
+  }
+
+  const slots_booked = teacherData.slots_booked || {};
+
+  const bookedSlotsForNewDate = slots_booked[newSlotDate] || [];
+  if (bookedSlotsForNewDate.includes(newSlotTime)) {
+    return next(new AppError("New slot is already booked", 400));
+  }
+
+  // تحقق من أن الوقت الجديد متاح في أوقات الأستاذ
+  if (!availableDay.slots.includes(newSlotTime)) {
+    return next(new AppError("New slot is not available", 400));
+  }
+
+  // إزالة الموعد القديم من slots_booked للأستاذ
+  const oldDate = appointment.slotDate.toISOString().split('T')[0];
+  const oldTime = appointment.slotTime;
+
+  if (slots_booked[oldDate]) {
+    slots_booked[oldDate] = slots_booked[oldDate].filter(slot => slot !== oldTime);
+    if (slots_booked[oldDate].length === 0) delete slots_booked[oldDate];
+  }
+
+  // إضافة الموعد الجديد إلى slots_booked
+  if (!slots_booked[newSlotDate]) slots_booked[newSlotDate] = [];
+  slots_booked[newSlotDate].push(newSlotTime);
+
+  // تحديث بيانات الحجز
+  appointment.slotDate = new Date(newSlotDate);
+  appointment.slotTime = newSlotTime;
+  await appointment.save();
+
+  // تحديث الأستاذ بالموعد الجديد
+  await teacherModel.findByIdAndUpdate(teacherData._id, { slots_booked }, { new: true });
+
+  res.status(200).json({
+    success: true,
+    message: "Appointment updated successfully",
+    appointment
+  });
+
+  await sendEmail.sendEmail2({
+    email: teacherInfo.email, // ← تأكد أن الحقل موجود في سكيمتك
+    subject: "📚 تم حجز درس جديد",
+    html: `
+      <p>مرحبًا ${teacherInfo.name}،</p>
+      <p>لقد قام الطالب <strong>${studentInfo.name}</strong> بتعديل موعد درس لديك.</p>
+      <ul>
+        <li><strong>التاريخ:</strong> ${newSlotDate}</li>
+        <li><strong>الوقت:</strong> ${newSlotTime}</li>
+        <li><strong>السعر:</strong> ${teacherData.price} ل.س</li>
+      </ul>
+      <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
+      <hr>
+      <p>منصة تيليسكوب للخدمات التعليمية</p>
+    `,
+    text: `تم تعديل موعد درس  من الطالب ${studentInfo.name} بتاريخ ${newSlotDate}، الساعة ${newSlotTime}. السعر: ${teacherData.price} ل.س.`
+  });
+  
+
+});
 
 // api to get user appointments for my appointment page
 exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
@@ -189,15 +281,26 @@ exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
 }).populate('teacherId', 'name subject image')
 
 })
-exports.listCompletedAppointment =catchasync(async(req,res,next)=>{
-  const {userid}=req.body
-  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:false,isCompleted:true });
-  res.status(200).json({
-    success:true,
-    data: list
-}).populate('teacherId', 'name subject image')
+//-------------------------
+exports.listCompletedAppointment = catchasync(async (req, res, next) => {
+  const { userid } = req.body;
 
-})
+  const list = await appointmentModel.find({
+    userId: mongoose.Types.ObjectId(userid),
+    cancelled: false,
+    isCompleted: true
+  }).populate('teacherId', 'name subject image');
+
+  
+  const totalPrice = list.reduce((acc, appointment) => acc + (appointment.price || 0), 0);
+
+  res.status(200).json({
+    success: true,
+    totalLessons: list.length,
+    totalPrice, 
+    data: list
+  });
+});
 exports.listcancelledAppointment =catchasync(async(req,res,next)=>{
   const {userid}=req.body
   const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:true,isCompleted:false });
@@ -296,5 +399,32 @@ exports.getNearestTeachersForStudent = catchasync(async (req, res, next) => {
     status: "success",
     count: nearbyTeachers.length,
     data: nearbyTeachers
+  });
+});
+exports.connectWithUs = catchasync(async (req, res, next) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return next(new AppError("please fill all fields", 400));
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL; 
+
+  await sendEmail.sendEmail2({
+    email: adminEmail,
+    subject: '📩 رسالة جديدة من صفحة اتصل بنا',
+    html: `
+      <h3>رسالة من: ${name}</h3>
+      <p><strong>البريد:</strong> ${email}</p>
+      <p><strong>الرسالة:</strong></p>
+      <p>${message}</p>
+      <hr>
+      <p>مرسلة عبر منصة تيليسكوب</p>
+    `,
+    text: `رسالة من ${name} (${email}): ${message}`
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'successful sending'
   });
 });

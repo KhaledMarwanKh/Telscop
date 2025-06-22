@@ -1,0 +1,552 @@
+[
+  {
+    "name": "أحمد درويش",
+    "email": "ahmad.darwish@example.com",
+    "gender": "ذكر",
+    "subject": "الرياضيات",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في الرياضيات"
+    ],
+    "about": "مدرّس رياضيات بخبرة واسعة في تبسيط المفاهيم لطلاب المرحلة الثانوية.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.714,
+        34.730999999999995
+      ]
+    },
+    "image": "image1.jpg",
+    "idImage": "id1.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 5,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123461",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 11",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 11400
+  },
+  {
+    "name": "ليلى الخطيب",
+    "email": "laila.khatib@example.com",
+    "gender": "أنثى",
+    "subject": "اللغة الإنجليزية",
+    "degree": "ماجستير",
+    "certificates": [
+      "ماجستير في تعليم اللغة الإنجليزية"
+    ],
+    "about": "أستاذة لغة إنجليزية بخبرة طويلة في التحضير للامتحانات الدولية.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.715,
+        34.732
+      ]
+    },
+    "image": "image2.jpg",
+    "idImage": "id2.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 6,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123462",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 12",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 11800
+  },
+  {
+    "name": "يوسف الحسين",
+    "email": "youssef.hussein@example.com",
+    "gender": "ذكر",
+    "subject": "الفيزياء",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في الفيزياء"
+    ],
+    "about": "أستاذ فيزياء يتميز بشرح سهل وتجارب عملية مبسطة.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.716,
+        34.733
+      ]
+    },
+    "image": "image3.jpg",
+    "idImage": "id3.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 7,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123463",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 13",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 12200
+  },
+  {
+    "name": "رنا صالح",
+    "email": "rana.salah@example.com",
+    "gender": "أنثى",
+    "subject": "الكيمياء",
+    "degree": "ماجستير",
+    "certificates": [
+      "ماجستير في الكيمياء العضوية"
+    ],
+    "about": "مدرّسة كيمياء تركز على ربط المادة بالحياة اليومية.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.717,
+        34.733999999999995
+      ]
+    },
+    "image": "image4.jpg",
+    "idImage": "id4.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 8,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123464",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 14",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 12600
+  },
+  {
+    "name": "عمر العلي",
+    "email": "omar.ali@example.com",
+    "gender": "ذكر",
+    "subject": "التاريخ",
+    "degree": "دكتوراه",
+    "certificates": [
+      "دكتوراه في التاريخ الإسلامي"
+    ],
+    "about": "أستاذ تاريخ بخبرة طويلة في تدريس المرحلة الثانوية والجامعية.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.718,
+        34.735
+      ]
+    },
+    "image": "image5.jpg",
+    "idImage": "id5.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 9,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123465",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 15",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 13000
+  },
+  {
+    "name": "سارة المصري",
+    "email": "sara.masri@example.com",
+    "gender": "أنثى",
+    "subject": "الأحياء",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في العلوم البيولوجية"
+    ],
+    "about": "مدرّسة أحياء تهتم بالتطبيق العملي والتشريح المبسط.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.719,
+        34.736
+      ]
+    },
+    "image": "image6.jpg",
+    "idImage": "id6.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 10,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123466",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 16",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 13400
+  },
+  {
+    "name": "فادي ناصر",
+    "email": "fadi.naser@example.com",
+    "gender": "ذكر",
+    "subject": "اللغة الفرنسية",
+    "degree": "ماجستير",
+    "certificates": [
+      "ماجستير في اللغة الفرنسية"
+    ],
+    "about": "مدرّس فرنسيّة يحب التفاعل مع الطلاب عبر المحادثة.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.72,
+        34.736999999999995
+      ]
+    },
+    "image": "image7.jpg",
+    "idImage": "id7.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 11,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123467",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 17",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 13800
+  },
+  {
+    "name": "مها زيدان",
+    "email": "maha.zidan@example.com",
+    "gender": "أنثى",
+    "subject": "اللغة العربية",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في الأدب العربي"
+    ],
+    "about": "خبيرة في اللغة العربية وشرح القواعد بطريقة مبسطة وسلسة.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.721000000000004,
+        34.738
+      ]
+    },
+    "image": "image8.jpg",
+    "idImage": "id8.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 12,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123468",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 18",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 14200
+  },
+  {
+    "name": "رامي كمال",
+    "email": "rami.kamal@example.com",
+    "gender": "ذكر",
+    "subject": "المعلوماتية",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في هندسة الحاسوب"
+    ],
+    "about": "أستاذ معلوماتية يدرّس البرمجة والتطبيقات التكنولوجية الحديثة.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.722,
+        34.739
+      ]
+    },
+    "image": "image9.jpg",
+    "idImage": "id9.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 13,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123469",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 19",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 14600
+  },
+  {
+    "name": "هبة مرعي",
+    "email": "hiba.marai@example.com",
+    "gender": "أنثى",
+    "subject": "الجغرافيا",
+    "degree": "إجازة جامعية",
+    "certificates": [
+      "إجازة في الجغرافيا"
+    ],
+    "about": "مدرّسة جغرافيا تهتم بالخرائط والتفاعل مع الطلاب بالوسائل البصرية.",
+    "password": "Test@1234",
+    "passwordConfirm": "Test@1234",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        36.723,
+        34.739999999999995
+      ]
+    },
+    "image": "image10.jpg",
+    "idImage": "id10.jpg",
+    "Class": [
+      10,
+      11
+    ],
+    "experience": 14,
+    "available": true,
+    "activate": true,
+    "automaticAccept": false,
+    "checkAdmin": false,
+    "phone": "0932123470",
+    "address": {
+      "city": "حمص",
+      "street": "شارع 20",
+      "region": "الإنشاءات"
+    },
+    "slots_booked": {},
+    "availableTimes": [
+      {
+        "day": "monday",
+        "slots": [
+          "10:00",
+          "11:00"
+        ]
+      },
+      {
+        "day": "wednesday",
+        "slots": [
+          "12:00",
+          "13:00"
+        ]
+      }
+    ],
+    "price": 15000
+  }
+]

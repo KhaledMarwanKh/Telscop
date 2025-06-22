@@ -192,7 +192,7 @@ exports.statsByDateRange = catchasync(async (req, res, next) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
 
-   const features = new apiFeatures(await appointmentModel.find({
+   const features = new apiFeatures( appointmentModel.find({
     slotDate: { $gte: start, $lte: end }
   }),req.query)
       .filter()
@@ -210,8 +210,6 @@ exports.statsByDateRange = catchasync(async (req, res, next) => {
     return sum;
   }, 0);
   
-  
-
   res.status(200).json({
     success: true,
     data: {
@@ -223,34 +221,45 @@ exports.statsByDateRange = catchasync(async (req, res, next) => {
 });
 //-----------------------------------
 //API to get completed appointments
-exports.adminCompletedAppointments=catchasync(async(req,res,next)=>{
+exports.adminCompletedAppointments = catchasync(async (req, res, next) => {
+  const appointments = await appointmentModel
+    .find({ isCompleted: true })
+    .populate('userId','-image')
+    .populate('teacherId');
 
-  const appointments = await appointmentModel.find({isCompleted:true})
   res.status(200).json({
-    success:true,
-    data:appointments
-  })
-})
-//-----------------------------
-//API to get cancelled appointments
-exports.adminCancelledAppointments=catchasync(async(req,res,next)=>{
+    success: true,
+    data: appointments
+  });
+});
 
-  const appointments = await appointmentModel.find({cancelled:true})
-  res.status(200).json({
-    success:true,
-    data:appointments
-  })
-})
-//------------------------------
-//API to get current appointments
-exports.adminCurrentAppointments=catchasync(async(req,res,next)=>{
+// API to get cancelled appointments
+exports.adminCancelledAppointments = catchasync(async (req, res, next) => {
+  const appointments = await appointmentModel
+    .find({ cancelled: true })
+    .populate('userId','-image')
+    .populate('teacherId');
 
-  const appointments = await appointmentModel.find({isCompleted:false,cancelled:false})
   res.status(200).json({
-    success:true,
-    data:appointments
-  })
-})
+    success: true,
+    data: appointments
+  });
+});
+
+// API to get current (ongoing) appointments
+exports.adminCurrentAppointments = catchasync(async (req, res, next) => {
+  const appointments = await appointmentModel
+    .find({ isCompleted: false, cancelled: false })
+    .populate('userId','-image')
+    .populate('teacherId');
+
+  res.status(200).json({
+    success: true,
+    result:appointments.length,
+    data: appointments
+  });
+});
+
 //------------------------
 exports.adminAppointments = catchasync(async (req, res, next) => {
   const query = appointmentModel.find({ cancelled: false })
@@ -380,6 +389,7 @@ await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
 const {teacherId,slotDate,slotTime}=appointmentData
 const teacherData= await teacherModel.findById(teacherId)
 let slots_booked=teacherData.slots_booked
+console.log(teacherData)
 slots_booked[slotDate]= slots_booked[slotDate].filter(e=> e!==slotTime)
 
 await teacherModel.findByIdAndUpdate(teacherId,{slots_booked})

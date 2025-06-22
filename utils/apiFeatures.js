@@ -10,13 +10,15 @@ class apiFeatures {
     const queryobj = {...this.querystring};
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete queryobj[el]);
-    //1B advansed filltring query
+  
     let queryStr = JSON.stringify(queryobj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     const queryjson = JSON.parse(queryStr);
-  this.query= this.query.find(queryjson)
+  
+    this.query = this.query.find(queryjson);  // ← فقط this.query
     return this;
   }
+  
 
   sorting() {
     if (this.querystring.sort) {

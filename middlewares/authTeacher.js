@@ -40,7 +40,8 @@ exports.authteacher = catchasync(async (req, res, next) => {
       new appError("user recently changee password!! please log in again", 401),
     );
   }
-  req.body.teacherId =decode.id;
+  req.user = { id: decode.id }; // 👈 هذا هو المعيار في JWT-based auth
+
   //Grant acces to protcted route
 
   next();

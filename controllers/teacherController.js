@@ -11,7 +11,17 @@ const sendEmail = require("../utils/email");
 const validator = require("validator");
 const { json } = require("stream/consumers");
 const path = require("path");
-
+function parseIfString(data) {
+  if (typeof data === "string") {
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.warn("فشل التحويل إلى JSON:", data);
+      return data;
+    }
+  }
+  return data;
+}
 
 const uploadAndDelete = async (file) => {
   const filePath = path.resolve(file.path);
@@ -47,7 +57,7 @@ const generatetoken = (id) =>
   });
 
 exports.changeAvailablity = catchasync(async (req, res, next) => {
-  const { id } = req.body;
+  const  id  = req.user?.id;
 
   const teaData = await teacherModel.findById(id);
   await teacherModel.findByIdAndUpdate(id, { available: !teaData.available });
@@ -91,14 +101,32 @@ exports.signup_teacher = catchasync(async (req, res, next) => {
     availableTimes,
     location,
     phone,
-    Class
+    Class,
+    birthDate
   } = req.body;
-  location =JSON.parse(location)
-address =JSON.parse(address)
-Class=JSON.parse(Class)
-console.log(availableTimes)
 
-availableTimes=JSON.parse(availableTimes)
+  location =parseIfString(location)
+address =parseIfString(address)
+Class=parseIfString(Class)
+availableTimes=parseIfString(availableTimes)
+console.log({
+  name,
+  email,
+  password,
+  passwordConfirm,
+  degree,
+  about,
+  experience,
+  gender,
+  address,
+  subject,
+  price,
+  location,
+  phone,
+  Class,
+  birthDate,
+  availableTimes
+})
   if (
     !name ||
     !email ||
@@ -113,7 +141,9 @@ availableTimes=JSON.parse(availableTimes)
     !price||
     !location||
     !phone||
-    !Class
+    !Class||
+    !birthDate||
+    !availableTimes
   ) {
     return next(new appError("Missing details", 400));
   }
@@ -154,7 +184,8 @@ availableTimes=JSON.parse(availableTimes)
     certificates: certificateUrls,
     phone:phone,
     location:location,
-    Class:Class
+    Class:Class,
+    birthDate:birthDate
   };
 
 
@@ -196,7 +227,7 @@ exports.login_teacher = catchasync(async (req, res, next) => {
 });
 // API FOR GET TEACHER APPOINTMENTS
 exports.appointmentsTeacher = catchasync(async (req, res, next) => {
-  const { teacherId } = req.body;
+  const teacherId = req.user?.id;
   const appointments = await appointmentModel
     .find({ teacherId })
     .populate("userId", "name Class subject price comment");
@@ -209,8 +240,8 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
 
 // api to mark appointment complete
 exports.appointmentComplete = catchasync(async (req, res, next) => {
-  const { teacherId, appointmentId } = req.body;
-
+  const { appointmentId } = req.body;
+const teacherId =req.user?.id
   const appointmentData = await appointmentModel.findById(appointmentId);
   if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
     return res.status(400).json({
@@ -243,7 +274,8 @@ exports.appointmentComplete = catchasync(async (req, res, next) => {
 // api to canclled appointment
 
 exports.appointmentCancelled = catchasync(async (req, res, next) => {
-  const { teacherId, appointmentId } = req.body;
+  const { appointmentId } = req.body;
+  const teacherId =req.user?.id
 
   const appointmentData = await appointmentModel.findById(appointmentId);
   if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
@@ -295,7 +327,7 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
 
 // api to dashboard for teacher
 exports.teacherDashboard = catchasync(async (req, res, next) => {
-  const { teacherId } = req.body;
+  const teacherId =req.user?.id
 
   const appointments = await appointmentModel
     .find({ teacherId })
@@ -327,7 +359,7 @@ exports.teacherDashboard = catchasync(async (req, res, next) => {
 
 // api to get teacher profile
 exports.teacherProfile = catchasync(async (req, res, next) => {
-  const { teacherId } = req.body;
+  const teacherId =req.user?.id
   const profileData = await teacherModel
     .findById(teacherId)
     .select("-password");
@@ -338,8 +370,8 @@ exports.teacherProfile = catchasync(async (req, res, next) => {
 });
 // api for update profileData
 exports.updateTeacherProfile = catchasync(async (req, res, next) => {
+  const teacherId =req.user?.id
   let {
-    teacherId,
     address,
     availableTimes,
     Class,
@@ -350,11 +382,13 @@ exports.updateTeacherProfile = catchasync(async (req, res, next) => {
     birthDate,
     location
   } = req.body;
-
   try {
-    availableTimes = availableTimes ? JSON.parse(availableTimes) : [];
-    address = address ? JSON.parse(address) : {};
-    location = location ? JSON.parse(location) : {};
+    location =parseIfString(location)
+address =parseIfString(address)
+Class=parseIfString(Class)
+availableTimes=parseIfString(availableTimes)
+console.log(Class)
+
   } catch (err) {
     return next(new appError("Invalid JSON format in address, location, or availableTimes", 400));
   }
@@ -396,6 +430,7 @@ if (experience) updateObj.experience = experience;
     const allCertificates = [...(teacher.certificates || []), ...uploadedUrls];
     updateObj.certificates = allCertificates;
   }
+  
 
   const t=await teacherModel.findByIdAndUpdate(teacherId, updateObj, { new: true });
 

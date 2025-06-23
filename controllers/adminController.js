@@ -124,10 +124,18 @@ exports.teacherByClass =catchasync(async(req,res,next)=>{
 //-----------------------------
 
 exports.getNewTeachers=catchasync(async(req,res,next)=>{
-  const teacher =await teacherModel.find({activate:false,checkAdmin:false})
+  const query = teacherModel.find({activate:false,checkAdmin:false})
+  const features = new apiFeatures(query, req.query)
+  .filter()
+  .sorting()
+  .limitField()
+  .pagination();
+
+const teachers = await features.query;
+
 res.status(200).json({
   success:true,
-  data:teacher
+  data:teachers
 })
 })
 //------------------------------------------
@@ -281,7 +289,7 @@ exports.adminAppointments = catchasync(async (req, res, next) => {
       path: 'teacherId',
       select: 'name subject '
     });
-
+//---------------------------------------------
   const features = new apiFeatures(query, req.query)
     .filter()
     .sorting()

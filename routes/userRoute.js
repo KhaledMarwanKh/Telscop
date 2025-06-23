@@ -19,5 +19,5 @@ router.post('/get-nearest-teacher',authUser.authUser,userController.getNearestTe
 router.post('/forget-password',authUser.forgetPassword)
 router.patch('/resetPassword',authUser.resetPassword)
 router.post('/connect',userController.connectWithUs);
-
+router.post('/update-appointment',authUser,userController.updateAppointment)
 module.exports =router

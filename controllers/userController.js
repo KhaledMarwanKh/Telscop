@@ -150,7 +150,8 @@ exports.appointment = catchasync(async (req, res, next) => {
     teacherId,
     price: teacherData.price,
     slotDate: new Date(slotDate),
-    slotTime
+    slotTime,
+    subject:teacherData.subject
   };
 
   await appointmentModel.create(appointmentData);

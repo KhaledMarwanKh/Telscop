@@ -32,6 +32,10 @@ const appointmentSchema =new mongoose.Schema({
   isCompleted:{
     type:Boolean,
     default:false
+  },
+  subject:{
+    type :String,
+    required:true
   }
 },
 {timestamps:true}

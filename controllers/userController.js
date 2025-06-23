@@ -245,30 +245,34 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
   // تحديث الأستاذ بالموعد الجديد
   await teacherModel.findByIdAndUpdate(teacherData._id, { slots_booked }, { new: true });
 
-  res.status(200).json({
-    success: true,
-    message: "Appointment updated successfully",
-    appointment
-  });
+const studentInfo = await studentModel.findById(userId).select("name email");
+if (!studentInfo) {
+  return next(new AppError("Student not found", 404));
+}
 
-  await sendEmail.sendEmail2({
-    email: teacherInfo.email, // ← تأكد أن الحقل موجود في سكيمتك
-    subject: "📚 تم حجز درس جديد",
-    html: `
-      <p>مرحبًا ${teacherInfo.name}،</p>
-      <p>لقد قام الطالب <strong>${studentInfo.name}</strong> بتعديل موعد درس لديك.</p>
-      <ul>
-        <li><strong>التاريخ:</strong> ${newSlotDate}</li>
-        <li><strong>الوقت:</strong> ${newSlotTime}</li>
-        <li><strong>السعر:</strong> ${teacherData.price} ل.س</li>
-      </ul>
-      <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
-      <hr>
-      <p>منصة تيليسكوب للخدمات التعليمية</p>
-    `,
-    text: `تم تعديل موعد درس  من الطالب ${studentInfo.name} بتاريخ ${newSlotDate}، الساعة ${newSlotTime}. السعر: ${teacherData.price} ل.س.`
-  });
-  
+await sendEmail.sendEmail2({
+  email: teacherData.email,
+  subject: "📚 تم حجز درس جديد",
+  html: `
+    <p>مرحبًا ${teacherData.name}،</p>
+    <p>لقد قام الطالب <strong>${studentInfo.name}</strong> بتعديل موعد درس لديك.</p>
+    <ul>
+      <li><strong>التاريخ:</strong> ${newSlotDate}</li>
+      <li><strong>الوقت:</strong> ${newSlotTime}</li>
+      <li><strong>السعر:</strong> ${teacherData.price} ل.س</li>
+    </ul>
+    <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
+    <hr>
+    <p>منصة تيليسكوب للخدمات التعليمية</p>
+  `,
+  text: `تم تعديل موعد درس من الطالب ${studentInfo.name} بتاريخ ${newSlotDate}، الساعة ${newSlotTime}. السعر: ${teacherData.price} ل.س.`
+});
+
+res.status(200).json({
+  success: true,
+  message: "Appointment updated successfully",
+  appointment
+});
 
 });
 

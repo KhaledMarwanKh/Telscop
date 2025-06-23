@@ -280,7 +280,15 @@ exports.adminCurrentAppointments = catchasync(async (req, res, next) => {
 
 //------------------------
 exports.adminAppointments = catchasync(async (req, res, next) => {
-  const query = appointmentModel.find({ cancelled: false })
+const  {cancell,complete} =req.body
+let flt={}
+if(cancell){
+flt.cancelled=cancell
+}
+if(complete){
+  flt.isCompleted=complete
+}
+  const query = appointmentModel.find({ flt })
     .populate({
       path: 'userId',
       select: 'name Class'
@@ -417,23 +425,69 @@ res.status(200).json({
   message:"Appoinrment cancelled"
 })
 })
+exports.activateOrNotActivteTeacher=catchasync(async(req,res,next)=>{
+  const teacherId =req.user?.id
+  const state =req.body.state
+  const teacher =await teacherModel.findByIdAndUpdate(teacherId,{activate:state})
+  if(!teacher){
+    return next(new appError("teacher not found",404))
+  }
+  res.status(200).json({
+    success:true,
+    message: `Teacher has been ${state ? "activated" : "deactivated"}`
+  })
+})
 
-// exports.adminDashboard=catchasync(async(req,res,next)=>{
 
-// const teachers = await teacherModel.find({})
-// const users =await userModel.find({})
-// const appointments =await appointmentModel.find({})
-// const dash_data ={
-//   teachers :teachers.length,
-//   appointments:appointments.length,
-//   students :users.length,
-//   latest_appointments: appointments.slice(-5).reverse()
-// }
-// res.status(200).json({
-//   success:true,
-//   data:dash_data
-// })
+exports.getMonthlyCounts = catchasync(async (req, res, next) => {
+  // تابع لتحويل الرقم لاسم شهر
+  const getMonthName = (monthNumber) =>
+    new Date(2000, monthNumber - 1).toLocaleString('default', { month: 'long' });
 
-// })
+  // جلب الاحصائيات حسب من اي مودل جاية 
+  const aggregateByMonth = async (model) => {
+    const result = await model.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
 
-// api to get number students for each class
+    const data = {};
+    result.forEach(item => {
+      data[getMonthName(item._id)] = item.count;
+    });
+
+    return data;
+  };
+
+  // احصل على عدد كل كيان حسب الشهر
+  const [teachers, students, lessons] = await Promise.all([
+    aggregateByMonth(teacherModel),
+    aggregateByMonth(userModel),
+    aggregateByMonth(appointmentModel)
+  ]);
+
+  // دمج البيانات الشهرية في نتيجة واحدة
+  const allMonths = new Set([
+    ...Object.keys(teachers),
+    ...Object.keys(students),
+    ...Object.keys(lessons)
+  ]);
+
+  const result = {};
+  allMonths.forEach(month => {
+    result[month] = {
+      teachers: teachers[month] || 0,
+      students: students[month] || 0,
+      lessons: lessons[month] || 0
+    };
+  });
+
+  res.status(200).json({
+    success: true,
+    data: result
+  });
+});

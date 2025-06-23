@@ -80,10 +80,6 @@ const teacherSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
-  automaticAccept:{
-    type:Boolean,
-    default:false
-  },
   checkAdmin:{
     type:Boolean,
     default:false
@@ -95,6 +91,10 @@ const teacherSchema = new mongoose.Schema({
   phone:{
 type:String,
 required:true
+  },
+  birthDate:{
+    type:Date,
+    required:true
   },
   address: {
     city: { type: String, required: true },
@@ -130,7 +130,7 @@ required:true
 }, {
   timestamps: true // ← to add createdAt و updatedAt
 });
-teacherSchema.index({ location: '2dsphere' });
+teacherSchema.index({location: '2dsphere' });
 
 teacherSchema.methods.changedPasswordAfter = function (jwttimetamp) {
   if (this.passwordChangedAt) {

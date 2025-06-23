@@ -50,6 +50,7 @@ const sendEmail2 = async (options) => {
     };
 
     await transporter.sendMail(mailOptions);
+    console.log(options)
   } catch (err) {
     return next(new appError(`error in send message to email ${err}`,500))
   }

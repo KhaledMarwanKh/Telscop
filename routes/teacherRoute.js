@@ -5,7 +5,7 @@ const authTeacher = require("../middlewares/authTeacher");
 const upload =require('../middlewares/multer')
 
 const teacherFiles = upload.fields([
-  { name: 'profileImage', maxCount: 1 },
+  { name: 'image', maxCount: 1 },
   { name: 'idImage', maxCount: 1 },
   { name: 'certificates', maxCount: 5 }
 ]);
@@ -19,7 +19,7 @@ router.post('/logout',authTeacher.authteacher,teacherController.logout)
 router.get("/list-teachers", teacherController.listTeachers);
 router.post("/login-teacher", teacherController.login_teacher);
 router.post("/signup-teacher", teacherFiles,teacherController.signup_teacher);
-router.post(
+router.get(
   "/appointments",
   authTeacher.authteacher,
   teacherController.appointmentsTeacher
@@ -47,6 +47,10 @@ router.get(
 router.post(
   "/update-profile",
   authTeacher.authteacher,
+  upload.fields([
+    { name: "image", maxCount: 1 },   // صورة شخصية واحدة
+    { name: "certificates", maxCount: 5 },    // حتى 5 شهادات
+  ]),
   teacherController.updateTeacherProfile
 );
 

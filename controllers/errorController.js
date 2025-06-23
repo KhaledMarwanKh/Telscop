@@ -30,7 +30,7 @@ module.exports = (err, req, res, next) => {
   err.status = err.status || "error";
 
   if (process.env.NODE_ENV === "development") {
-    res.status(err.statusCode).json({
+    return res.status(err.statusCode).json({
       status: err.status,
       error: err,
       message: err.message,
@@ -50,12 +50,13 @@ module.exports = (err, req, res, next) => {
     if (error.name === "TokenExpiredError") error = handleJWTExpiredError();
 
     if (error.isOperational) {
-      res.status(error.statusCode).json({
+      return res.status(error.statusCode).json({
         status: error.status,
         message: error.message,
       });
     } else {
-      res.status(500).json({
+      // Unexpected error
+      return res.status(500).json({
         status: "error",
         message: "Something went very wrong!",
       });

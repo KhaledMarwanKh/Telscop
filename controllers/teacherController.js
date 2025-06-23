@@ -5,10 +5,24 @@ const jwt = require("jsonwebtoken");
 const appointmentModel = require("../models/appointmentModel");
 const apiFeatures = require("./../utils/apiFeatures");
 const cloudinary = require("cloudinary").v2;
-const fs = require('fs');
+const fs = require("fs");
 const { findByIdAndUpdate } = require("../models/userModel");
-const sendEmail =require('../utils/email')
+const sendEmail = require("../utils/email");
+const validator = require("validator");
+const { json } = require("stream/consumers");
+const path = require("path");
 
+
+const uploadAndDelete = async (file) => {
+  const filePath = path.resolve(file.path);
+
+  const result = await cloudinary.uploader.upload(filePath, {
+    resource_type: "auto",
+  });
+
+  fs.unlinkSync(filePath); // حذف الملف بعد رفعه
+  return result.secure_url;
+};
 const createSendToken = (nuser, statusCode, res) => {
   const token = generatetoken(nuser);
   const cookieOption = {
@@ -62,19 +76,48 @@ exports.listTeachers = catchasync(async (req, res, next) => {
 //api for teacher signup
 
 exports.signup_teacher = catchasync(async (req, res, next) => {
-  const {
-    name, email, password, passwordConfirm,
-    degree, about, experience, gender, address,
-    subject, price, availableTimes
+  let {
+    name,
+    email,
+    password,
+    passwordConfirm,
+    degree,
+    about,
+    experience,
+    gender,
+    address,
+    subject,
+    price,
+    availableTimes,
+    location,
+    phone,
+    Class
   } = req.body;
+  location =JSON.parse(location)
+address =JSON.parse(address)
+Class=JSON.parse(Class)
+console.log(availableTimes)
 
-  if (!name || !email || !password || !passwordConfirm || !degree || !about || !experience || !gender || !address || !subject || !price) {
+availableTimes=JSON.parse(availableTimes)
+  if (
+    !name ||
+    !email ||
+    !password ||
+    !passwordConfirm ||
+    !degree ||
+    !about ||
+    !experience ||
+    !gender ||
+    !address ||
+    !subject ||
+    !price||
+    !location||
+    !phone||
+    !Class
+  ) {
     return next(new appError("Missing details", 400));
   }
 
-  if (!validator.isEmail(email)) {
-    return next(new appError("Invalid email!", 400));
-  }
 
   if (password.length < 8) {
     return next(new appError("Password must be at least 8 characters", 400));
@@ -83,21 +126,13 @@ exports.signup_teacher = catchasync(async (req, res, next) => {
   const existing = await teacherModel.findOne({ email });
   if (existing) return next(new appError("Email already registered", 400));
 
-  const uploadAndDelete = async (file) => {
-    const result = await cloudinary.uploader.upload(file.path, {
-      resource_type: "auto"
-    });
-    fs.unlinkSync(file.path); // حذف الملف
-    return result.secure_url;
-  };
-
   // رفع الصور
-  const profileImage = req.files?.profileImage?.[0];
+  const profileImage = req.files?.image?.[0];
   const idImage = req.files?.idImage?.[0];
   const certificates = req.files?.certificates || [];
 
-  const imageUrl = profileImage ? await uploadAndDelete(profileImage) : '';
-  const idUrl = idImage ? await uploadAndDelete(idImage) : '';
+  const imageUrl = profileImage ? await uploadAndDelete(profileImage) : "";
+  const idUrl = idImage ? await uploadAndDelete(idImage) : "";
   const certificateUrls = await Promise.all(certificates.map(uploadAndDelete));
 
   // بناء بيانات المدرّس
@@ -113,26 +148,31 @@ exports.signup_teacher = catchasync(async (req, res, next) => {
     address,
     subject,
     price: Number(price),
-    availableTimes: JSON.parse(availableTimes || "[]"),
+    availableTimes: availableTimes,
     image: imageUrl,
     idImage: idUrl,
     certificates: certificateUrls,
-    date: Date.now(),
+    phone:phone,
+    location:location,
+    Class:Class
   };
 
-  const teacher = await teacherModel.create(teacherData);
-  createSendToken(teacher, 201, res);
-});
 
-exports.logout = (req, res,next) => {
-  res.cookie('jwt', 'loggedout', {
+  const teacher = await teacherModel.create(teacherData);
+  res.status(200).json({
+    success: true,
+    message: "waiting for accept your acount by admin",
+  });});
+
+exports.logout = (req, res, next) => {
+  res.cookie("jwt", "loggedout", {
     httpOnly: true,
-    expires: new Date(Date.now() + 10 * 1000)
+    expires: new Date(Date.now() + 10 * 1000),
   });
 
   res.status(200).json({
-    status: 'success',
-    message: 'logout successfly'
+    status: "success",
+    message: "logout successfly",
   });
 };
 // api for teacher login
@@ -142,10 +182,12 @@ exports.login_teacher = catchasync(async (req, res, next) => {
   if (!teacher) {
     return next(new appError("invalid credentials", 404));
   }
-  if (!teacher.isActive) {
-    return res.status(403).send('Your account is not activated yet.');
+  if (!teacher.activate) {
+    return res.status(403).json({success:false,
+      message:"Your account is not activated yet."
+  });
   }
-  const correct = await teacher.correctpassword(password);
+  const correct = await teacher.correctPassword(password);
   if (correct) {
     createSendToken(teacher, 201, res);
   } else {
@@ -155,7 +197,9 @@ exports.login_teacher = catchasync(async (req, res, next) => {
 // API FOR GET TEACHER APPOINTMENTS
 exports.appointmentsTeacher = catchasync(async (req, res, next) => {
   const { teacherId } = req.body;
-  const appointments = await appointmentModel.find({ teacherId}).populate('userId', 'name Class subject price comment');
+  const appointments = await appointmentModel
+    .find({ teacherId })
+    .populate("userId", "name Class subject price comment");
 
   res.status(200).json({
     success: true,
@@ -196,7 +240,7 @@ exports.appointmentComplete = catchasync(async (req, res, next) => {
     message: "Appointment marked as completed and slot released.",
   });
 });
-// api to canclled appointment 
+// api to canclled appointment
 
 exports.appointmentCancelled = catchasync(async (req, res, next) => {
   const { teacherId, appointmentId } = req.body;
@@ -228,7 +272,6 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Appointment cancelled and slot released.",
-    
   });
   const student = await userModel.findById(appointmentData.userId);
 
@@ -246,16 +289,17 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
       <hr>
       <p>منصة تيليسكوب للخدمات التعليمية</p>
     `,
-    text: `تم إلغاء موعد درسك مع الأستاذ ${teacher.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`
+    text: `تم إلغاء موعد درسك مع الأستاذ ${teacher.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`,
   });
-  
 });
 
 // api to dashboard for teacher
 exports.teacherDashboard = catchasync(async (req, res, next) => {
   const { teacherId } = req.body;
 
-  const appointments = await appointmentModel.find({ teacherId }).sort({ createdAt: -1 });
+  const appointments = await appointmentModel
+    .find({ teacherId })
+    .sort({ createdAt: -1 });
 
   let earnings = 0;
   let completedLessons = 0;
@@ -277,7 +321,7 @@ exports.teacherDashboard = catchasync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    data: dashsdata
+    data: dashsdata,
   });
 });
 
@@ -294,19 +338,70 @@ exports.teacherProfile = catchasync(async (req, res, next) => {
 });
 // api for update profileData
 exports.updateTeacherProfile = catchasync(async (req, res, next) => {
-  const { teacherId, address, subject,availableTimes,Class,about,price,phone } = req.body;
-  const updateObj = {};
+  let {
+    teacherId,
+    address,
+    availableTimes,
+    Class,
+    about,
+    price,
+    phone,
+    experience,
+    birthDate,
+    location
+  } = req.body;
+
+  try {
+    availableTimes = availableTimes ? JSON.parse(availableTimes) : [];
+    address = address ? JSON.parse(address) : {};
+    location = location ? JSON.parse(location) : {};
+  } catch (err) {
+    return next(new appError("Invalid JSON format in address, location, or availableTimes", 400));
+  }
+  birthDate = birthDate ? new Date(birthDate) : undefined;
+    const updateObj = {};
   if (phone) updateObj.phone = phone;
   if (price) updateObj.price = price;
   if (address) updateObj.address = address;
-  if (subject) updateObj.subject = subject;
   if (availableTimes) updateObj.availableTimes = availableTimes;
   if (Class) updateObj.Class = Class;
   if (about) updateObj.about = about;
-  
-  await teacherModel.findByIdAndUpdate(teacherId, updateObj, { new: true }); 
-   res.status(200).json({
+  if (location) updateObj.location = location;
+if(birthDate) updateObj.birthDate =birthDate
+if (experience) updateObj.experience = experience;
+  // رفع الصورة الشخصية (واحدة فقط)
+  if (
+    req.files &&
+    req.files.image &&
+    req.files.image.length > 0
+  ) {
+
+    const profileImgFile = req.files.image[0];
+    console.log(req.files.image[0])
+    updateObj.image = await uploadAndDelete(profileImgFile);
+
+  }
+
+  // رفع شهادات متعددة مع الدمج مع اشلهادات القديمة
+  if (req.files && req.files.certificates && req.files.certificates.length > 0) {
+    const uploadPromises = req.files.certificates.map((file) =>
+      uploadAndDelete(file)
+    );
+    const uploadedUrls = await Promise.all(uploadPromises);
+
+    // جلب بيانات المعلم الحالية
+    const teacher = await teacherModel.findById(teacherId);
+
+    // دمج الشهادات القديمة مع الجديدة
+    const allCertificates = [...(teacher.certificates || []), ...uploadedUrls];
+    updateObj.certificates = allCertificates;
+  }
+
+  const t=await teacherModel.findByIdAndUpdate(teacherId, updateObj, { new: true });
+
+  res.status(200).json({
     success: true,
-    message: "profile updated",
+    message: "Profile updated",
+    data:t
   });
 });

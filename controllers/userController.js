@@ -274,7 +274,7 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
 // api to get user appointments for my appointment page
 exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
   const {userid}=req.body
-  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:false,isCompleted:false});
+  const list = await appointmentModel.find({ userId:userid,cancelled:false,isCompleted:false});
   res.status(200).json({
     success:true,
     data: list
@@ -286,7 +286,7 @@ exports.listCompletedAppointment = catchasync(async (req, res, next) => {
   const { userid } = req.body;
 
   const list = await appointmentModel.find({
-    userId: mongoose.Types.ObjectId(userid),
+    userId:userid,
     cancelled: false,
     isCompleted: true
   }).populate('teacherId', 'name subject image');
@@ -303,17 +303,18 @@ exports.listCompletedAppointment = catchasync(async (req, res, next) => {
 });
 exports.listcancelledAppointment =catchasync(async(req,res,next)=>{
   const {userid}=req.body
-  const list = await appointmentModel.find({ userId:  mongoose.Types.ObjectId(userid) ,cancelled:true,isCompleted:false });
+  const list = await appointmentModel.find({ userId:userid ,cancelled:true,isCompleted:false })
+  .populate('teacherId','name subject image');
   res.status(200).json({
     success:true,
     data: list
-}).populate('teacherId','name subject image')
+})
 
 })
 // api to cancle  appointment
 exports.cancleAppointment =catchasync(async(req,res,next)=>{
 const {userid,appointmentId} =req.body
-const appointmentData =  await appointmentModel.findById(appointmentId)
+const appointmentData =  await appointmentModel.findById(appointmentId).populate("teacherId",'email').populate("userId",name)
 if(appointmentData.userId!==userid){
   return next(new AppError("unauthorized action"))
 }
@@ -330,6 +331,25 @@ res.status(200).json({
   success:true,
   message:"Appoinrment cancelled"
 })
+
+
+  await sendEmail.sendEmail2({
+    email: appointmentData.teacherId?.email,
+    subject: "❌ تم إلغاء موعد الدرس",
+    html: `
+      <p>مرحبًا ${student.name}،</p>
+      <p>نأسف لإبلاغك بأن الطالب <strong>${appointmentData.userId?.name}</strong> قد قام بإلغاء حجز الدرس التالي:</p>
+      <ul>
+        <li><strong>التاريخ:</strong> ${appointmentData.slotDate.toDateString()}</li>
+        <li><strong>الوقت:</strong> ${appointmentData.slotTime}</li>
+      </ul>
+      <p>يرجى حجز موعد جديد في الوقت المناسب لك.</p>
+      <hr>
+      <p>منصة تيليسكوب للخدمات التعليمية</p>
+    `,
+    text: `تم إلغاء موعد درسك مع الطالب ${appointmentData.userId?.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`
+  });
+
 })
 // api to get teacher
 exports.getTeacher = catchasync(async (req, res, next) => {
@@ -364,13 +384,13 @@ exports.getAllTeachers = catchasync(async (req, res, next) => {
 });
 //api for get nearest teachers 
 exports.getNearestTeachersForStudent = catchasync(async (req, res, next) => {
-  const { studentId, maxDistanceKm  } = req.body;
-
+  const { userid, maxDistanceKm  } = req.body;
+  const studentId=userid
   const student = await userModel.findById(studentId);
   if (!student || !student.location || !student.location.coordinates) {
-    return next(new appError('Student location not found', 404));
+    return next(new AppError('Student location not found', 404));
   }
-
+console.log(student.location.coordinates,maxDistanceKm)
   const [lng, lat] = student.location.coordinates;
   const maxDistanceMeters = maxDistanceKm * 1000;
 

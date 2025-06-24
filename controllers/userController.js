@@ -469,11 +469,25 @@ console.log(student.location.coordinates,maxDistanceKm)
   });
 });
 exports.connectWithUs = catchasync(async (req, res, next) => {
-  const {role} = req.body;
-  if(!role){
+const {name,email,message,subject,phone}=req.body
+if(!name||!email||!message||!subject||!phone)
+{
+  return next(new AppError('messing detailes', 400));
 
+}
+let q ={}
+q.name=name
+q.email=email
+q.message=message
+q.subject=subject
+q.phone=phone
+
+const question= await questionModel.create(q);
+if(!question)
+  {
+    return next(new AppError('error in qeustion', 400));
+  
   }
-
   res.status(200).json({
     success: true,
     message: 'successful sending'

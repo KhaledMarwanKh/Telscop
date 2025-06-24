@@ -48,11 +48,15 @@ exports.logout = (req, res,next) => {
 exports.loginAdmin = catchasync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-    createSendToken(email, 201, res);
-  } else {
+  const admins =await userModel.find({email:email,role:"admin"})
+  if(!admins){
     return next(new appError("Invalid email or password", 400));
   }
+const correct=  admins.correctpassword(password,admins.password)
+if(!correct){
+  return next(new appError("Invalid email or password", 400));
+}
+    createSendToken(email, 201, res);
 });
 
 //---------------------------

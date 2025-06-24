@@ -1,4 +1,4 @@
-import { FiBookOpen, FiHome, FiLogOut } from 'react-icons/fi'
+import { FiHome, FiLogOut } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
@@ -11,10 +11,6 @@ const Header = () => {
                             <span className="text-2xl">🔭</span>
                             <span className="text-xl font-bold text-emerald-600">تلسكوب</span>
                         </Link>
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                            <FiBookOpen className="w-5 h-5 text-gray-500" />
-                            <span className="text-gray-700 font-medium">الملف الشخصي</span>
-                        </div>
                     </div>
 
                     <div className="flex items-center space-x-4 space-x-reverse">

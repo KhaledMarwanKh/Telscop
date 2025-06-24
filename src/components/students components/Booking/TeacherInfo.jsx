@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FiMapPin, FiPhone } from 'react-icons/fi'
 
 const TeacherInfo = ({ teacher }) => {
+    const [showMore, setShowMore] = useState(false);
+
     return (
         <div className="d border-b pb-8 mb-8 border py-3 px-4 rounded shadow-lg">
             <div className="flex items-start space-x-6 space-x-reverse">
@@ -39,16 +41,29 @@ const TeacherInfo = ({ teacher }) => {
                     </div>
                 </div>
             </div>
+            {
+                showMore && (
+                    <>
 
-            <div className="mt-6">
-                <h3 className="font-semibold text-gray-800 mb-2">الشهادة والمؤهلات</h3>
-                <p className="text-gray-600">{teacher.qualification}</p>
+                        <div className="mt-6">
+                            <h3 className="font-semibold text-gray-800 mb-2">الشهادة والمؤهلات</h3>
+                            <p className="text-gray-600">{teacher.qualification}</p>
+                        </div>
+
+                        <div className="mt-4">
+                            <h3 className="font-semibold text-gray-800 mb-2">نبذة عن المعلم</h3>
+                            <p className="text-gray-600">{teacher.bio}</p>
+                        </div>
+                    </>
+                )
+            }
+
+            <div className='mt-5 border-t-[2px] py-2 text-center text-gray-600 cursor-pointer' onClick={() => setShowMore(!showMore)}>
+                {
+                    showMore ? 'عرض اقل' : "عرض المزيد"
+                }
             </div>
 
-            <div className="mt-4">
-                <h3 className="font-semibold text-gray-800 mb-2">نبذة عن المعلم</h3>
-                <p className="text-gray-600">{teacher.bio}</p>
-            </div>
         </div>
     )
 }

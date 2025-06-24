@@ -22,14 +22,14 @@ const RenderTeacherStats = (
                     <h3 className="text-lg font-semibold text-gray-800">المعلمين النشطين</h3>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full">
+                    <table className="w-full text-center">
                         <thead className="bg-gray-50 border-b border-gray-200">
                             <tr>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الطلاب</th>
-                                <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الأرباح الإجمالية</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الطلاب</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الأرباح الإجمالية</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">

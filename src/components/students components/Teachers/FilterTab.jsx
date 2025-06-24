@@ -57,14 +57,14 @@ const FilterTab = ({
                 <div className="flex items-end">
                     <button
                         onClick={clearFilters}
-                        className="w-full border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="w-full h-[63px] border border-gray-300 text-gray-700  rounded-lg hover:bg-gray-50 transition-colors"
                     >
                         إلغاء الفلاتر
                     </button>
                 </div>
 
                 <div className="flex items-end">
-                    <div className="w-full bg-primary text-white px-6 py-3 rounded-lg text-center">
+                    <div className="w-full h-[63px] flex items-center justify-center bg-primary text-white px-6 py-3 rounded-lg text-center">
                         {filteredTeachers.length} معلم متاح
                     </div>
                 </div>

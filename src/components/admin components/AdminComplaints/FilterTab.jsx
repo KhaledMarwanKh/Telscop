@@ -1,11 +1,13 @@
-import { subjects } from "../../../data/adminMockData"
+import React from 'react'
 
-const FilterTab = ({
-    statusFilter,
-    setStatusFilter,
-    setSubjectFilter,
-    subjectFilter,
-}) => {
+const FilterTab = (
+    {
+        setStatusFilter,
+        setUserTypeFilter,
+        userTypeFilter,
+        statusFilter
+    }
+) => {
     return (
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
             <div className="flex items-center justify-between gap-4">
@@ -15,19 +17,20 @@ const FilterTab = ({
                     className="w-[40%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                     <option value="all">جميع الحالات</option>
-                    <option value="confirmed">مؤكد</option>
-                    <option value="completed">مكتمل</option>
-                    <option value="cancelled">ملغي</option>
+                    <option value="pending">في الانتظار</option>
+                    <option value="in_progress">قيد المراجعة</option>
+                    <option value="resolved">تم الحل</option>
                 </select>
 
                 <select
-                    value={subjectFilter}
-                    onChange={(e) => setSubjectFilter(e.target.value)}
+                    value={userTypeFilter}
+                    onChange={(e) => setUserTypeFilter(e.target.value)}
                     className="w-[40%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                    {subjects.map(subject => (
-                        <option key={subject.key} value={subject.key}>{subject.name}</option>
-                    ))}
+                    <option value="all">جميع المستخدمين</option>
+                    <option value="other">اخرون</option>
+                    <option value="student">طالب</option>
+                    <option value="teacher">معلم</option>
                 </select>
             </div>
         </div>

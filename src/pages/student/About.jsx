@@ -1,6 +1,15 @@
-import { FiTarget, FiHeart, FiUsers, FiAward } from 'react-icons/fi';
-import about_image from '../../data/images/about_image.jpg'
-
+import {
+  HiOutlineLightBulb,
+  HiOutlineClipboardCheck,
+  HiOutlineHeart,
+  HiOutlineUserGroup,
+  HiOutlineCalendar,
+  HiOutlineLocationMarker,
+  HiOutlineTrendingUp,
+  HiOutlineCash,
+  HiOutlineSupport
+} from 'react-icons/hi'; import about_image from '../../data/images/about_image.jpg'
+import { FiUsers } from 'react-icons/fi'
 const About = () => {
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -9,7 +18,7 @@ const About = () => {
           {
             backgroundImage: `url("${about_image}")`,
             backgroundSize: '100% 100%',
-            boxShadow: '600px 600px 10px 0 rgba(0,0,0,0.5) inset'
+            boxShadow: '600px 600px 10px 0 rgba(0,0,0,0.7) inset',
           }
         }>
           <h1 className="text-3xl text-center font-bold mb-8 text-white">من نحن</h1>
@@ -23,7 +32,7 @@ const About = () => {
           {/* Vision */}
           <div className="w-[95%] md:w-[30%] bg-primary bg-opacity-5 px-6 py-3 rounded-lg mb-8 hover:translate-y-[-20px] transition-all duration-500 cursor-pointer">
             <div className="flex items-center justify-center flex-col mb-2">
-              <FiTarget className="w-[50px] h-[50px] text-white mb-2" />
+              <HiOutlineLightBulb className="w-[50px] h-[50px] text-white mb-2" />
               <h2 className="text-2xl font-bold text-white">رؤيتنا</h2>
             </div>
             <p className="text-white text-justify leading-relaxed text-[1.3rem]">
@@ -35,7 +44,7 @@ const About = () => {
           {/* Mission */}
           <div className="w-[95%] md:w-[30%] bg-secondary bg-opacity-5 px-6 py-3 rounded-lg mb-8 hover:translate-y-[-20px] transition-all duration-500 cursor-pointer">
             <div className="flex items-center justify-center flex-col mb-2">
-              <FiHeart className="w-[50px] h-[50px] text-white mb-2" />
+              <HiOutlineHeart className="w-[50px] h-[50px] text-white mb-2" />
               <h2 className="text-2xl font-bold text-white">مهمتنا</h2>
             </div>
             <p className="text-white text-justify leading-relaxed text-[1.3rem]">
@@ -47,7 +56,7 @@ const About = () => {
           {/* Commitment */}
           <div className="w-[95%] md:w-[30%] bg-accent bg-opacity-5 px-6 py-3 rounded-lg mb-8 hover:translate-y-[-20px] transition-all duration-500 cursor-pointer">
             <div className="flex items-center justify-center flex-col mb-2">
-              <FiAward className="w-[50px] h-[50px] text-white mb-2" />
+              <HiOutlineClipboardCheck className="w-[50px] h-[50px] text-white mb-2" />
               <h2 className="text-2xl font-bold text-white">التزامنا</h2>
             </div>
             <p className="text-white text-justify leading-relaxed text-[1.3rem]">
@@ -59,35 +68,52 @@ const About = () => {
         </div>
       </div>
 
-      {/* What We Offer */}
       <div className="mb-8">
         <div className="flex items-center space-x-3 space-x-reverse mb-6">
           <FiUsers className="w-8 h-8 text-black" />
           <h2 className="text-2xl font-bold text-gray-800">ما نقدمه</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">🎓 معلمون مؤهلون</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineUserGroup className='w-5 h-5 a' />
+              معلمون مؤهلون
+            </h3>
             <p className="text-gray-600 text-sm">شبكة واسعة من المعلمين المؤهلين والمعتمدين</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">📅 نظام حجز مرن</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineCalendar className='w-5 h-5 a' />
+              نظام حجز مرن
+            </h3>
             <p className="text-gray-600 text-sm">نظام حجز سهل ومرن يناسب جميع الأوقات</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">🗺️ خريطة تفاعلية</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineLocationMarker className='w-5 h-5 a' />
+              خريطة تفاعلية
+            </h3>
             <p className="text-gray-600 text-sm">خريطة تفاعلية لإيجاد أقرب المعلمين</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">📊 متابعة التقدم</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineTrendingUp className='w-5 h-5 a' />
+              متابعة التقدم
+            </h3>
             <p className="text-gray-600 text-sm">متابعة دقيقة للتقدم الأكاديمي</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">💰 أسعار تنافسية</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineCash className='w-5 h-5 a' />
+              أسعار تنافسية
+            </h3>
             <p className="text-gray-600 text-sm">أسعار تنافسية وشفافة لجميع الخدمات</p>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="font-semibold text-gray-800 mb-2">🛠️ دعم فني</h3>
+          <div className="f bg-gray-50 p-4 rounded-lg hover:bg-white hover:shadow-lg cursor-pointer hover:scale-[1.05] transition-all duration-300">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 mb-2">
+              <HiOutlineSupport className='w-5 h-5 a' />
+              دعم فني
+            </h3>
             <p className="text-gray-600 text-sm">دعم فني متواصل لحل جميع المشاكل</p>
           </div>
         </div>

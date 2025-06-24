@@ -12,18 +12,18 @@ const BookingsTable = (
 ) => {
     return (
         <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-center">
                 <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة والصف</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">التاريخ والوقت</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المدة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">التكلفة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ الحجز</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة والصف</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">التاريخ والوقت</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المدة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">التكلفة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ الحجز</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -82,7 +82,7 @@ const BookingsTable = (
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                    <div className="flex items-center justify-center space-x-2 space-x-reverse">
                                         {(booking.status === 'confirmed') && (
                                             <button
                                                 onClick={() => handleCancelBooking(booking.id)}

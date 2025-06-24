@@ -1,25 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  FiUsers, FiCheck, FiX,
-  FiPhone, FiMail,
-  FiDownload, FiClock
+  FiUsers, FiClock
 } from 'react-icons/fi';
-import { adminProfile, pendingTeachers, subjects } from '../../data/adminMockData';
+import { pendingTeachers, subjects } from '../../data/adminMockData';
 import { toast } from 'react-toastify';
-import Header from '../../components/admin components/AdminPendingTeachers/Header';
 import StatisBar from '../../components/admin components/AdminPendingTeachers/StatisBar';
 import PendingTeachersTable from '../../components/admin components/AdminPendingTeachers/PendingTeachersTable';
 
 const AdminPendingTeachers = () => {
   const [subjectFilter, setSubjectFilter] = useState('all');
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [filteredTeachers, setFilteredTeachers] = useState([]);
-  const [admin, setAdmin] = useState({});
-
-  useEffect(() => {
-    setAdmin(adminProfile);
-  }, [])
 
   useEffect(() => {
     applyFilter();
@@ -67,12 +57,6 @@ const AdminPendingTeachers = () => {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <Header
-        admin={admin}
-        setIsProfileMenuOpen={setIsProfileMenuOpen}
-        isProfileMenuOpen={isProfileMenuOpen}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="mb-8">
@@ -98,20 +82,17 @@ const AdminPendingTeachers = () => {
         )}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">فلترة بالمادة</label>
-              <select
-                value={subjectFilter}
-                onChange={(e) => setSubjectFilter(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {subjects.map(subject => (
-                  <option key={subject.key} value={subject.key}>{subject.name}</option>
-                ))}
-              </select>
-            </div>
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+          <div className="flex items-center justify-center gap-4">
+            <select
+              value={subjectFilter}
+              onChange={(e) => setSubjectFilter(e.target.value)}
+              className="w-[50%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {subjects.map(subject => (
+                <option key={subject.key} value={subject.key}>{subject.name}</option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -119,7 +100,7 @@ const AdminPendingTeachers = () => {
           filteredTeachers={filteredTeachers}
         />
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-800">طلبات التدريس ({filteredTeachers.length})</h3>
           </div>

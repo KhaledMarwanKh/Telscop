@@ -45,12 +45,12 @@ const TeahcerBookingForm = ({
                         <span>اختر الوقت</span>
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                        {avialableTimeSolt.map((slot) => (
+                        {timeSlots.map((slot) => (
                             <button
                                 key={slot.value}
                                 type="button"
                                 onClick={() => handleTimeSelect(slot.value)}
-                                className={`p-3 border rounded-lg transition-colors ${selectedTime === slot.value
+                                className={`p-3 ${(!avialableTimeSolt.find(s => s.value === slot.value)) ? "bg-red-100 pointer-events-none" : ""} border rounded-lg transition-colors ${selectedTime === slot.value
                                     ? 'bg-primary text-white border-primary'
                                     : 'border-gray-300 hover:bg-primary hover:text-white'
                                     }`}

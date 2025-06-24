@@ -14,14 +14,13 @@ const TeacherSupport = () => {
     subject: '',
     category: '',
     message: '',
-    priority: 'normal'
   });
   const [expandedFaq, setExpandedFaq] = useState(null);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     toast.success('تم إرسال رسالتك بنجاح! سنرد عليك خلال 24 ساعة');
-    setContactForm({ subject: '', category: '', message: '', priority: 'normal' });
+    setContactForm({ subject: '', category: '', message: '' });
   };
 
   const handleInputChange = (e) => {
@@ -242,23 +241,6 @@ const TeacherSupport = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                مستوى الأولوية
-              </label>
-              <select
-                name="priority"
-                value={contactForm.priority}
-                onChange={handleInputChange}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-              >
-                <option value="low">منخفضة</option>
-                <option value="normal">عادية</option>
-                <option value="high">عالية</option>
-                <option value="urgent">عاجلة</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
                 الرسالة *
               </label>
               <textarea
@@ -426,10 +408,6 @@ const TeacherSupport = () => {
                 <span className="text-2xl">🔭</span>
                 <span className="text-xl font-bold text-emerald-600">تلسكوب</span>
               </Link>
-              <div className="flex items-center space-x-2 space-x-reverse">
-                <FiHelpCircle className="w-5 h-5 text-gray-500" />
-                <span className="text-gray-700 font-medium">المساعدة والدعم</span>
-              </div>
             </div>
 
             <div className="flex items-center space-x-4 space-x-reverse">

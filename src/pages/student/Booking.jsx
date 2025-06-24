@@ -27,16 +27,15 @@ const Booking = () => {
   }, [teacherId, navigate]);
 
   useEffect(() => {
-    if (!localStorage.getItem('booking_id')) {
-      const teacherBookingsTimes = mockBookings.filter(booking => parseInt(booking.teacherId) === parseInt(teacherId) && booking.status === 'upcoming')
-        .map(booking => booking.time);
+    const teacherBookingsTimes = mockBookings.filter(booking => parseInt(booking.teacherId) === parseInt(teacherId) && booking.status === 'upcoming')
+      .map(booking => booking.time);
 
-      const avialableTimeSolts = timeSlots.filter(time => !teacherBookingsTimes.includes(time.value))
+    const avialableTimeSolts = timeSlots.filter(time => !teacherBookingsTimes.includes(time.value));
 
-      setAvailableTimeSlot(avialableTimeSolts)
-    } else {
-      setAvailableTimeSlot(timeSlots);
-    }
+    setAvailableTimeSlot(avialableTimeSolts);
+
+    localStorage.clear();
+
   }, [teacherId])
 
   useEffect(() => {

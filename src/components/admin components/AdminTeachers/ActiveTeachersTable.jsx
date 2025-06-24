@@ -11,18 +11,18 @@ const ActiveTeachersTable = (
 ) => {
     return (
         <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-center">
                 <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الصفوف</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الطلاب</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الأرباح</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ الانضمام</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المعلم</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الصفوف</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الطلاب</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الأرباح</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ الانضمام</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

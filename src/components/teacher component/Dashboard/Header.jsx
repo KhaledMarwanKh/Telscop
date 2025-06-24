@@ -1,4 +1,4 @@
-import { FiBookOpen, FiChevronDown, FiEdit3, FiHelpCircle, FiHome, FiLogOut, FiUser } from 'react-icons/fi'
+import { FiChevronDown, FiEdit3, FiHelpCircle, FiHome, FiLogOut, FiUser } from 'react-icons/fi'
 import { Link, useNavigate } from 'react-router-dom'
 
 const Header = (
@@ -25,10 +25,6 @@ const Header = (
                             <span className="text-2xl">🔭</span>
                             <span className="text-xl font-bold text-emerald-600">تلسكوب</span>
                         </Link>
-                        <div className="flex items-center space-x-2 space-x-reverse">
-                            <FiBookOpen className="w-5 h-5 text-gray-500" />
-                            <span className="text-gray-700 font-medium">بوابة المعلمين</span>
-                        </div>
                     </div>
 
                     <div className="flex items-center space-x-4 space-x-reverse">

@@ -9,16 +9,16 @@ const StudentsTable = (
 ) => {
     return (
         <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-center">
                 <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الصف</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">ولي الأمر</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">العنوان</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ التسجيل</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الصف</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">ولي الأمر</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">العنوان</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">عدد الدروس</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">تاريخ التسجيل</th>
+                        <th className="text-center px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -59,7 +59,7 @@ const StudentsTable = (
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                    <div className="flex items-center justify-center gap-1 space-x-2 space-x-reverse">
                                         <a
                                             href={`tel:${student.phone}`}
                                             className="text-green-600 hover:text-green-800 p-1 rounded hover:bg-green-50"

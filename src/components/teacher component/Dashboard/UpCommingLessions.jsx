@@ -11,16 +11,16 @@ const UpCommingLessions = (
 ) => {
     return (
         <div className="w-full">
-            <table className="w-full">
+            <table className="w-full text-center">
                 <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة والصف</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">التاريخ والوقت</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">التكلفة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الملاحظات</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
-                        <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الطالب</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">المادة والصف</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">التاريخ والوقت</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">التكلفة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الملاحظات</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">الحالة</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -37,7 +37,7 @@ const UpCommingLessions = (
                                         />
                                         <div>
                                             <div className="text-sm font-medium text-gray-900">{lesson.studentName}</div>
-                                            <div className="text-sm text-gray-500">{lesson.studentPhone}</div>
+                                            <div style={{direction:'ltr'}} className="text-sm text-gray-500">{lesson.studentPhone}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -45,7 +45,7 @@ const UpCommingLessions = (
                                     <div className="text-sm font-medium text-gray-900">{lesson.subject}</div>
                                     <div className="text-sm text-gray-500">الصف {lesson.grade}</div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className="px-6 flex flex-col items-center py-4 whitespace-nowrap">
                                     <div className="flex items-center text-sm text-gray-900 mb-1">
                                         <FiCalendar className="w-4 h-4 ml-2 text-gray-400" />
                                         {formatDate(lesson.date)}
@@ -72,7 +72,7 @@ const UpCommingLessions = (
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                    <div className="flex items-center justify-center gap-1 space-x-2 space-x-reverse">
                                         <button
                                             onClick={() => handleCallStudent(lesson.studentPhone)}
                                             className="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50"

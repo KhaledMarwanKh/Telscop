@@ -30,7 +30,7 @@ const TeacherMap = ({ teachers, onTeacherSelect }) => {
 
     teachers.forEach(teacher => {
 
-    const customIcon = L.divIcon({
+      const customIcon = L.divIcon({
         className: 'teacher-marker',
         html: `<div style="            
             width:30px;
@@ -46,7 +46,7 @@ const TeacherMap = ({ teachers, onTeacherSelect }) => {
         </div>`,
         iconSize: [30, 30],
         iconAnchor: [15, 15]
-    });
+      });
 
       const marker = L.marker([teacher.lat, teacher.lng], { icon: customIcon })
         .addTo(mapInstance.current);
@@ -105,7 +105,7 @@ const TeacherMap = ({ teachers, onTeacherSelect }) => {
     };
   }, [onTeacherSelect]);
 
-  return <div ref={mapRef} className="w-full h-96  border border-gray-200" />;
+  return <div ref={mapRef} className="w-full h-96 rounded  border border-gray-200" />;
 };
 
 export default TeacherMap;

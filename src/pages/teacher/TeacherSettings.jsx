@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FiUser, FiLock, FiBell, FiEye, FiMail, FiPhone, FiMapPin, 
+  FiUser, FiLock, FiBell, FiEye, FiMail, FiPhone,
   FiSave, FiHome, FiLogOut, FiBookOpen, FiShield, FiCreditCard,
   FiToggleLeft, FiToggleRight, FiChevronRight
 } from 'react-icons/fi';

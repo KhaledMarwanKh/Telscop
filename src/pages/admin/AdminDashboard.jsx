@@ -9,14 +9,11 @@ import {
   Legend,
 } from 'chart.js';
 
-import {
-  adminProfile as ap, studentsByGrade as sbg, lessonsBySubject as lbs, teachersByGrade as tbg,
+import { studentsByGrade as sbg, lessonsBySubject as lbs, teachersByGrade as tbg,
   activeTeachers as at, subjects, monthlyStats as ms
 } from '../../data/adminMockData';
 
 import RenderOverview from '../../components/admin components/Dashboared/RenderOverview';
-import Header from '../../components/admin components/Dashboared/Header';
-import NavigationMenu from '../../components/admin components/Dashboared/NavigationMenu';
 import TabsMenu from '../../components/admin components/Dashboared/TabsMenu';
 import RenderTeacherStats from '../../components/admin components/Dashboared/RenderTeacherStats';
 import RenderLessonsStats from '../../components/admin components/Dashboared/RenderLessonsStats';
@@ -33,7 +30,6 @@ ChartJS.register(
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [filters, setFilters] = useState({
     subject: 'all',
     dateRange: {
@@ -41,8 +37,6 @@ const AdminDashboard = () => {
       end: ''
     }
   });
-
-  const [admin, setAdmin] = useState({ n: 1 });
 
   const [monthlyStats, setMonthlyStats] = useState({ n: 1 });
 
@@ -60,10 +54,6 @@ const AdminDashboard = () => {
     totalStudents: 0,
     totalTeachers: 0
   })
-
-  useEffect(() => {
-    setAdmin(ap);
-  }, [])
 
   useEffect(() => {
     setMonthlyStats(ms);
@@ -220,20 +210,11 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <Header
-        isProfileMenuOpen={isProfileMenuOpen}
-        admin={admin}
-        setIsProfileMenuOpen={setIsProfileMenuOpen}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">لوحة تحكم الإدارة</h1>
-          <p className="text-gray-600">إحصائيات شاملة ونظرة عامة على النظام</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">إحصائيات شاملة</h1>
+          <p className="text-gray-600">عرض احصائيات شاملة عن النظام</p>
         </div>
-
-        <NavigationMenu />
-
 
         <TabsMenu
           setActiveTab={setActiveTab}

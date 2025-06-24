@@ -142,18 +142,16 @@
 }
 
 /* Map marker styles */
-.teacher-marker {
-  background: hsl(207, 90%, 54%);
-  border-radius: 50%;
+.teacher-marker::before {
+  content: "";
+  position: absolute;
   width: 30px;
   height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  border: 3px solid white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  top: 50%;
+  left: 0;
+  background-color: blue;
+  z-index: -1;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
 }
 
 /* Custom scrollbar for RTL */
@@ -311,10 +309,42 @@
   height: 100%;
   position: absolute;
   left: 0;
-  top:0;
-  z-index:-1;
+  top: 0;
+  z-index: -1;
   transform: scale(1.05, 1.1);
   border-radius: inherit;
   animation: animate 2s infinite linear;
-  background-image: conic-gradient(from var(--angle),rgb(255, 232, 99) 0%,rgb(255, 232, 99) 5%,white 5%,white 100%);
+  background-image: conic-gradient(from var(--angle), rgb(255, 232, 99) 0%, rgb(255, 232, 99) 5%, white 5%, white 100%);
+}
+
+.nav-link:not(.active):hover {
+  transform: translateZ(5px);
+}
+
+@keyframes show-menu {
+  0% {
+    top: 30px;
+    opacity: 0;
+    z-index: -1;
+  }
+
+  100% {
+    top: 40px;
+    opacity: 1;
+    z-index: 50;
+  }
+}
+
+.show-menu {
+  animation: show-menu 0.3s ease-in-out 1 forwards;
+}
+
+.profile-menu-link:hover {
+  transform: translateZ(5px);
+  color: black;
+}
+
+.f:hover .a {
+  transition: 0.5s;
+  transform: rotate(360deg);
 }

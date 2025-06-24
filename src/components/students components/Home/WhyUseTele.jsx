@@ -11,7 +11,7 @@ const WhyUseTele = () => {
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className="d text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
                         <div className="w-16 h-16 bg-primary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FiBook className="w-8 h-8 text-white" />
+                            <FiBook className="icon w-8 h-8 text-white" />
                         </div>
                         <h3 className="text-xl font-semibold mb-3">معلمون مؤهلون</h3>
                         <p className="text-gray-600">
@@ -21,7 +21,7 @@ const WhyUseTele = () => {
 
                     <div className="d text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
                         <div className="w-16 h-16 bg-secondary bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FiCalendar className="w-8 h-8 text-white" />
+                            <FiCalendar className="icon w-8 h-8 text-white" />
                         </div>
                         <h3 className="text-xl font-semibold mb-3">جدولة مرنة</h3>
                         <p className="text-gray-600">
@@ -30,7 +30,7 @@ const WhyUseTele = () => {
                     </div>
 
                     <div className="d text-center p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                        <div className="w-16 h-16 bg-accent bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div className="icon w-16 h-16 bg-accent bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
                             <FiMapPin className="w-8 h-8 text-accent text-white" />
                         </div>
                         <h3 className="text-xl font-semibold mb-3">قريب منك</h3>

@@ -166,13 +166,29 @@ const Login = () => {
                 </div>
               </div>
 
+              <div className='w-full flex items-center flex-wrap gap-3 justify-evenly'>
+                <h3 className="block w-full text-sm font-semibold text-gray-700 mb-3">من انت ؟</h3>
+                <div className='flex items-center gap-2'>
+                  <input type="radio" name="role" id="teacher" value={"teacher"} required />
+                  <label htmlFor="teacher" >معلم</label>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <input type="radio" name="role" id="student" value={"student"} required />
+                  <label htmlFor="student" >طالب</label>
+                </div>
+                <div className='flex items-center gap-2'>
+                  <input type="radio" name="role" id="admin" value={"admin"} required />
+                  <label htmlFor="admin" >مدير</label>
+                </div>
+              </div>
+
               <div className="pt-4">
                 <button
                   type="submit"
                   disabled={isLoading}
                   className={`w-full relative overflow-hidden py-4 px-6 rounded-xl font-bold text-white transition-all duration-300 transform hover:scale-[1.02] focus:scale-[1.02] shadow-lg hover:shadow-xl ${isLoading
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
                     }`}
                 >
                   <div className="flex items-center justify-center space-x-3 space-x-reverse">
@@ -193,14 +209,23 @@ const Login = () => {
             </form>
 
             {/* Sign Up Link */}
-            <div className="mt-8 text-center">
-              <p className="text-gray-600">
+            <div className="mt-8 text-center flex items-center flex-col gap-y-3">
+              <p className="text-gray-600 text-sm">
                 ليس لديك حساب؟{' '}
                 <Link
                   to="/register"
                   className="font-bold text-primary hover:text-blue-700 transition-colors hover:underline"
                 >
                   إنشاء حساب جديد
+                </Link>
+              </p>
+              <p className="text-gray-600 text-[0.7rem]">
+                انت معلم ؟{' '}
+                <Link
+                  to="/teacher/register"
+                  className="font-bold text-primary hover:text-blue-700 transition-colors hover:underline"
+                >
+                  قم بانشاء حساب جديد خاص بك
                 </Link>
               </p>
             </div>

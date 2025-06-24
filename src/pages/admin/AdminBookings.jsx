@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   FiCalendar,
 } from 'react-icons/fi';
-import { adminProfile, allBookings, subjects } from '../../data/adminMockData';
+import { allBookings, subjects } from '../../data/adminMockData';
 import { toast } from 'react-toastify';
-import Header from '../../components/admin components/AdminBookings/Header';
 import FilterTab from '../../components/admin components/AdminBookings/FilterTab';
 import StatisBar from '../../components/admin components/AdminBookings/StatisBar';
 import BookingsTable from '../../components/admin components/AdminBookings/BookingsTable';
@@ -12,9 +11,7 @@ import BookingsTable from '../../components/admin components/AdminBookings/Booki
 const AdminBookings = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [filteredBookings, setFilteredBookings] = useState([]);
-  const [admin, setAdmin] = useState({})
   const [stats, setStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
@@ -46,10 +43,6 @@ const AdminBookings = () => {
     applyFilters();
   }, [statusFilter, subjectFilter])
 
-  useEffect(() => {
-    setAdmin(adminProfile);
-  }, [])
-
   const handleCancelBooking = (bookingId) => {
     if (window.confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) {
       setFilteredBookings(prev => prev.map(b =>
@@ -80,12 +73,6 @@ const AdminBookings = () => {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      <Header
-        admin={admin}
-        setIsProfileMenuOpen={setIsProfileMenuOpen}
-        isProfileMenuOpen={isProfileMenuOpen}
-      />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="mb-8">
@@ -103,7 +90,7 @@ const AdminBookings = () => {
         <StatisBar
           stats={stats}
         />
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-800">قائمة الحجوزات ({filteredBookings.length})</h3>
           </div>

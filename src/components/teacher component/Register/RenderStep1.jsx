@@ -1,5 +1,5 @@
 import React from 'react'
-import { FiCalendar, FiMail, FiMapPin, FiPhone, FiUser } from 'react-icons/fi';
+import { FiMail, FiMapPin, FiPhone, FiUser } from 'react-icons/fi';
 
 const RenderStep1 = (
     {
@@ -76,15 +76,12 @@ const RenderStep1 = (
                         تاريخ الميلاد *
                     </label>
                     <div className="relative">
-                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                            <FiCalendar className="h-5 w-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors" />
-                        </div>
                         <input
                             type="date"
                             name="birthDate"
                             value={formData.birthDate}
                             onChange={handleInputChange}
-                            className="w-full pl-4 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
+                            className="w-full pl-4 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
                             max={new Date().toISOString().split('T')[0]}
                             required
                         />

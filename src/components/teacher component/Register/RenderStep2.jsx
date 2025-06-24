@@ -24,7 +24,7 @@ const RenderStep2 = (
                     <option value="">اختر المادة</option>
                     {teacherSubjects.map((subject) => (
                         <option key={subject.key} value={subject.key}>
-                            {subject.icon} {subject.name}
+                             {subject.name}
                         </option>
                     ))}
                 </select>

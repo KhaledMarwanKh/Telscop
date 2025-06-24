@@ -42,7 +42,7 @@ const Contact = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Contact Information */}
-          <div>
+          <div className="bg-white shadow-lg px-4 py-5">
             <h2 className="text-xl font-semibold mb-6">معلومات التواصل</h2>
 
             <div className="space-y-6">
@@ -97,7 +97,7 @@ const Contact = () => {
           </div>
 
           {/* Contact Form */}
-          <div>
+          <div className="bg-white shadow-lg px-4 py-5">
             <h2 className="text-xl font-semibold mb-6">أرسل لنا رسالة</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

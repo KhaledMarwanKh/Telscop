@@ -67,8 +67,8 @@ const Teachers = () => {
         clearFilters={clearFilters}
       />
 
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h2 className="text+-xl font-semibold mb-4 flex items-center space-x-2 space-x-reverse">
+      <div className="p-6 rounded-lg py-2 px-3 bg-white shadow-lg mb-8">
+        <h2 className="text-xl font-semibold my-10 flex items-center space-x-2 space-x-reverse">
           <span>🗺️</span>
           <span>خريطة المعلمين</span>
         </h2>

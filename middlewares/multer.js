@@ -10,11 +10,11 @@ const storage = multer.diskStorage({
   },
 });
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-  if (allowedTypes.includes(file.mimetype)) {
+  const allowedTypes = [  'image/jpeg',  'image/jpg',  'image/png',  'image/webp','image/gif','image/svg+xml','application/pdf']; 
+   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('نوع الملف غير مدعوم، يجب أن يكون صورة أو PDF فقط'), false);
+    cb(new Error('image or pdf only'), false);
   }
 };
 const upload = multer({ storage,fileFilter });

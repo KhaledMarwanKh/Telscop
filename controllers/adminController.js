@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 const teacherModel = require('../models/teacherModel');
 const appointmentModel =require("../models/appointmentModel");
 const userModel = require('../models/userModel');
-const apiFeatures =require('../utils/apiFeatures')
+const apiFeatures =require('../utils/apiFeatures');
+const questionModel = require('../models/questionsModel');
 const generatetoken = (email) =>
   jwt.sign({email: email }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -489,5 +490,44 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: result
+  });
+});
+exports.getQuestions = catchasync(async (req, res, next) => {
+  const {role} = req.body;
+  let questions;
+  if (role === "teacher") {
+    const teacherEmails = await teacherModel.find({}).select("email").lean();
+    const emailList = teacherEmails.map(t => t.email);
+  
+     questions = await questionModel.find({
+      email: { $in: emailList }
+    });
+  
+  }
+  else if(role =="student"){
+    const studentsEmails = await userModel.find({}).select("email").lean();
+    const emailList = studentsEmails.map(t => t.email);
+  
+     questions = await questionModel.find({
+      email: { $in: emailList }
+    });
+  }
+  else if(role =="other"){
+    const teacherEmails = await teacherModel.find({}).select("email").lean();
+    const studentsEmails = await userModel.find({}).select("email").lean();
+    const emailList1= teacherEmails.map(t => t.email);
+    const emailList2= studentsEmails.map(t => t.email);
+const emailList =[...emailList1,...emailList2]
+     questions = await questionModel.find({
+      email: { $nin: emailList }
+    });
+  }
+else{
+  const questions = await questionModel.find({})
+
+}
+  res.status(200).json({
+    success: true,
+    data: questions
   });
 });

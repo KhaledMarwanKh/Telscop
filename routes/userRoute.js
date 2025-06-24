@@ -4,7 +4,7 @@ const userController =require('../controllers/userController');
 const authUser =require('../middlewares/authUser')
 const upload =require('../middlewares/multer')
 
-router.post('/register',userController.signup)
+router.post('/register',upload.single('image'),userController.signup)
 router.post('/login',userController.login)
 router.post('/logout',authUser.authUser,userController.logout)
 router.get('/get-profile',authUser.authUser,userController.getProfile)

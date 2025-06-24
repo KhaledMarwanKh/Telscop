@@ -29,6 +29,6 @@ router.get('/students-by-class', authAdmin, adminController.studentsByClass);
 router.get('/all-students', authAdmin, adminController.allStudents);
 router.get('/get-monthly-count', authAdmin, adminController.getMonthlyCounts);
 router.get('/change-state-teacher', authAdmin, adminController.activateOrNotActivteTeacher);
-
+router.post('/get-questions',authAdmin, adminController.getQuestions)
 
 module.exports=router

@@ -125,6 +125,10 @@ required:true
   passwordChangedAt: {
     type: Date,
   },
+  role:{
+    type:String,
+    default:"teacher"
+  },
   resetCode: String,
   resetCodeExpires: Date
 }, {

@@ -68,6 +68,15 @@ const userSchema =new mongoose.Schema({
   passwordChangedAt: {
     type: Date,
   },
+  birthDate:{
+    type:Date,
+    required:true
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'student'],
+    default:"student"
+  },
   resetCode: String,
 resetCodeExpires: Date
 }

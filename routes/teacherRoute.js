@@ -15,43 +15,21 @@ router.post(
   authTeacher.authteacher,
   teacherController.changeAvailablity
 );
+router.post('/forget-password',authTeacher.forgetPassword)
+router.patch('/resetPassword',authTeacher.resetPassword)
 router.post('/logout',authTeacher.authteacher,teacherController.logout)
 router.get("/list-teachers", teacherController.listTeachers);
 router.post("/login-teacher", teacherController.login_teacher);
 router.post("/signup-teacher", teacherFiles,teacherController.signup_teacher);
-router.get(
-  "/appointments",
-  authTeacher.authteacher,
-  teacherController.appointmentsTeacher
-);
-router.post(
-  "/complete-appointments",
-  authTeacher.authteacher,
-  teacherController.appointmentComplete
-);
-router.post(
-  "/cancel-appointments",
-  authTeacher.authteacher,
-  teacherController.appointmentCancelled
-);
-router.get(
-  "/dashboard",
-  authTeacher.authteacher,
-  teacherController.teacherDashboard
-);
-router.get(
-  "/profile",
-  authTeacher.authteacher,
-  teacherController.teacherProfile
-);
-router.post(
-  "/update-profile",
-  authTeacher.authteacher,
+router.get("/appointments",authTeacher.authteacher,teacherController.appointmentsTeacher);
+router.post("/complete-appointments",authTeacher.authteacher,teacherController.appointmentComplete);
+router.post("/cancel-appointments",authTeacher.authteacher,  teacherController.appointmentCancelled);
+router.get("/dashboard",authTeacher.authteacher,teacherController.teacherDashboard);
+router.get("/profile",authTeacher.authteacher,teacherController.teacherProfile);
+router.post("/update-profile",authTeacher.authteacher,
   upload.fields([
     { name: "image", maxCount: 1 },   // صورة شخصية واحدة
     { name: "certificates", maxCount: 5 },    // حتى 5 شهادات
-  ]),
-  teacherController.updateTeacherProfile
-);
+  ]),teacherController.updateTeacherProfile);
 
 module.exports = router;

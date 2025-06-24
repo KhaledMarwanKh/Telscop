@@ -160,7 +160,7 @@ console.log({
   const profileImage = req.files?.image?.[0];
   const idImage = req.files?.idImage?.[0];
   const certificates = req.files?.certificates || [];
-
+  
   const imageUrl = profileImage ? await uploadAndDelete(profileImage) : "";
   const idUrl = idImage ? await uploadAndDelete(idImage) : "";
   const certificateUrls = await Promise.all(certificates.map(uploadAndDelete));

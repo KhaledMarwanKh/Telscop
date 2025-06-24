@@ -2,6 +2,7 @@ const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const catchasync = require("../utils/catchasync");
 const AppError = require("../utils/appError");
+const questionModel = require("../models/questionsModel");
 const teacherModel = require("../models/teacherModel");
 const appointmentModel =require("../models/appointmentModel")
 const cloudinary= require('cloudinary').v2
@@ -33,6 +34,16 @@ const generatetoken = (id) =>
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
+  const uploadAndDelete = async (file) => {
+    const filePath = path.resolve(file.path);
+  
+    const result = await cloudinary.uploader.upload(filePath, {
+      resource_type: "auto",
+    });
+  
+    fs.unlinkSync(filePath); // حذف الملف بعد رفعه
+    return result.secure_url;
+  };
   exports.logout = (req, res,next) => {
     res.cookie('jwt', 'loggedout', {
       httpOnly: true,
@@ -45,7 +56,38 @@ const generatetoken = (id) =>
     });
   };
 exports.signup = catchasync(async (req, res, next) => {
-  const newuser = await userModel.create(req.body);
+  let {
+    name,
+    email,
+    password,
+    passwordConfirm,
+    gender,
+    address,
+    location,
+    phone,
+    Class,
+    birthDate
+  } = req.body;
+
+  const profileImage = req.files?.image?.[0];
+  const imageUrl = profileImage ? await uploadAndDelete(profileImage) : "";
+  const userData = {
+    name,
+    email,
+    password,
+    passwordConfirm,
+    gender,
+    address,
+    image: imageUrl,
+    phone:phone,
+    location:location,
+    Class:Class,
+    birthDate:birthDate
+  };
+
+  const newuser = await userModel.create(userData);
+
+
   createSendToken(newuser, 201, res);
 });
 exports.login = catchasync(async (req, res, next) => {
@@ -427,26 +469,10 @@ console.log(student.location.coordinates,maxDistanceKm)
   });
 });
 exports.connectWithUs = catchasync(async (req, res, next) => {
-  const { name, email, message } = req.body;
-  if (!name || !email || !message) {
-    return next(new AppError("please fill all fields", 400));
+  const {role} = req.body;
+  if(!role){
+
   }
-
-  const adminEmail = process.env.ADMIN_EMAIL; 
-
-  await sendEmail.sendEmail2({
-    email: adminEmail,
-    subject: '📩 رسالة جديدة من صفحة اتصل بنا',
-    html: `
-      <h3>رسالة من: ${name}</h3>
-      <p><strong>البريد:</strong> ${email}</p>
-      <p><strong>الرسالة:</strong></p>
-      <p>${message}</p>
-      <hr>
-      <p>مرسلة عبر منصة تيليسكوب</p>
-    `,
-    text: `رسالة من ${name} (${email}): ${message}`
-  });
 
   res.status(200).json({
     success: true,

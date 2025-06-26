@@ -48,10 +48,6 @@ const teacherSchema = new mongoose.Schema({
     validate: [arr => arr.length > 0, "At least one certificate is required"],
     required: true
   },  
-  idImage:{
-    type:String,
-    required:true
-  },
   Class:{
     type:[Number],
     required:true

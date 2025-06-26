@@ -158,11 +158,9 @@ console.log({
 
   // رفع الصور
   const profileImage = req.files?.image?.[0];
-  const idImage = req.files?.idImage?.[0];
   const certificates = req.files?.certificates || [];
   
   const imageUrl = profileImage ? await uploadAndDelete(profileImage) : "";
-  const idUrl = idImage ? await uploadAndDelete(idImage) : "";
   const certificateUrls = await Promise.all(certificates.map(uploadAndDelete));
 
   // بناء بيانات المدرّس
@@ -228,8 +226,33 @@ exports.login_teacher = catchasync(async (req, res, next) => {
 // API FOR GET TEACHER APPOINTMENTS
 exports.appointmentsTeacher = catchasync(async (req, res, next) => {
   const teacherId = req.user?.id;
+  let flt = {};
+  const  {cancell,complete,current,time} =req.query
+  if(cancell){
+  flt.cancelled=cancell
+  }
+  else if(complete){
+    flt.isCompleted=complete
+  }
+  // فلترة حسب حالة الدرس
+  const now = new Date();
+// فلترة حسب التوقيت
+  if (time === 'today') {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    flt.slotDate = { $gte: startOfDay, $lte: endOfDay };
+  } else if (time === 'upcoming') {
+    flt.slotDate = { $gt: now };
+  } else if (time === 'past') {
+    flt.slotDate = { $lt: now };
+  }
+
   const appointments = await appointmentModel
-    .find({ teacherId })
+    .find({ teacherId, ...flt })
     .populate("userId", "name Class subject price comment");
 
   res.status(200).json({
@@ -237,7 +260,6 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
     data: appointments,
   });
 });
-
 // api to mark appointment complete
 exports.appointmentComplete = catchasync(async (req, res, next) => {
   const { appointmentId } = req.body;

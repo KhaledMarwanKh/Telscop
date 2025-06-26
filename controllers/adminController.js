@@ -61,41 +61,86 @@ if(!correct){
 
 //---------------------------
 exports.statsByTeacher = catchasync(async (req, res, next) => {
-  const stats = await appointmentModel.aggregate([
-    {
-      $match: {
-        cancelled: false,
-        isCompleted: true
-      }
-    },
-    {
-      $group: {
-        _id: "$teacherId",
-        lessons: { $sum: 1 },
-        totalRevenue: { $sum: "$price" },
-        uniqueStudents: { $addToSet: "$userId" } 
-      }
-    },
+  const matchStage = {};
+
+  // فلترة حسب المنطقة (region)
+  if (req.query["address.region"]) {
+    matchStage["address.region"] = req.query["address.region"];
+  }
+
+  // فلترة حسب المادة
+  if (req.query.subject) {
+    matchStage.subject = req.query.subject;
+  }
+
+
+  const stats = await teacherModel.aggregate([
+  { $match: matchStage },
+    //  ربط كل معلم بحجوزاته 
     {
       $lookup: {
-        from: "teachers",
+        from: "appointments",
         localField: "_id",
-        foreignField: "_id",
-        as: "teacherData"
+        foreignField: "teacherId",
+        as: "appointments"
       }
     },
-    { $unwind: "$teacherData" },
+
+    // فلتر الحجوزات داخل الأستاذ حسب الشرط
+    {
+      $addFields: {
+        filteredAppointments: {
+          $filter: {
+            input: "$appointments",
+            as: "app",
+            cond: {
+              $and: [
+                { $eq: ["$$app.cancelled", false] },
+                { $eq: ["$$app.isCompleted", true] }
+              ]
+            }
+          }
+        }
+      }
+    },
+
+    // حساب عدد الدروس والإيرادات وعدد الطلاب
     {
       $project: {
-        _id: 0,
-        teacherName: "$teacherData.name",
-        subject: "$teacherData.subject",
-        lessons: 1,
-        totalRevenue: 1,
-        studentCount: { $size: "$uniqueStudents"}
+        teacherName: "$name",
+        subject: 1,
+        lessons: { $size: "$filteredAppointments" },
+        totalRevenue: {
+          $sum: "$filteredAppointments.price"
+        },
+        studentIds: {
+          $map: {
+            input: "$filteredAppointments",
+            as: "appt",
+            in: "$$appt.userId"
+          }
+        }
       }
     },
-    { $sort: { totalRevenue: -1 } }
+
+    // حساب عدد الطلاب الفريدين
+    {
+      $addFields: {
+        studentCount: { $size: { $setUnion: ["$studentIds", []] } }
+      }
+    },
+
+    // إخفاء studentIds لأنو ما نحتاجو بالنتيجة النهائية
+    {
+      $project: {
+        studentIds: 0
+      }
+    },
+
+    // ترتيب حسب الإيرادات
+    {
+      $sort: { totalRevenue: -1 }
+    }
   ]);
 
   res.status(200).json({
@@ -103,6 +148,8 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
     data: stats
   });
 });
+
+
 //-----------------------------
 
 //api to get number treacher for each class
@@ -180,68 +227,76 @@ exports.acceptOrRejectTeacher = catchasync(async (req, res, next) => {
   });
 });
 //-------------------------------
-exports.getGeneralInformation=catchasync(async(req,res,next)=>{
-  
-  const students =await userModel.find({}).select('-password')
-  const teachers_activate =await teacherModel.find({activate:true}).select('-password')
-const appointments =await appointmentModel.find({isCompleted:true})
-  const l =students.length
-  const l2 =teachers_activate.length
-  const l3 =appointments.length
-  const totalRevenueResult = await appointmentModel.aggregate([
-    { $match: { isCompleted: true } },
-    { $group: { _id: null, totalRevenue: { $sum: "$price" } } }
+exports.getGeneralInformation = catchasync(async (req, res, next) => {
+  // تنفيذ العد والـ aggregation بالتوازي لسرعة أكبر
+  const [
+    studentsCount,
+    activeTeachersCount,
+    completedAppointmentsCount,
+    totalRevenueResult
+  ] = await Promise.all([
+    userModel.countDocuments({}),
+    teacherModel.countDocuments({ activate: true }),
+    appointmentModel.countDocuments({ isCompleted: true }),
+    appointmentModel.aggregate([
+      { $match: { isCompleted: true } },
+      { $group: { _id: null, totalRevenue: { $sum: "$price" } } }
+    ])
   ]);
-  
-  const totalRevenue = totalRevenueResult[0]?.totalRevenue || 0;
-  
-  res.status(200).json({
-    studentsCount: l,
-    activeTeachersCount: l2,
-    completedAppointmentsCount: l3,
-    totalRevenue: totalRevenue
-  });
 
-})
+  const totalRevenue = totalRevenueResult[0]?.totalRevenue || 0;
+
+  res.status(200).json({
+    studentsCount,
+    activeTeachersCount,
+    completedAppointmentsCount,
+    totalRevenue
+  });
+});
 //-----------------------------
 
 exports.statsByDateRange = catchasync(async (req, res, next) => {
   const { startDate, endDate } = req.body;
 
-  if (!startDate || !endDate) {
-    return next(new appError("Please provide both startDate and endDate", 400));
+
+  const dateFilter = {};
+  if (startDate) dateFilter.$gte = new Date(startDate);
+  if (endDate) dateFilter.$lte = new Date(endDate);
+
+  const matchStage = {
+    cancelled: false,
+    isCompleted: true
+  };
+
+  if (startDate && endDate) {
+    matchStage.slotDate = dateFilter;
   }
 
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-
-   const features = new apiFeatures( appointmentModel.find({
-    slotDate: { $gte: start, $lte: end }
-  }),req.query)
-      .filter()
-      .sorting()
-      .limitField()
-      .pagination();
-    const appointments = await features.query;;
-
-  const completedLessons = appointments.filter(a=>a.isCompleted).length;
-  const cancelledLessons = appointments.filter(a => a.cancelled).length;
-  const totalRevenue = appointments.reduce((sum, a) => {
-    if (!a.cancelled && a.isCompleted) {
-      return sum + (a.price || 0);
+  const stats = await appointmentModel.aggregate([
+    { $match: matchStage },
+    {
+      $group: {
+        _id: "$subject",
+        totalRevenue: { $sum: "$price" },
+        lessonsCount: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        subject: "$_id",
+        totalRevenue: 1,
+        lessonsCount: 1,
+        _id: 0
+      }
     }
-    return sum;
-  }, 0);
-  
+  ]);
+
   res.status(200).json({
     success: true,
-    data: {
-      completedLessons,
-      cancelledLessons,
-      totalRevenue,
-    }
+    data: stats
   });
 });
+
 //-----------------------------------
 //API to get completed appointments
 exports.adminCompletedAppointments = catchasync(async (req, res, next) => {
@@ -285,12 +340,12 @@ exports.adminCurrentAppointments = catchasync(async (req, res, next) => {
 
 //------------------------
 exports.adminAppointments = catchasync(async (req, res, next) => {
-const  {cancell,complete} =req.body
+const  {cancell,complete,current} =req.query
 let flt={}
 if(cancell){
 flt.cancelled=cancell
 }
-if(complete){
+else if(complete){
   flt.isCompleted=complete
 }
   const query = appointmentModel.find({ flt })
@@ -321,18 +376,22 @@ if(complete){
 
 // api to get all students
 exports.allStudents = catchasync(async (req, res, next) => {
-  const filterClass = req.query.filterClass;
+  const filter = {
+  };
+
+  // فلترة حسب الصف
+  if (req.query.filterClass) {
+    filter.Class = Number(req.query.filterClass);
+  }
+
+  // فلترة حسب المنطقة
+  if (req.query.region) {
+    filter["address.region"] = req.query.region;
+  }
 
   const studentLessons = await userModel.aggregate([
+    { $match: filter },
 
-    {
-      $match: {
-        Class: { $exists: true }  // نتأكد فقط أن لديه صف دراسي (طالما هو طالب)
-      }
-    },
-    ...(filterClass
-      ? [{ $match: { Class: Number(filterClass) } }]
-      : []),
     {
       $lookup: {
         from: "appointments",
@@ -373,6 +432,7 @@ exports.allStudents = catchasync(async (req, res, next) => {
     data: studentLessons,
   });
 });
+
 
 //-----------------------
 exports.studentsByClass = catchasync(async (req, res, next) => {

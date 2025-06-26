@@ -8,7 +8,10 @@ const appointmentModel =require("../models/appointmentModel")
 const cloudinary= require('cloudinary').v2
 const apiFeatures =require('../utils/apiFeatures')
 const sendEmail =require('../utils/email')
-const createSendToken = (nuser, statusCode, res) => {
+
+
+
+const createSendToken = (nuser, statusCode, res, userType) => {
   const token = generatetoken(nuser);
   const cookieOption = {
     expires: new Date(
@@ -22,7 +25,8 @@ const createSendToken = (nuser, statusCode, res) => {
   nuser.password = undefined;
   res.status(statusCode).json({
     status: "success",
-    token,
+    userType:userType,
+    token
   });
 };
 
@@ -90,31 +94,48 @@ exports.signup = catchasync(async (req, res, next) => {
 
   createSendToken(newuser, 201, res);
 });
+
 exports.login = catchasync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // تحقق من وجود البيانات المطلوبة
   if (!email || !password) {
-    return next(new AppError("Please provide email and password", 400)); // 400 Bad Request
+    return next(new AppError("Please provide email and password", 400));
   }
 
-  // البحث عن المستخدم في قاعدة البيانات
-  const nuser = await userModel.findOne({ email: email }).select("+password");
+  let user;
+  let userType;
 
-  if (!nuser) {
-    return next(new AppError("Incorrect email or password", 401)); // 401 Unauthorized
+  user = await userModel.findOne({ email, role: "admin" }).select("+password");
+  if (user) {
+    userType = "admin";
   }
 
-  // التحقق من كلمة المرور
-  const correct = await nuser.correctpassword(password, nuser.password);
+  if (!user) {
+    user = await userModel.findOne({ email }).select("+password");
+    if (user) {
+      userType = "student";
+    }
+  }
 
+  if (!user) {
+    user = await teacherModel.findOne({ email }).select("+password");
+    if (user) {
+      userType = "teacher";
+    }
+  }
+
+  if (!user) {
+    return next(new AppError("Incorrect email or password", 401));
+  }
+
+  const correct = await user.correctpassword(password, user.password);
   if (!correct) {
     return next(new AppError("Incorrect email or password", 401));
   }
-  //req.id= nuser._id
-  // إنشاء التوكن وإرساله
-  createSendToken(nuser, 201, res);
+
+  createSendToken(user, 200, res, { userType });
 });
+
 
 exports.getProfile = catchasync(async (req, res, next) => {
   const { userid } = req.body;

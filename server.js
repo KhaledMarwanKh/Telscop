@@ -14,6 +14,7 @@ const globalError = require("./controllers/errorController");
 const adminRoute =require('./routes/adminRoute')
 const teacherRoute =require('./routes/teacherRoute')
 const userRoute =require('./routes/userRoute')
+const cron =require('./cron/cron')
 
 dotenv.config({path : './.env'})
 //app config 

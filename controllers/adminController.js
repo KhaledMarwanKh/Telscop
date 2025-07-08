@@ -61,18 +61,24 @@ if(!correct){
 
 //---------------------------
 exports.statsByTeacher = catchasync(async (req, res, next) => {
+
   const matchStage = {};
 
-  // فلترة حسب المنطقة (region)
+  // فلترة حسب المنطقة
   if (req.query["address.region"]) {
     matchStage["address.region"] = req.query["address.region"];
   }
-
+  
   // فلترة حسب المادة
   if (req.query.subject) {
     matchStage.subject = req.query.subject;
   }
-
+  
+  // فلترة حسب الصف (grade)
+  if (req.query.Class) {
+    matchStage.Class = { $in: [parseInt(req.query.Class)] };
+  }
+  
 
   const stats = await teacherModel.aggregate([
   { $match: matchStage },
@@ -107,12 +113,12 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
     // حساب عدد الدروس والإيرادات وعدد الطلاب
     {
       $project: {
+        id:1,
         teacherName: "$name",
+        amountRequired:"$amountMoneyRequired",
+        amountMoneyAllTime:"$amountMoneyAllTime",
         subject: 1,
         lessons: { $size: "$filteredAppointments" },
-        totalRevenue: {
-          $sum: "$filteredAppointments.price"
-        },
         studentIds: {
           $map: {
             input: "$filteredAppointments",
@@ -130,7 +136,6 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
       }
     },
 
-    // إخفاء studentIds لأنو ما نحتاجو بالنتيجة النهائية
     {
       $project: {
         studentIds: 0
@@ -139,7 +144,7 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
 
     // ترتيب حسب الإيرادات
     {
-      $sort: { totalRevenue: -1 }
+      $sort: { amountMoneyAllTime: -1 }
     }
   ]);
 
@@ -204,12 +209,12 @@ exports.acceptOrRejectTeacher = catchasync(async (req, res, next) => {
     }
 
     return res.status(200).json({
-      status: 'success',
+      success: true,
       message: 'Teacher rejected and deleted successfully'
     });
   }
 
-  const updatedTeacher = await userModel.findByIdAndUpdate(
+  const updatedTeacher = await teacherModel.findByIdAndUpdate(
     teacherId,
     { checkAdmin: true, activate: true },
     { new: true }
@@ -221,14 +226,13 @@ exports.acceptOrRejectTeacher = catchasync(async (req, res, next) => {
   }
 
   res.status(200).json({
-    status: 'success',
+    success: true,
     message: 'Teacher accepted and activated successfully',
     data: updatedTeacher
   });
 });
 //-------------------------------
 exports.getGeneralInformation = catchasync(async (req, res, next) => {
-  // تنفيذ العد والـ aggregation بالتوازي لسرعة أكبر
   const [
     studentsCount,
     activeTeachersCount,
@@ -238,9 +242,13 @@ exports.getGeneralInformation = catchasync(async (req, res, next) => {
     userModel.countDocuments({}),
     teacherModel.countDocuments({ activate: true }),
     appointmentModel.countDocuments({ isCompleted: true }),
-    appointmentModel.aggregate([
-      { $match: { isCompleted: true } },
-      { $group: { _id: null, totalRevenue: { $sum: "$price" } } }
+    teacherModel.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: "$amountMoneyAllTime" }
+        }
+      }
     ])
   ]);
 
@@ -258,7 +266,6 @@ exports.getGeneralInformation = catchasync(async (req, res, next) => {
 exports.statsByDateRange = catchasync(async (req, res, next) => {
   const { startDate, endDate } = req.body;
 
-
   const dateFilter = {};
   if (startDate) dateFilter.$gte = new Date(startDate);
   if (endDate) dateFilter.$lte = new Date(endDate);
@@ -268,7 +275,7 @@ exports.statsByDateRange = catchasync(async (req, res, next) => {
     isCompleted: true
   };
 
-  if (startDate && endDate) {
+  if (startDate || endDate) {
     matchStage.slotDate = dateFilter;
   }
 
@@ -277,7 +284,7 @@ exports.statsByDateRange = catchasync(async (req, res, next) => {
     {
       $group: {
         _id: "$subject",
-        totalRevenue: { $sum: "$price" },
+        totalRevenue: { $sum: { $multiply: ["$price", 0.05] } },
         lessonsCount: { $sum: 1 }
       }
     },
@@ -340,24 +347,21 @@ exports.adminCurrentAppointments = catchasync(async (req, res, next) => {
 
 //------------------------
 exports.adminAppointments = catchasync(async (req, res, next) => {
-const  {cancell,complete,current} =req.query
-let flt={}
-if(cancell){
-flt.cancelled=cancell
-}
-else if(complete){
-  flt.isCompleted=complete
-}
-  const query = appointmentModel.find({ flt })
+  const flt = {
+    ...(req.query.cancell !== undefined && { cancelled: req.query.cancell === 'true' }),
+    ...(req.query.complete !== undefined && { isCompleted: req.query.complete === 'true' })
+  };
+
+  const query = appointmentModel.find(flt)
     .populate({
       path: 'userId',
       select: 'name Class'
     })
     .populate({
       path: 'teacherId',
-      select: 'name subject '
+      select: 'name subject'
     });
-//---------------------------------------------
+
   const features = new apiFeatures(query, req.query)
     .filter()
     .sorting()
@@ -509,7 +513,6 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
   const getMonthName = (monthNumber) =>
     new Date(2000, monthNumber - 1).toLocaleString('default', { month: 'long' });
 
-  // جلب الاحصائيات حسب من اي مودل جاية 
   const aggregateByMonth = async (model) => {
     const result = await model.aggregate([
       {
@@ -528,7 +531,6 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
     return data;
   };
 
-  // احصل على عدد كل كيان حسب الشهر
   const [teachers, students, lessons] = await Promise.all([
     aggregateByMonth(teacherModel),
     aggregateByMonth(userModel),
@@ -595,3 +597,25 @@ else{
     data: questions
   });
 });
+exports.payTeacher = catchasync(async (req, res, next) => {
+  const { teacherId } = req.body;
+
+  const teacher = await teacherModel.findById(teacherId);
+
+  if (!teacher) {
+    return next(new Error('Teacher not found'));
+  }
+
+  const currentRequired = teacher.amountMoneyRequired || 0;
+  const currentTotal = teacher.amountMoneyAllTime || 0;
+
+  teacher.amountMoneyRequired = 0;
+  teacher.amountMoneyAllTime = currentTotal + currentRequired;
+
+  await teacher.save();
+
+  res.status(200).json({ 
+    success:true,
+    message: "seccessful payment"  });
+});
+

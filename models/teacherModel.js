@@ -39,6 +39,18 @@ const teacherSchema = new mongoose.Schema({
       required: true
     }
   },
+  checkMoney:{
+    type:Boolean,
+    default:false
+  },
+  amountMoneyRequired:{
+    type:Number,
+    default:0
+  },
+  amountMoneyAllTime:{
+    type:Number,
+    default:0
+  },
   image: {
     type: String,
     required: false

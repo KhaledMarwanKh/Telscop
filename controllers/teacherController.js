@@ -368,7 +368,7 @@ exports.teacherDashboard = catchasync(async (req, res, next) => {
   });
 
   const dashsdata = {
-    earnings,
+    earnings:earnings-(5/100*earnings),
     completedLessons,
     studentsCount: studentsSet.size,
   };

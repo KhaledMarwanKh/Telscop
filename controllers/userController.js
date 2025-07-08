@@ -346,7 +346,7 @@ exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
   res.status(200).json({
     success:true,
     data: list
-}).populate('teacherId', 'name subject image')
+}).populate('teacherId', 'name subject image location ')
 
 })
 //-------------------------

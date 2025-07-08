@@ -21,6 +21,10 @@ const appointmentSchema =new mongoose.Schema({
     type:String,
     required:true
   },
+  nots:{
+    type:String,
+    required:false
+  },
   price:{
     type:Number,
     required:true

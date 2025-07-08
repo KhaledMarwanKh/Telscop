@@ -7,19 +7,28 @@ class apiFeatures {
   }
 
   filter() {
-    const queryobj = {...this.querystring};
+    const queryobj = { ...this.querystring };
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete queryobj[el]);
   
+    if (queryobj.region) {
+      queryobj["address.region"] = queryobj.region;
+      delete queryobj.region;
+    }
+  
+    if (queryobj.Class) {
+      queryobj.Class = Number(queryobj.Class); // تأكد أنه رقم
+    }
+  
+    // معالجة عوامل المقارنة مثل gte و lte
     let queryStr = JSON.stringify(queryobj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     const queryjson = JSON.parse(queryStr);
   
-    this.query = this.query.find(queryjson);  // ← فقط this.query
+    this.query = this.query.find(queryjson);
     return this;
   }
   
-
   sorting() {
     if (this.querystring.sort) {
       const sortby = this.querystring.sort.split(",").join(" ");

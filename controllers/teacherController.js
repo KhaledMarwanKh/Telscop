@@ -57,7 +57,7 @@ const generatetoken = (id) =>
   });
 
 exports.changeAvailablity = catchasync(async (req, res, next) => {
-  const  id  = req.user?.id;
+  const  id  = req.body?.id;
 
   const teaData = await teacherModel.findById(id);
   await teacherModel.findByIdAndUpdate(id, { available: !teaData.available });
@@ -225,7 +225,8 @@ exports.login_teacher = catchasync(async (req, res, next) => {
 });
 // API FOR GET TEACHER APPOINTMENTS
 exports.appointmentsTeacher = catchasync(async (req, res, next) => {
-  const teacherId = req.user?.id;
+  const teacherId = req.body?.id;
+  console.log(req.user)
   let flt = {};
   const  {cancell,complete,current,time} =req.query
   if(cancell){
@@ -263,7 +264,7 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
 // api to mark appointment complete
 exports.appointmentComplete = catchasync(async (req, res, next) => {
   const { appointmentId } = req.body;
-const teacherId =req.user?.id
+const teacherId =req.body?.id
   const appointmentData = await appointmentModel.findById(appointmentId);
   if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
     return res.status(400).json({
@@ -297,7 +298,7 @@ const teacherId =req.user?.id
 
 exports.appointmentCancelled = catchasync(async (req, res, next) => {
   const { appointmentId } = req.body;
-  const teacherId =req.user?.id
+  const teacherId =req.body?.id
 
   const appointmentData = await appointmentModel.findById(appointmentId);
   if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
@@ -349,7 +350,8 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
 
 // api to dashboard for teacher
 exports.teacherDashboard = catchasync(async (req, res, next) => {
-  const teacherId =req.user?.id
+  const teacherId =req.body.id
+  console.log(teacherId)
 
   const appointments = await appointmentModel
     .find({ teacherId })
@@ -381,7 +383,9 @@ exports.teacherDashboard = catchasync(async (req, res, next) => {
 
 // api to get teacher profile
 exports.teacherProfile = catchasync(async (req, res, next) => {
-  const teacherId =req.user?.id
+  const teacherId =req.body?.id
+  console.log(teacherId)
+
   const profileData = await teacherModel
     .findById(teacherId)
     .select("-password");
@@ -393,6 +397,7 @@ exports.teacherProfile = catchasync(async (req, res, next) => {
 // api for update profileData
 exports.updateTeacherProfile = catchasync(async (req, res, next) => {
   const teacherId =req.user?.id
+  console.log(req.user.id)
   let {
     address,
     availableTimes,
@@ -433,7 +438,6 @@ if (experience) updateObj.experience = experience;
   ) {
 
     const profileImgFile = req.files.image[0];
-    console.log(req.files.image[0])
     updateObj.image = await uploadAndDelete(profileImgFile);
 
   }
@@ -446,6 +450,7 @@ if (experience) updateObj.experience = experience;
     const uploadedUrls = await Promise.all(uploadPromises);
 
     // جلب بيانات المعلم الحالية
+    console.log(teacherId)
     const teacher = await teacherModel.findById(teacherId);
 
     // دمج الشهادات القديمة مع الجديدة

@@ -26,7 +26,7 @@ exports.authteacher = catchasync(async (req, res, next) => {
   //verfication token
   const decode = jwt.verify(token, process.env.JWT_SECRET_KEY);
   // check if user still exists
-  const currentuser = await teacherModel.findById({ _id:decode.id}).select('-password');
+  const currentuser = await teacherModel.findOne({ email:decode.email}).select('-password');
   if (!currentuser) {
     // may be user not still in my database
     return next(
@@ -40,8 +40,10 @@ exports.authteacher = catchasync(async (req, res, next) => {
       new appError("user recently changee password!! please log in again", 401),
     );
   }
-  req.user = { id: decode.id }; // 👈 هذا هو المعيار في JWT-based auth
+  req.body.id = currentuser.id; 
+  req.user = { id: currentuser._id }; // أو خزن كامل الكائن لو تحب
 
+console.log(req.body.id)
   //Grant acces to protcted route
 
   next();

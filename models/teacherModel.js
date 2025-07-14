@@ -143,7 +143,13 @@ required:true
   timestamps: true // ← to add createdAt و updatedAt
 });
 teacherSchema.index({location: '2dsphere' });
-
+teacherSchema.methods.correctpassword = async function (
+  candidatepassword,
+  userpassword,
+) {
+  // copmare use it for verfy from (password encoded) and (password login)
+  return await bcrypt.compare(candidatepassword, userpassword);
+};
 teacherSchema.methods.changedPasswordAfter = function (jwttimetamp) {
   if (this.passwordChangedAt) {
     // the time that user do change password

@@ -21,7 +21,7 @@ cron.schedule('* * * * *', async () => {
       });
     }
 
-    console.log('✅');
+    
   } catch (err) {
     console.error('❌ error ron:', err);
   }

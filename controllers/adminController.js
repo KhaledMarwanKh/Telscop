@@ -381,6 +381,7 @@ exports.adminAppointments = catchasync(async (req, res, next) => {
 // api to get all students
 exports.allStudents = catchasync(async (req, res, next) => {
   const filter = {
+    role:"student"
   };
 
   // فلترة حسب الصف

@@ -496,7 +496,7 @@ res.status(200).json({
 })
 })
 exports.activateOrNotActivteTeacher=catchasync(async(req,res,next)=>{
-  const teacherId =req.user?.id
+  const teacherId =req.body?.id
   const state =req.body.state
   const teacher =await teacherModel.findByIdAndUpdate(teacherId,{activate:state})
   if(!teacher){

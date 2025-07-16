@@ -178,7 +178,6 @@ console.log({
     price: Number(price),
     availableTimes: availableTimes,
     image: imageUrl,
-    idImage: idUrl,
     certificates: certificateUrls,
     phone:phone,
     location:location,

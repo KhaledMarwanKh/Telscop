@@ -383,8 +383,10 @@ exports.listcancelledAppointment =catchasync(async(req,res,next)=>{
 // api to cancle  appointment
 exports.cancleAppointment =catchasync(async(req,res,next)=>{
 const {userid,appointmentId} =req.body
-const appointmentData =  await appointmentModel.findById(appointmentId).populate("teacherId",'email').populate("userId",name)
-if(appointmentData.userId!==userid){
+console.log(userid)
+const appointmentData =  await appointmentModel.findById(appointmentId).populate("teacherId",'email').populate("userId",'name')
+console.log(appointmentData.userId.id)
+if(appointmentData.userId.id!=userid){
   return next(new AppError("unauthorized action"))
 }
 await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
@@ -392,6 +394,7 @@ await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
 const {teacherId,slotDate,slotTime}=appointmentData
 const teacherData= await teacherModel.findById(teacherId)
 let slots_booked=teacherData.slots_booked
+console.log(slots_booked)
 slots_booked[slotDate]= slots_booked[slotDate].filter(e=> e!==slotTime)
 
 await teacherModel.findByIdAndUpdate(teacherId,{slots_booked})

@@ -55,6 +55,9 @@ app.use(
     ],
   }),
 );
+app.get('/',(req,res)=>{
+  res.send("API IS RUNNING")
+})
 // api route for admin
 app.use('/api/admin',adminRoute)
 app.use('/api/teacher',teacherRoute)

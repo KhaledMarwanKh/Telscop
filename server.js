@@ -31,8 +31,7 @@ if (process.env.NODE_ENV === "development") {
 app.use(
   cors({
     origin: '*',
-    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
-    // هنا لا نضع allowedHeaders لأننا عكسنا الهيدرز في الميدل وير فوق
+    credentials: true,
   })
 );
 //set securety http method

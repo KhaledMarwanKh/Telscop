@@ -28,8 +28,13 @@ connectCloudinary()
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-app.use(cors())
-
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET','HEAD','PUT','PATCH','POST','DELETE','OPTIONS'],
+    // هنا لا نضع allowedHeaders لأننا عكسنا الهيدرز في الميدل وير فوق
+  })
+);
 //set securety http method
 app.use(helmet());
 //limit request from same api
@@ -42,8 +47,6 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 //Body parser reading data from body into req.body
 app.use(express.json());
-
-app.use(cors())
 //Data sanitization against nosql query injection
 app.use(mongoSanitize());
 // data sanitize against xss

@@ -426,7 +426,7 @@ res.status(200).json({
 })
 // api to get teacher
 exports.getTeacher = catchasync(async (req, res, next) => {
-  const { teacherId } = req.params;
+  const  teacherId  = req.query.teacherId;
 
   const teacher = await teacherModel.findById(teacherId).select('-password');
 

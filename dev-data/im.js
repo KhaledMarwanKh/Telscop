@@ -1,47 +1,69 @@
-const mongoose =require('mongoose')
-const dotenv=require('dotenv')
-const teacherModel =require('../models/teacherModel')
-const userModel =require('../models/userModel')
-const appointmentModel =require('../models/appointmentModel')
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const teacherModel = require('../models/teacherModel');
+const userModel = require('../models/userModel');
+const appointmentModel = require('../models/appointmentModel');
 
+const fs = require('fs');
+const { dirname } = require('path');
 
+dotenv.config({ path: '../.env' });
 
-const fs =require('fs')
-const { dirname } = require('path')
+// Connect to MongoDB
 
-dotenv.config({path : '../.env'})
 mongoose.connect(process.env.DATABASE)
-.then(()=>{
-  console.log("success to connect on database")
-})
+  .then(() => console.log('Connected to database successfully'))
+  .catch(err => console.error('Database connection error:', err));
 
-let teachers =JSON.parse(fs.readFileSync(`${__dirname}/appointments.json`,'utf-8'))
+// Load appointments data from JSON
+const appointments = JSON.parse(
+  fs.readFileSync(`${__dirname}/appointments.json`, 'utf-8')
+);
 
-const import_data = async ()=>{
-  try{
-  await appointmentModel.create(teachers,{validateBeforeSave:false})
- console.log("successful") 
+// Import appointments data
+const importData = async () => {
+  try {
+    await appointmentModel.create(appointments, { validateBeforeSave: false });
+    console.log('Appointments imported successfully');
+  } catch (err) {
+    console.error('Import error:', err.message);
   }
-  catch(err){
-    console.log(err.message)
+  process.exit();
+};
+
+// Delete all appointments
+const deleteAllData = async () => {
+  try {
+    await appointmentModel.deleteMany();
+    console.log('All appointments deleted');
+  } catch (err) {
+    console.error('Delete error:', err.message);
   }
-  process.exit()
+  process.exit();
+};
 
-}
-const delete_all_data = async ()=>{
-try{  await appointmentModel.deleteMany()
-
-    console.log('data is deleted')
-}
-  catch(err){
-    console.log(err.message)
+// Update user images for all students
+const updateStudentImages = async () => {
+  try {
+    const result = await userModel.updateMany(
+      { role: 'student' }, // filter student users (adjust as needed)
+      { image: 'image.png' }
+    );
+  } catch (err) {
+    console.error('Update images error:', err.message);
   }
-  process.exit()
+  process.exit();
+};
 
-}
-if(process.argv[2] ==='--import'){
-  import_data()
-}
-else if (process.argv[2] ==='--delete'){
-  delete_all_data()
+// Determine operation based on CLI flag
+const flag = process.argv[2];
+if (flag === '--import') {
+  importData();
+} else if (flag === '--delete') {
+  deleteAllData();
+} else if (flag === '--update-images') {
+  updateStudentImages();
+} else {
+  console.log('Usage: node script.js [--import|--delete|--update-images]');
+  process.exit();
 }

@@ -68,21 +68,23 @@ exports.changeAvailablity = catchasync(async (req, res, next) => {
 });
 
 exports.listTeachers = catchasync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.teacherId) filter = { tour: req.params.teacherId };
-
-  const feature = new apiFeatures(teacherModel.find(filter), req.query)
+  const feature = new apiFeatures(
+    teacherModel.find({}).select("-password -email"),
+    req.query
+  )
     .filter()
     .sorting()
     .limitField()
     .pagination();
+
   const docs = await feature.query;
-  const teachers = await teacherModel.find({}).select(["-password", "-email"]);
+
   res.status(200).json({
     status: "success",
     data: docs,
   });
 });
+
 //api for teacher signup
 
 exports.signup_teacher = catchasync(async (req, res, next) => {

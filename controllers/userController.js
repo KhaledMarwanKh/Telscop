@@ -227,10 +227,6 @@ exports.appointment = catchasync(async (req, res, next) => {
     { new: true }
   );
 
-  res.status(201).json({
-    success: true,
-    message: "Appointment Booked"
-  });
 
   const teacherInfo = await teacherModel.findById(teacherId);
 const studentInfo = await userModel.findById(userid);
@@ -253,6 +249,11 @@ await sendEmail.sendEmail2({
   text: `تم حجز درس جديد من الطالب ${studentInfo.name} بتاريخ ${slotDate}، الساعة ${slotTime}. السعر: ${teacherInfo.price} ل.س.`
 });
 }
+res.status(201).json({
+  success: true,
+  message: "Appointment Booked"
+});
+
 });
 exports.updateAppointment = catchasync(async (req, res, next) => {
   const { appointmentId, newSlotDate, newSlotTime } = req.body;
@@ -384,9 +385,8 @@ exports.listcancelledAppointment =catchasync(async(req,res,next)=>{
 // api to cancle  appointment
 exports.cancleAppointment =catchasync(async(req,res,next)=>{
 const {userid,appointmentId} =req.body
-console.log(userid)
+
 const appointmentData =  await appointmentModel.findById(appointmentId).populate("teacherId",'email').populate("userId",'name')
-console.log(appointmentData.userId.id)
 if(appointmentData.userId.id!=userid){
   return next(new AppError("unauthorized action"))
 }
@@ -394,23 +394,18 @@ await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
 
 const {teacherId,slotDate,slotTime}=appointmentData
 const teacherData= await teacherModel.findById(teacherId)
+const dateKey = new Date(slotDate).toISOString().split('T')[0];
+
 let slots_booked=teacherData.slots_booked
-console.log(slots_booked)
-slots_booked[slotDate]= slots_booked[slotDate].filter(e=> e!==slotTime)
+console.log(slots_booked[dateKey])
+slots_booked[dateKey]= slots_booked[dateKey].filter(e=> e!==slotTime)
 
 await teacherModel.findByIdAndUpdate(teacherId,{slots_booked})
-
-res.status(200).json({
-  success:true,
-  message:"Appoinrment cancelled"
-})
-
-
   await sendEmail.sendEmail2({
     email: appointmentData.teacherId?.email,
     subject: "❌ تم إلغاء موعد الدرس",
     html: `
-      <p>مرحبًا ${student.name}،</p>
+      <p>مرحبًا ${appointmentData.userId?.name}،</p>
       <p>نأسف لإبلاغك بأن الطالب <strong>${appointmentData.userId?.name}</strong> قد قام بإلغاء حجز الدرس التالي:</p>
       <ul>
         <li><strong>التاريخ:</strong> ${appointmentData.slotDate.toDateString()}</li>
@@ -423,6 +418,11 @@ res.status(200).json({
     text: `تم إلغاء موعد درسك مع الطالب ${appointmentData.userId?.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`
   });
 
+  res.status(200).json({
+    success:true,
+    message:"Appoinrment cancelled"
+  })
+  
 })
 // api to get teacher
 exports.getTeacher = catchasync(async (req, res, next) => {

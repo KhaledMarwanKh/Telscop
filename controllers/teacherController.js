@@ -317,18 +317,15 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
   // إزالة الوقت من slots_booked
   const teacher = await teacherModel.findById(teacherId);
   const { slotDate, slotTime } = appointmentData;
+  const dateKey = new Date(slotDate).toISOString().split('T')[0];
 
-  if (teacher.slots_booked?.[slotDate]) {
-    teacher.slots_booked[slotDate] = teacher.slots_booked[slotDate].filter(
+  if (teacher.slots_booked?.[dateKey]) {
+    teacher.slots_booked[dateKey] = teacher.slots_booked[dateKey].filter(
       (time) => time !== slotTime
     );
     await teacher.save();
   }
 
-  res.status(200).json({
-    success: true,
-    message: "Appointment cancelled and slot released.",
-  });
   const student = await userModel.findById(appointmentData.userId);
 
   await sendEmail.sendEmail2({
@@ -346,6 +343,11 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
       <p>منصة تيليسكوب للخدمات التعليمية</p>
     `,
     text: `تم إلغاء موعد درسك مع الأستاذ ${teacher.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`,
+  });
+  
+  res.status(200).json({
+    success: true,
+    message: "Appointment cancelled and slot released.",
   });
 });
 

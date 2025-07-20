@@ -311,7 +311,7 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
   // تحديث الأستاذ بالموعد الجديد
   await teacherModel.findByIdAndUpdate(teacherData._id, { slots_booked }, { new: true });
 
-const studentInfo = await studentModel.findById(userId).select("name email");
+const studentInfo = await userModel.findById(userId).select("name email");
 if (!studentInfo) {
   return next(new AppError("Student not found", 404));
 }

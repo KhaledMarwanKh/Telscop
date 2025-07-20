@@ -256,13 +256,11 @@ res.status(201).json({
 
 });
 exports.updateAppointment = catchasync(async (req, res, next) => {
-  const { appointmentId, newSlotDate, newSlotTime } = req.body;
-  const userId = req.body.userid;
+  const { appointmentId, newSlotDate, newSlotTime, userid } = req.body;
 
   const appointment = await appointmentModel.findById(appointmentId);
-  if (!appointment || appointment.userId.toString() !== userId) {
-    return next(new AppError("Appointment not found or not yours", 404));
-  }
+  if (!appointment) return next(new AppError("Appointment not found", 404));
+  if (appointment.userId.toString() !== userid) return next(new AppError("Not authorized", 403));
 
   const teacherData = await teacherModel.findById(appointment.teacherId).select('-password');
   if (!teacherData || !teacherData.available) {
@@ -270,6 +268,7 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
   }
 
   const dateObj = new Date(newSlotDate);
+  const dateKey = dateObj.toISOString().split('T')[0];
   const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const dayName = dayNames[dateObj.getDay()];
 
@@ -279,68 +278,66 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
   }
 
   const slots_booked = teacherData.slots_booked || {};
+  const bookedSlotsForNewDate = slots_booked[dateKey] || [];
 
-  const bookedSlotsForNewDate = slots_booked[newSlotDate] || [];
   if (bookedSlotsForNewDate.includes(newSlotTime)) {
     return next(new AppError("New slot is already booked", 400));
   }
 
-  // تحقق من أن الوقت الجديد متاح في أوقات الأستاذ
   if (!availableDay.slots.includes(newSlotTime)) {
     return next(new AppError("New slot is not available", 400));
   }
 
-  // إزالة الموعد القديم من slots_booked للأستاذ
-  const oldDate = appointment.slotDate.toISOString().split('T')[0];
+  // Remove old slot
+  const oldDateKey = appointment.slotDate.toISOString().split('T')[0];
   const oldTime = appointment.slotTime;
-
-  if (slots_booked[oldDate]) {
-    slots_booked[oldDate] = slots_booked[oldDate].filter(slot => slot !== oldTime);
-    if (slots_booked[oldDate].length === 0) delete slots_booked[oldDate];
+  if (slots_booked[oldDateKey]) {
+    slots_booked[oldDateKey] = slots_booked[oldDateKey].filter(slot => slot !== oldTime);
+    if (slots_booked[oldDateKey].length === 0) delete slots_booked[oldDateKey];
   }
 
-  // إضافة الموعد الجديد إلى slots_booked
-  if (!slots_booked[newSlotDate]) slots_booked[newSlotDate] = [];
-  slots_booked[newSlotDate].push(newSlotTime);
+  // Add new slot
+  if (!slots_booked[dateKey]) slots_booked[dateKey] = [];
+  slots_booked[dateKey].push(newSlotTime);
 
-  // تحديث بيانات الحجز
+  // Update appointment
   appointment.slotDate = new Date(newSlotDate);
   appointment.slotTime = newSlotTime;
   await appointment.save();
 
-  // تحديث الأستاذ بالموعد الجديد
-  await teacherModel.findByIdAndUpdate(teacherData._id, { slots_booked }, { new: true });
+  await teacherModel.findByIdAndUpdate(teacherData._id, { slots_booked });
 
-const studentInfo = await userModel.findById(userId).select("name email");
-if (!studentInfo) {
-  return next(new AppError("Student not found", 404));
-}
+  const studentInfo = await userModel.findById(userid).select("name email");
+  if (!studentInfo) return next(new AppError("Student not found", 404));
 
-await sendEmail.sendEmail2({
-  email: teacherData.email,
-  subject: "📚 تم حجز درس جديد",
-  html: `
-    <p>مرحبًا ${teacherData.name}،</p>
-    <p>لقد قام الطالب <strong>${studentInfo.name}</strong> بتعديل موعد درس لديك.</p>
-    <ul>
-      <li><strong>التاريخ:</strong> ${newSlotDate}</li>
-      <li><strong>الوقت:</strong> ${newSlotTime}</li>
-      <li><strong>السعر:</strong> ${teacherData.price} ل.س</li>
-    </ul>
-    <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
-    <hr>
-    <p>منصة تيليسكوب للخدمات التعليمية</p>
-  `,
-  text: `تم تعديل موعد درس من الطالب ${studentInfo.name} بتاريخ ${newSlotDate}، الساعة ${newSlotTime}. السعر: ${teacherData.price} ل.س.`
+  // Send email notification (without awaiting to prevent headers error)
+  sendEmail.sendEmail2({
+    email: teacherData.email,
+    subject: "📚 تم تعديل موعد الدرس",
+    html: `
+      <p>مرحبًا ${teacherData.name}،</p>
+      <p>قام الطالب <strong>${studentInfo.name}</strong> بتعديل موعد الدرس.</p>
+      <ul>
+        <li><strong>التاريخ الجديد:</strong> ${dateKey}</li>
+        <li><strong>الوقت:</strong> ${newSlotTime}</li>
+        <li><strong>السعر:</strong> ${teacherData.price} ل.س</li>
+      </ul>
+      <p>يرجى مراجعة لوحة التحكم للاطلاع على التفاصيل.</p>
+      <hr>
+      <p>منصة تيليسكوب للخدمات التعليمية</p>
+    `,
+    text: `تم تعديل موعد الدرس من الطالب ${studentInfo.name} إلى التاريخ ${dateKey}، الساعة ${newSlotTime}. السعر: ${teacherData.price} ل.س.`
+  }).catch(err => {
+    console.error("فشل إرسال الإيميل:", err.message);
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Appointment updated successfully",
+    appointment
+  });
 });
 
-res.status(200).json({
-  success: true,
-  message: "Appointment updated successfully",
-  appointment
-});
-
-});
 
 // api to get user appointments for my appointment page
 exports.listCurrentAppointment =catchasync(async(req,res,next)=>{

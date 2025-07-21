@@ -40,19 +40,19 @@ const sendEmail2 = async (options) => {
       }
     });
 
-
     const mailOptions = {
       from: '"Telescope للخدمات التعليمية" <kenan.kh2223@gmail.com>',
       to: options.email,
       subject: options.subject,
       text: options.message,
-      html: options.html || options.message  // دعم HTML
+      html: options.html || options.message
     };
 
     await transporter.sendMail(mailOptions);
     console.log(options)
   } catch (err) {
-    return next(new appError(`error in send message to email ${err}`,500))
+    // throw الخطأ إلى الدالة اللي استدعت sendEmail2
+    throw new appError(`error in send message to email ${err}`, 500);
   }
 };
 

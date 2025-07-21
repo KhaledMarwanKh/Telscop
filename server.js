@@ -20,6 +20,17 @@ dotenv.config({path : './.env'})
 //app config 
 const app = express();
 const port =process.env.PORT || 4000 ;
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+);
+
+app.options('*', cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use('/uploads',express.static('uploads')); // توفير الوصول للملفات المرفوعة
 
 connectDb()
@@ -28,12 +39,6 @@ connectCloudinary()
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  })
-);
 //set securety http method
 app.use(helmet());
 //limit request from same api

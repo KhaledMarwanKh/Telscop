@@ -1,6 +1,7 @@
 const nodemailer =require('nodemailer')
 require('dotenv').config();
 const { Resend } = require('resend');
+const appError = require("./appError");
 
 // const sendEmail =async(options)=>{
 //   //1) Create transporter 
@@ -49,9 +50,7 @@ const sendEmail2 = async (options) => {
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(options)
   } catch (err) {
-    // throw الخطأ إلى الدالة اللي استدعت sendEmail2
     throw new appError(`error in send message to email ${err}`, 500);
   }
 };

@@ -2,6 +2,7 @@ const catchasync =require('../utils/catchasync')
 const appError = require('../utils/appError')
 const jwt = require("jsonwebtoken");
 const userModel = require('../models/userModel');
+const techerModel = require('../models/teacherModel');
 const sendEmail =require('../utils/email')
 const crypto =require('crypto')
 const createSendToken = (nuser, statusCode, res) => {
@@ -75,18 +76,16 @@ exports.authUser = catchasync(async (req, res, next) => {
 // api for forget  password
 exports.forgetPassword = catchasync(async (req, res, next) => {
   const { email } = req.body;
-
-  // أولاً: جرّب تبحث بين المستخدمين
+ 
   let account = await userModel.findOne({ email });
   let role = "user";
 
-  // إذا ما لقيته بالمستخدمين، دور عليه بين المدرسين
+
   if (!account) {
     account = await teacherModel.findOne({ email });
     role = "teacher";
   }
 
-  // إذا ما لقيته نهائياً
   if (!account) {
     return next(new appError("There is no user or teacher with this email address", 404));
   }

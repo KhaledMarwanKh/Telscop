@@ -141,7 +141,7 @@ exports.verifyResetCode = catchasync(async (req, res, next) => {
   account.resetCode = undefined;
   account.resetCodeExpires = undefined;
 
-  await account.save();
+  await account.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",
     message: `code is success (${role})`,
@@ -153,9 +153,7 @@ exports.resetPassword = catchasync(async (req, res, next) => {
   const { email, password, passwordConfirm } = req.body;
 
   let account = await userModel.findOne({
-    email,
-
-    resetCodeExpires: { $gt: Date.now() },
+    email
   });
 
   let role = "user";
@@ -163,9 +161,7 @@ exports.resetPassword = catchasync(async (req, res, next) => {
 
   if (!account) {
     account = await teacherModel.findOne({
-      email,
-      resetCodeExpires: { $gt: Date.now() },
-    });
+      email    });
     role = "teacher";
   }
 
@@ -178,7 +174,7 @@ exports.resetPassword = catchasync(async (req, res, next) => {
   account.password = password;
   account.passwordConfirm = passwordConfirm;
 
-  await account.save();
+  await account.save({ validateBeforeSave: false });
 
 
   createSendToken(account, 200, res);

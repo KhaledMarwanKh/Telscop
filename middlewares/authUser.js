@@ -2,7 +2,7 @@ const catchasync =require('../utils/catchasync')
 const appError = require('../utils/appError')
 const jwt = require("jsonwebtoken");
 const userModel = require('../models/userModel');
-const techerModel = require('../models/teacherModel');
+const teacherModel = require('../models/teacherModel');
 const sendEmail =require('../utils/email')
 const crypto =require('crypto')
 const createSendToken = (nuser, statusCode, res) => {
@@ -152,7 +152,6 @@ exports.verifyResetCode = catchasync(async (req, res, next) => {
 exports.resetPassword = catchasync(async (req, res, next) => {
   const { email, password, passwordConfirm } = req.body;
 
-  // البحث أولاً في المستخدمين
   let account = await userModel.findOne({
     email,
 
@@ -161,7 +160,7 @@ exports.resetPassword = catchasync(async (req, res, next) => {
 
   let role = "user";
 
-  // إذا ما وجدنا المستخدم، نبحث في المدرسين
+
   if (!account) {
     account = await teacherModel.findOne({
       email,
@@ -170,7 +169,7 @@ exports.resetPassword = catchasync(async (req, res, next) => {
     role = "teacher";
   }
 
-  // إذا لم يتم العثور على أي حساب
+
   if (!account) {
     return next(new appError("code is not available", 400));
   }

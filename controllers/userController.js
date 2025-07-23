@@ -342,12 +342,12 @@ exports.updateAppointment = catchasync(async (req, res, next) => {
 // api to get user appointments for my appointment page
 exports.listCurrentAppointment =catchasync(async(req,res,next)=>{
   const {userid}=req.body
-  const list = await appointmentModel.find({ userId:userid,cancelled:false,isCompleted:false});
+  const list = await appointmentModel.find({ userId:userid,cancelled:false,isCompleted:false})
+  .populate('teacherId', 'name subject image location ');
   res.status(200).json({
     success:true,
     data: list
-}).populate('teacherId', 'name subject image location ')
-
+})
 })
 //-------------------------
 exports.listCompletedAppointment = catchasync(async (req, res, next) => {

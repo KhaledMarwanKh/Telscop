@@ -17,7 +17,7 @@ router.post('/cancel-appointment',authUser.authUser,userController.cancleAppoint
 router.get('/get-teacher',authUser.authUser,userController.getTeacher)
 router.post('/get-nearest-teacher',authUser.authUser,userController.getNearestTeachersForStudent)
 router.post('/forget-password',authUser.forgetPassword)
-router.post('/verify-resrtcode',authUser.verifyResetCode)
+router.post('/verify-resetcode',authUser.verifyResetCode)
 router.patch('/resetPassword',authUser.resetPassword)
 router.post('/connect',userController.connectWithUs);
 router.post('/update-appointment',authUser.authUser,userController.updateAppointment)

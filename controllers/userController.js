@@ -39,6 +39,7 @@ const generatetoken = (id) =>
       expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
+  
   const uploadAndDelete = async (file) => {
     const filePath = path.resolve(file.path);
   
@@ -199,7 +200,8 @@ exports.appointment = catchasync(async (req, res, next) => {
     userId: userid,
     slotDate: new Date(slotDate),
     slotTime,
-    cancelled: false
+    cancelled: false,
+    isCompleted:false
   });
 
   if (existingAppointment) {

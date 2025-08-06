@@ -3,6 +3,7 @@ const appError = require("../utils/appError");
 const catchasync = require("../utils/catchasync");
 const jwt = require("jsonwebtoken");
 const appointmentModel = require("../models/appointmentModel");
+const userModel =require("../models/userModel")
 const apiFeatures = require("./../utils/apiFeatures");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
@@ -11,6 +12,14 @@ const sendEmail = require("../utils/email");
 const validator = require("validator");
 const { json } = require("stream/consumers");
 const path = require("path");
+function getDateKey(dateInput) {
+  const date = new Date(dateInput);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function parseIfString(data) {
   if (typeof data === "string") {
     try {
@@ -265,8 +274,14 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
 // api to mark appointment complete
 exports.appointmentComplete = catchasync(async (req, res, next) => {
   const { appointmentId } = req.body;
-const teacherId =req.body?.id
-  const appointmentData = await appointmentModel.findById(appointmentId);
+  const teacherId = req.body?.id;
+//6892a76aac8300171b840277
+const appointmentData = await appointmentModel.findOne({
+  _id: appointmentId,
+  cancelled: false,
+  isCompleted: false
+});
+  console.log(appointmentData)
   if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
     return res.status(400).json({
       success: false,
@@ -274,7 +289,7 @@ const teacherId =req.body?.id
     });
   }
 
-  // تحديث الموعد
+  // وضع الموعد كمُكتمل
   await appointmentModel.findByIdAndUpdate(appointmentId, {
     isCompleted: true,
   });
@@ -282,12 +297,17 @@ const teacherId =req.body?.id
   // إزالة الوقت من slots_booked
   const teacher = await teacherModel.findById(teacherId);
   const { slotDate, slotTime } = appointmentData;
+  const dateKey = getDateKey(slotDate)
+console.log(dateKey)
+  if (teacher.slots_booked?.[dateKey]) {
+    const updatedSlots = {
+      ...teacher.slots_booked,
+      [dateKey]: teacher.slots_booked[dateKey].filter((time) => time !== slotTime),
+    };
 
-  if (teacher.slots_booked?.[slotDate]) {
-    teacher.slots_booked[slotDate] = teacher.slots_booked[slotDate].filter(
-      (time) => time !== slotTime
-    );
-    await teacher.save();
+    await teacherModel.findByIdAndUpdate(teacherId, {
+      slots_booked: updatedSlots,
+    });
   }
 
   res.status(200).json({
@@ -299,17 +319,21 @@ const teacherId =req.body?.id
 
 exports.appointmentCancelled = catchasync(async (req, res, next) => {
   const { appointmentId } = req.body;
-  const teacherId =req.body?.id
+  const teacherId = req.body?.id;
 
-  const appointmentData = await appointmentModel.findById(appointmentId);
-  if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
+  const appointmentData = await appointmentModel.findOne({
+    _id: appointmentId,
+    cancelled: false,
+    isCompleted: false
+  });
+    if (!appointmentData || appointmentData.teacherId.toString() !== teacherId) {
     return res.status(400).json({
       success: false,
       message: "Appointment not found or unauthorized",
     });
   }
 
-  // تحديث الموعد
+  // تحديث الموعد إلى مُلغى
   await appointmentModel.findByIdAndUpdate(appointmentId, {
     cancelled: true,
   });
@@ -317,15 +341,22 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
   // إزالة الوقت من slots_booked
   const teacher = await teacherModel.findById(teacherId);
   const { slotDate, slotTime } = appointmentData;
-  const dateKey = new Date(slotDate).toISOString().split('T')[0];
+  const dateKey =getDateKey(slotDate);
 
   if (teacher.slots_booked?.[dateKey]) {
-    teacher.slots_booked[dateKey] = teacher.slots_booked[dateKey].filter(
-      (time) => time !== slotTime
-    );
-    await teacher.save();
+    // تحديث نسخة محدثة من slots_booked
+    const updatedSlots = {
+      ...teacher.slots_booked,
+      [dateKey]: teacher.slots_booked[dateKey].filter((time) => time !== slotTime),
+    };
+
+    // تحديث مباشر بدون .save() لتفادي التحقق من الحقول المطلوبة مثل passwordConfirm
+    await teacherModel.findByIdAndUpdate(teacherId, {
+      slots_booked: updatedSlots,
+    });
   }
 
+  // إرسال إيميل للطالب
   const student = await userModel.findById(appointmentData.userId);
 
   await sendEmail.sendEmail2({
@@ -344,7 +375,7 @@ exports.appointmentCancelled = catchasync(async (req, res, next) => {
     `,
     text: `تم إلغاء موعد درسك مع الأستاذ ${teacher.name} بتاريخ ${appointmentData.slotDate}, الساعة ${appointmentData.slotTime}.`,
   });
-  
+
   res.status(200).json({
     success: true,
     message: "Appointment cancelled and slot released.",

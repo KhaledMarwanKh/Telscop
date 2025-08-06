@@ -7,7 +7,7 @@ cron.schedule('* * * * *', async () => {
 
   try {
     const lessons = await Lesson.find({
-      date: { $lt: now },
+      slotDate: { $lt: now },
       isCancelled: false,
       isCompleted: false
     });

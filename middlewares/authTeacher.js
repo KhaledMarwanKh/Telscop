@@ -41,7 +41,7 @@ exports.authteacher = catchasync(async (req, res, next) => {
     );
   }
   req.body.id = currentuser.id; 
-  req.user = { id: currentuser._id }; // أو خزن كامل الكائن لو تحب
+  req.user = { id: currentuser._id };
 
 console.log(req.body.id)
   //Grant acces to protcted route

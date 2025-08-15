@@ -563,7 +563,7 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
 });
 exports.getQuestions = catchasync(async (req, res, next) => {
   const role = req.body?.role;
-  let questions;
+  let questions="";
   if (role === "teacher") {
     const teacherEmails = await teacherModel.find({}).select("email").lean();
     const emailList = teacherEmails.map(t => t.email);

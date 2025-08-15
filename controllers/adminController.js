@@ -486,9 +486,10 @@ await appointmentModel.findByIdAndUpdate(appointmentId,{cancelled:true})
 
 const {teacherId,slotDate,slotTime}=appointmentData
 const teacherData= await teacherModel.findById(teacherId)
+const dateKey = new Date(slotDate).toISOString().split('T')[0];
 let slots_booked=teacherData.slots_booked
 console.log(teacherData)
-slots_booked[slotDate]= slots_booked[slotDate].filter(e=> e!==slotTime)
+slots_booked[dateKey]= slots_booked[dateKey].filter(e=> e!==slotTime)
 
 await teacherModel.findByIdAndUpdate(teacherId,{slots_booked})
  

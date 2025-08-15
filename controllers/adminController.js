@@ -562,7 +562,7 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
   });
 });
 exports.getQuestions = catchasync(async (req, res, next) => {
-  const {role} = req.body;
+  const role = req.body?.role;
   let questions;
   if (role === "teacher") {
     const teacherEmails = await teacherModel.find({}).select("email").lean();
@@ -592,7 +592,7 @@ const emailList =[...emailList1,...emailList2]
     });
   }
 else{
-  const questions = await questionModel.find({})
+   questions = await questionModel.find({})
 
 }
   res.status(200).json({

@@ -115,6 +115,7 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
       $project: {
         id:1,
         teacherName: "$name",
+        image :"$image",
         amountRequired:"$amountMoneyRequired",
         amountMoneyAllTime:"$amountMoneyAllTime",
         subject: 1,
@@ -355,11 +356,11 @@ exports.adminAppointments = catchasync(async (req, res, next) => {
   const query = appointmentModel.find(flt)
     .populate({
       path: 'userId',
-      select: 'name Class'
+      select: 'name Class image'
     })
     .populate({
       path: 'teacherId',
-      select: 'name subject'
+      select: 'name subject image'
     });
 
   const features = new apiFeatures(query, req.query)
@@ -425,6 +426,7 @@ exports.allStudents = catchasync(async (req, res, next) => {
         email: 1,
         class: "$Class",
         address: 1,
+        image:1,
         lessonsCount: 1
       }
     },

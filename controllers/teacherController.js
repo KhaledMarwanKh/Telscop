@@ -264,7 +264,7 @@ exports.appointmentsTeacher = catchasync(async (req, res, next) => {
 
   const appointments = await appointmentModel
     .find({ teacherId, ...flt })
-    .populate("userId", "name Class subject price comment");
+    .populate("userId", "name Class subject price comment image");
 
   res.status(200).json({
     success: true,

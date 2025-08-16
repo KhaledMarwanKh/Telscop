@@ -14,6 +14,10 @@ name:{
     lowercase: true,
     validate: [validator.isEmail, "please provide a valid email"],
   },
+  status:{
+    type: Boolean,
+    default:false
+  },
 subject:{
   type: String,
   required:true

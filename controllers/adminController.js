@@ -9,6 +9,9 @@ const appointmentModel =require("../models/appointmentModel");
 const userModel = require('../models/userModel');
 const apiFeatures =require('../utils/apiFeatures');
 const questionModel = require('../models/questionsModel');
+const sendEmail =require('../utils/email')
+
+
 const generatetoken = (email) =>
   jwt.sign({email: email }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -563,42 +566,95 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
   });
 });
 exports.getQuestions = catchasync(async (req, res, next) => {
-  const role = req.body?.role;
-  let questions="";
-  if (role === "teacher") {
-    const teacherEmails = await teacherModel.find({}).select("email").lean();
-    const emailList = teacherEmails.map(t => t.email);
-  
-     questions = await questionModel.find({
-      email: { $in: emailList }
-    });
-  
-  }
-  else if(role =="student"){
-    const studentsEmails = await userModel.find({}).select("email").lean();
-    const emailList = studentsEmails.map(t => t.email);
-  
-     questions = await questionModel.find({
-      email: { $in: emailList }
-    });
-  }
-  else if(role =="other"){
-    const teacherEmails = await teacherModel.find({}).select("email").lean();
-    const studentsEmails = await userModel.find({}).select("email").lean();
-    const emailList1= teacherEmails.map(t => t.email);
-    const emailList2= studentsEmails.map(t => t.email);
-const emailList =[...emailList1,...emailList2]
-     questions = await questionModel.find({
-      email: { $nin: emailList }
-    });
-  }
-else{
-   questions = await questionModel.find({})
+  const { role, status } = req.body || {};
+  const filter = {};
 
-}
+  if (role === "teacher") {
+    const teacherEmails = await teacherModel.find({}, "email").lean();
+    filter.email = { $in: teacherEmails.map(t => t.email) };
+  } else if (role === "student") {
+    const studentEmails = await userModel.find({}, "email").lean();
+    filter.email = { $in: studentEmails.map(s => s.email) };
+  } else if (role === "other") {
+    const teacherEmails = await teacherModel.find({}, "email").lean();
+    const studentEmails = await userModel.find({}, "email").lean();
+    const inList = [...teacherEmails, ...studentEmails].map(x => x.email);
+    filter.email = { $nin: inList };
+  }
+
+  if (typeof status === "boolean") {
+    filter.status = status;
+  } else if (typeof status === "string") {
+    if (status.toLowerCase() === "true") filter.status = true;
+    else if (status.toLowerCase() === "false") filter.status = false;
+  }
+
+  const questions = await questionModel.find(filter).lean();
+
   res.status(200).json({
     success: true,
     data: questions
+  });
+});
+exports.changeStatus = catchasync(async (req, res, next) => {
+  const { questionId, status } = req.body;
+
+  if (!questionId) {
+    return next(new appError("questionId is required", 400));
+  }
+
+  let newStatus = true;
+  if (typeof status === "boolean") {
+    newStatus = status;
+  } else if (typeof status === "string") {
+    if (status.toLowerCase() === "false") newStatus = false;
+  }
+
+  const q = await questionModel.findByIdAndUpdate(
+    questionId,
+    { status: newStatus },
+    { new: true, runValidators: true }
+  );
+
+  if (!q) {
+    return next(new appError("Question not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: q
+  });
+});
+exports.sendRespons = catchasync(async (req, res, next) => {
+  const { message, subject, questionId } = req.body;
+
+  // تحقق من وجود questionId
+  if (!questionId) {
+    return next(new appError("questionId is required", 400));
+  }
+
+  // جيب السؤال من الـ DB
+  const q = await questionModel.findById(questionId)
+
+  if (!q) {
+    return next(new appError("Question not found", 404));
+  }
+
+  await sendEmail.sendEmail2({
+    email: q.email,
+    subject: subject || "رد على استفسار",
+    html: `
+      <p>مرحبًا ${q.name || ""},</p>
+      <p>${message}</p>
+      <hr>
+      <p>منصة تيليسكوب للخدمات التعليمية</p>
+    `,
+    text: message
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Response sent successfully"
   });
 });
 exports.payTeacher = catchasync(async (req, res, next) => {

@@ -679,3 +679,21 @@ exports.payTeacher = catchasync(async (req, res, next) => {
     message: "seccessful payment"  });
 });
 
+exports.deleteUser = catchasync(async (req, res, next) => {
+  const { userId } = req.body || {};
+
+  if (!userId) {
+    return next(new AppError("userId is required", 400));
+  }
+
+  const u = await userModel.findByIdAndDelete(userId);
+
+  if (!u) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  });
+});

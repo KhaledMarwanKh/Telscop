@@ -32,5 +32,5 @@ router.post('/change-state-teacher', authAdmin, adminController.activateOrNotAct
 router.post('/change-state-question', authAdmin, adminController.changeStatus);
 router.post('/send-respons', authAdmin, adminController.sendRespons);
 router.post('/get-questions',authAdmin, adminController.getQuestions)
-
+router.post('/delete-user',authAdmin, adminController.deleteUser)
 module.exports=router

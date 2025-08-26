@@ -427,6 +427,7 @@ exports.allStudents = catchasync(async (req, res, next) => {
         _id: 1,
         name: 1,
         email: 1,
+        createdAt:1,
         class: "$Class",
         address: 1,
         image:1,

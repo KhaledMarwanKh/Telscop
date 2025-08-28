@@ -472,7 +472,7 @@ exports.studentsByClass = catchasync(async (req, res, next) => {
 
 exports.allActivateTeachers = catchasync(async(req,res,next)=>{
 
-  const teachers_activate =await teacherModel.find({activate:true}).select('-password')
+  const teachers_activate =await teacherModel.find({checkAdmin:true}).select('-password')
   res.status(200).json({
     status: "success",
     number_activate:teachers_activate.length,

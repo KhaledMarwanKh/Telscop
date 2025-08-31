@@ -1,4 +1,4 @@
-import { subjects } from "../../../data/adminMockData"
+import { subjects } from "../../../data/assests"
 
 const FilterTab = ({
     statusFilter,
@@ -8,11 +8,11 @@ const FilterTab = ({
 }) => {
     return (
         <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="flex items-center justify-between gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-[40%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                     <option value="all">جميع الحالات</option>
                     <option value="confirmed">مؤكد</option>
@@ -23,10 +23,11 @@ const FilterTab = ({
                 <select
                     value={subjectFilter}
                     onChange={(e) => setSubjectFilter(e.target.value)}
-                    className="w-[40%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
+                    <option value="all">جميع  المواد</option>
                     {subjects.map(subject => (
-                        <option key={subject.key} value={subject.key}>{subject.name}</option>
+                        <option key={subject.key} value={subject.name}>{subject.name}</option>
                     ))}
                 </select>
             </div>

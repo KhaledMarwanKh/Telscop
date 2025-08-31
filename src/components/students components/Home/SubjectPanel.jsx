@@ -1,6 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { subjects } from '../../../data/mockData'
-import middle_image from '../../../data/images/middle_image.jpg'
+import { assets, subjects } from '../../../data/assests'
 
 const SubjectPanel = () => {
     const navigate = useNavigate()
@@ -8,7 +7,7 @@ const SubjectPanel = () => {
     return (
         <section style={
             {
-                backgroundImage: `url("${middle_image}")`,
+                backgroundImage: `url("${assets.middle_image}")`,
                 backgroundSize: '100% 100%',
                 backgroundAttachment: 'fixed'
             }

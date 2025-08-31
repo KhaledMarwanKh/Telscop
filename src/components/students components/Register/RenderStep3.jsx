@@ -2,15 +2,27 @@ import React from 'react'
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 
-const RenderStep3 = ({handleInputChange,
+const RenderStep3 = ({ handleInputChange,
     formData,
     setShowConfirmPassword,
     showConfirmPassword,
     getPasswordStrength,
     showPassword,
-    setShowPassword}) => {
+    setShowPassword,
+    handleFileUpload
+}) => {
     return (
         <div className="space-y-5">
+            <div className='flex flex-col space-x-2 space-x-reverse'>
+                <span>صورة شخصية (اختيارية)</span>
+                <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    name='image'
+                    onChange={handleFileUpload}
+                    className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-xl hover:border-emerald-500 transition-colors cursor-pointer"
+                />
+            </div>
             <div className="group">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                     كلمة المرور *
@@ -63,8 +75,8 @@ const RenderStep3 = ({handleInputChange,
                     </div>
                     <input
                         type={showConfirmPassword ? 'text' : 'password'}
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
+                        name="passwordConfirm"
+                        value={formData.passwordConfirm}
                         onChange={handleInputChange}
                         className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-primary/20 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400 ${formData.confirmPassword && formData.password !== formData.confirmPassword
                             ? 'border-red-300 focus:border-red-500'

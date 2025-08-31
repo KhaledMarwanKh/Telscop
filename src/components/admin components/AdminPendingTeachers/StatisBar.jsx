@@ -15,7 +15,7 @@ const StatisBar = (
                     </div>
                     <div className="mr-4">
                         <p className="text-sm font-medium text-gray-600">طلبات جديدة</p>
-                        <p className="text-2xl font-bold text-yellow-600">{filteredTeachers.length}</p>
+                        <p className="text-2xl font-bold text-yellow-600">{filteredTeachers?.length}</p>
                     </div>
                 </div>
             </div>
@@ -27,7 +27,7 @@ const StatisBar = (
                     </div>
                     <div className="mr-4">
                         <p className="text-sm font-medium text-gray-600">تمت الموافقة اليوم</p>
-                        <p className="text-2xl font-bold text-green-600">3</p>
+                        <p className="text-2xl font-bold text-green-600">0</p>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@ const StatisBar = (
                     </div>
                     <div className="mr-4">
                         <p className="text-sm font-medium text-gray-600">تم الرفض اليوم</p>
-                        <p className="text-2xl font-bold text-red-600">1</p>
+                        <p className="text-2xl font-bold text-red-600">0</p>
                     </div>
                 </div>
             </div>

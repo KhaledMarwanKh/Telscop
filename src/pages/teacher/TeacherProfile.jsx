@@ -1,65 +1,105 @@
 import { useEffect, useState } from 'react';
 import {
-  FiEdit2, FiSave, 
+  FiEdit2, FiSave,
 } from 'react-icons/fi';
-import { mockTeacherProfile } from '../../data/teacherMockData';
 import { toast } from 'react-toastify';
 import RenderPersonalInfo from '../../components/teacher component/Profile/RenderPersonalInfo';
 import RenderProfissionalInfo from '../../components/teacher component/Profile/RenderProfissionalInfo';
 import RenderSchedule from '../../components/teacher component/Profile/RenderSchedule';
 import Header from '../../components/teacher component/Profile/Header';
-import StatisBar from '../../components/teacher component/Profile/StatisBar';
+import { useLoaderData } from 'react-router-dom';
+import api from '../../lib/api';
 
 const TeacherProfile = () => {
+  const teacherInfo = useLoaderData();
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [activeTab, setActiveTab] = useState('personal');
 
   const [formData, setFormData] = useState({
-    name:""
+    name: teacherInfo.name,
+    email: teacherInfo.email,
+    phone: teacherInfo.phone,
+    birthDate: teacherInfo.birthDate,
+    gender: teacherInfo.gender,
+    address: {
+      city: teacherInfo.address.city,
+      region: teacherInfo.address.region,
+      street: teacherInfo.address.street
+    },
+    subject: teacherInfo.subject,
+    Class: teacherInfo.Class,
+    experience: teacherInfo.experience,
+    price: teacherInfo.price,
+    degree: teacherInfo.degree,
+    about: teacherInfo.about,
+    availableTimes: teacherInfo.availableTimes,
+    slots_booked: teacherInfo.slots_booked,
+    location: teacherInfo.location,
+    image: teacherInfo.image
   });
 
-  const [profileImage, setProfileImage] = useState(mockTeacherProfile.image);
+  const [profileImage, setProfileImage] = useState(teacherInfo.image);
 
-  const [statis,setStatis] =  useState({})
+  const [sendImage, setSendImage] = useState(null);
 
-  useEffect(()=>{
-    setFormData(mockTeacherProfile)
-  },[])
-
-  useEffect(()=>{
-    if (localStorage.getItem('activeTab')){
+  useEffect(() => {
+    if (localStorage.getItem('activeTab')) {
       setActiveTab("schedule");
       setIsEditing(true);
       localStorage.clear();
     }
-  },[])
-
-  useEffect(()=>{
-    setStatis(mockTeacherProfile.stats)
-  },[statis])
+  }, [])
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'experience' ? parseInt(value) : value
     }));
+  };
+
+
+  const handleAddressChange = ({ target: { value, name } }) => {
+    setFormData((prev) => (
+      {
+        ...prev,
+        address: {
+          ...prev.address,
+          [name]: value
+        }
+      }
+    ))
   };
 
   const handleGradeChange = (gradeValue) => {
     setFormData(prev => ({
       ...prev,
-      grades: prev.grades.includes(gradeValue)
-        ? prev.grades.filter(g => g !== gradeValue)
-        : [...prev.grades, gradeValue]
+      Class: prev.Class.includes(gradeValue)
+        ? prev.Class.filter(g => g !== gradeValue)
+        : [...prev.Class, parseInt(gradeValue)]
     }));
   };
 
   const handleAvailabilityChange = (day, slot) => {
+    console.log(day)
+    if (!formData.availableTimes.map(e => e.day).includes(day)) {
+      console.log(formData.availableTimes)
+      setFormData((prev) => ({
+        ...prev,
+        availableTimes: [
+          ...prev.availableTimes,
+          { day, slots: [slot] }
+        ]
+      }))
+
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
-      availability: prev.availability.map(daySchedule =>
+      availableTimes: prev.availableTimes.map(daySchedule =>
         daySchedule.day === day
           ? {
             ...daySchedule,
@@ -80,38 +120,103 @@ const TeacherProfile = () => {
         setProfileImage(e.target.result);
       };
       reader.readAsDataURL(file);
+      setSendImage(file);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.success('تم حفظ التغييرات بنجاح!');
+
+    const { teacherToken } = localStorage;
+
+    if (teacherToken) {
+      try {
+        console.log(formData, "update profile")
+
+        const updateRequest = await (await api.post(
+          "/api/teacher/update-Profile"
+          , formData
+          , {
+            headers: {
+              authorization: `Bearer ${teacherToken}`
+            }
+          }
+        )).data;
+
+        if (updateRequest.success === true) {
+          toast.success("تم تعديل البيانات بنجاح");
+        } else {
+          toast.error("لقد حدث خطا ما");
+          handleCancel();
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    }
+
+    try {
+      if (sendImage) {
+        const formData = new FormData();
+
+        formData.append("image", sendImage);
+
+        const imageUpdateRequest = await (await api.post(
+          "/api/teacher/update-Profile"
+          , formData
+          , {
+            timeout: 1000000,
+            headers: {
+              authorization: `Bearer ${teacherToken}`,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        )).data;
+
+        if (imageUpdateRequest.success === true) {
+          toast.success("تم تعديل البيانات بنجاح");
+        } else {
+          toast.error("لقد حدث خطا ما");
+          handleCancel();
+        }
+
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
+
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setFormData({
-      name: mockTeacherProfile.name,
-      email: mockTeacherProfile.email,
-      phone: mockTeacherProfile.phone,
-      birthDate: mockTeacherProfile.birthDate,
-      gender: mockTeacherProfile.gender,
-      address: mockTeacherProfile.address,
-      subject: mockTeacherProfile.subject,
-      grades: mockTeacherProfile.grades,
-      experience: mockTeacherProfile.experience,
-      price: mockTeacherProfile.price,
-      qualification: mockTeacherProfile.qualification,
-      bio: mockTeacherProfile.bio,
-      availability: mockTeacherProfile.availability
+      name: teacherInfo.name,
+      email: teacherInfo.email,
+      phone: teacherInfo.phone,
+      birthDate: teacherInfo.birthDate,
+      gender: teacherInfo.gender,
+      address: {
+        city: teacherInfo.address.city,
+        region: teacherInfo.address.region,
+        street: teacherInfo.address.street
+      },
+      subject: teacherInfo.subject,
+      Class: teacherInfo.Class,
+      experience: teacherInfo.experience,
+      price: teacherInfo.price,
+      degree: teacherInfo.degree,
+      about: teacherInfo.about,
+      availableTimes: teacherInfo.availableTimes,
+      slots_booked: teacherInfo.slots_booked,
+      location: teacherInfo.location,
+      image: teacherInfo.image
     });
-    setProfileImage(mockTeacherProfile.image);
+    setProfileImage(teacherInfo.image);
     setIsEditing(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      
+
       <Header />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -189,6 +294,7 @@ const TeacherProfile = () => {
               isEditing={isEditing}
               formData={formData}
               profileImage={profileImage}
+              handleAddressChange={handleAddressChange}
             />}
             {activeTab === 'professional' && <RenderProfissionalInfo
               handleGradeChange={handleGradeChange}
@@ -203,14 +309,34 @@ const TeacherProfile = () => {
             />}
           </form>
 
-          {/* Statistics */}
-          {!isEditing && (
-            <StatisBar teacherStat={statis} />
-          )}
         </div>
       </div>
     </div>
   );
 };
+
+export const getInfo = async () => {
+  const { teacherToken } = localStorage;
+
+  if (teacherToken) {
+    try {
+      const teacherInfoRequest = await (await api.get(
+        "/api/teacher/profile"
+        , {
+          headers: {
+            authorization: `Bearer ${teacherToken}`
+          }
+        }
+      )).data;
+
+      if (teacherInfoRequest.success === true) {
+        return teacherInfoRequest.data;
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+}
 
 export default TeacherProfile;

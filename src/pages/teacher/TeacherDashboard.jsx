@@ -1,49 +1,148 @@
 import { useEffect, useState } from 'react';
-import { mockTeacherProfile, mockTodayLessons, mockUpcomingLessons } from '../../data/teacherMockData';
 import { toast } from 'react-toastify';
 import Header from '../../components/teacher component/Dashboard/Header';
 import NoLessions from '../../components/teacher component/Dashboard/NoLessions';
 import TodayLessions from '../../components/teacher component/Dashboard/TodayLessions';
 import UpCommingLessions from '../../components/teacher component/Dashboard/UpCommingLessions';
 import StatisBar from '../../components/teacher component/Dashboard/StatisBar';
+import { formatDate, getDayKeyByNumber, getNextDayDate, getTimeSlotId } from '../../data/assests';
+import api from '../../lib/api';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import FilterTab from '../../components/teacher component/Dashboard/Filter';
 
 const TeacherDashboard = () => {
+  const dashboardInfo = useLoaderData();
   const [activeTab, setActiveTab] = useState('today');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [teacherInfo, setTeacherInfo] = useState({});
-  const [statis, setStatis] = useState({})
-  const [todayLessons, setTodayLessons] = useState([])
-  const [upcommingLessons, setUpcommingLessons] = useState([])
+  const [statis, setStatis] = useState({});
+  const [todayLessons, setTodayLessons] = useState([]);
+  const [upcommingLessons, setUpcommingLessons] = useState([]);
+  const [dayFilter, setDayFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [totalBookings, setTotalBookings] = useState([]);
+  const navigate = useNavigate();
 
-  const handleCompleteLesson = (lessonId) => {
-    toast.success('اكتمل الدرس بنجاح');
+  const handleCompleteLesson = async (lessonId) => {
+    try {
+      const { teacherToken } = localStorage;
+
+      const completeBookingRequest = await (await api.post(
+        "/api/teacher/complete-appointments"
+        , {
+          appointmentId: lessonId
+        },
+        {
+          headers: {
+            authorization: `Bearer ${teacherToken}`
+          }
+        }
+      )).data;
+
+      if (completeBookingRequest.success) {
+        toast.success("تم تعليم الدرس كمكتمل");
+        navigate("/teacher/dashboard");
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
   };
 
-  const handleCancelLesson = (lessonId) => {
-    toast.error('تم الغاء الدرس');
-  };
+  const handleCancelLesson = async (lessonId) => {
+    try {
+      const { teacherToken } = localStorage;
 
-  const handleCallStudent = (phone) => {
-    toast.info(`جاري الاتصال بـ ${phone}`);
+      const canceleBookingRequest = await (await api.post(
+        "/api/teacher/cancel-appointments",
+        {
+          appointmentId: lessonId
+        },
+        {
+          headers: {
+            authorization: `Bearer ${teacherToken}`
+          }
+        }
+      )).data;
+
+      if (canceleBookingRequest.success) {
+        toast.success("تم الغاء الدرس بنجاح");
+        navigate("/teacher/dashboard")
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error)
+    }
   };
 
   useEffect(() => {
-    setTeacherInfo(mockTeacherProfile)
-  }, [teacherInfo])
+    setStatis(dashboardInfo.statis);
+    setTeacherInfo(dashboardInfo.teacherInfo);
+    setTodayLessons(dashboardInfo.todayLessons);
+    setUpcommingLessons(dashboardInfo.upcommingLessons);
+    setTotalBookings(dashboardInfo.bookings);
+  }, [dashboardInfo])
 
   useEffect(() => {
-    setStatis(mockTeacherProfile.stats)
-  }, [statis])
+    updateBookings();
+  }, [dayFilter, statusFilter]);
 
-  useEffect(() => {
-    setUpcommingLessons(mockUpcomingLessons);
-    setTodayLessons(mockTodayLessons)
-  }, [todayLessons, upcommingLessons])
+  const updateBookings = async () => {
+    const { teacherToken } = localStorage;
+    try {
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US');
-  };
+      const bookingsRequest = await (await api.get(
+        "/api/teacher/appointments"
+        , {
+          headers: {
+            authorization: `Bearer ${teacherToken}`
+          }
+        }
+      )).data;
+
+      if (bookingsRequest.success) {
+        const bookings = bookingsRequest.data;
+
+        let upcommingLessons, todayLessons;
+
+        todayLessons = bookings
+          .filter(booking => booking.slotDate.split("T")[0] === formatDate(new Date().toLocaleDateString("en-US")))
+          .sort((a, b) => getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime));
+
+        upcommingLessons = bookings
+          .filter(booking => new Date(booking.slotDate.split("T")[0]) > new Date(formatDate(new Date().toLocaleDateString("en-US"))))
+          .sort((a, b) => new Date(a.slotDate.split("T")[0]) - new Date(b.slotDate.split("T")[0]));
+
+        if (dayFilter !== "all") {
+          upcommingLessons = upcommingLessons.filter(booking => getDayKeyByNumber(new Date(booking.slotDate).getDay()) === dayFilter);
+        }
+
+        if (statusFilter !== "all") {
+          if (statusFilter === "confirmed") {
+            upcommingLessons = upcommingLessons.filter(booking => !booking.isCompleted && !booking.cancelled);
+            todayLessons = todayLessons.filter(booking => !booking.isCompleted && !booking.cancelled);
+          }
+          else if (statusFilter === "completed") {
+            upcommingLessons = upcommingLessons.filter(booking => booking.isCompleted);
+            todayLessons = todayLessons.filter(booking => booking.isCompleted);
+          }
+          else {
+            upcommingLessons = upcommingLessons.filter(booking => booking.cancelled);
+            todayLessons = todayLessons.filter(booking => booking.cancelled);
+          }
+        }
+
+        setTodayLessons(todayLessons);
+
+        setUpcommingLessons(upcommingLessons);
+
+        setTotalBookings(bookings);
+
+      }
+
+    } catch (e) {
+      toast.error(e.message);
+    }
+  }
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -62,7 +161,6 @@ const TeacherDashboard = () => {
         <TodayLessions
           handleCancelLesson={handleCancelLesson}
           handleCompleteLesson={handleCompleteLesson}
-          handleCallStudent={handleCallStudent}
           getStatusBadge={getStatusBadge}
           todayLessons={todayLessons}
         />
@@ -80,7 +178,6 @@ const TeacherDashboard = () => {
           formatDate={formatDate}
           handleCancelLesson={handleCancelLesson}
           handleCompleteLesson={handleCompleteLesson}
-          handleCallStudent={handleCallStudent}
           upcommingLessons={upcommingLessons}
         />
       )}
@@ -97,17 +194,8 @@ const TeacherDashboard = () => {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            لوحة التحكم
-          </h1>
-          <p className="text-gray-600">إليك نظرة عامة على نشاطك اليوم</p>
-        </div>
 
-
-        <StatisBar statis={statis} />
-
+        <StatisBar statis={statis} bookings={totalBookings} />
 
         {/* Main Content */}
         <div className="grid grid-cols-1 w-full lg:grid-cols-2 gap-8">
@@ -137,6 +225,18 @@ const TeacherDashboard = () => {
 
             {/* Content */}
             <div className='w-full'>
+              <FilterTab
+                setDayFilter={setDayFilter}
+                setStatusFilter={setStatusFilter}
+                dayFilter={dayFilter}
+                statusFilter={statusFilter}
+                daysInEnglish={
+                  teacherInfo?.availableTimes?.map(daySlot => daySlot.day)
+                    ?.filter(day => new Date(getNextDayDate(day)) > new Date())
+                    ?.sort((a, b) => new Date(getNextDayDate(a)) - new Date(getNextDayDate(b)))
+                }
+                activeTab={activeTab}
+              />
               {activeTab === 'today' && renderTodayLessons()}
               {activeTab === 'upcoming' && renderUpcomingLessons()}
             </div>
@@ -146,5 +246,70 @@ const TeacherDashboard = () => {
     </div>
   );
 };
+
+export const dashboardInfoLoader = async () => {
+  const { teacherToken } = localStorage;
+
+  let upcommingLessons = [];
+  let todayLessons = [];
+  let statis = {};
+
+  if (teacherToken) {
+    try {
+      const statisRequest = await (await api.get(
+        "/api/teacher/dashboard",
+        {
+          headers: {
+            authorization: `Bearer ${teacherToken}`
+          }
+        }
+      )).data;
+
+      if (statisRequest.status === "success") {
+        statis = statisRequest.data;
+
+        const bookingsRequest = await (await api.get(
+          "/api/teacher/appointments"
+          , {
+            headers: {
+              authorization: `Bearer ${teacherToken}`
+            }
+          }
+        )).data;
+
+        if (bookingsRequest.success === true) {
+          const bookings = bookingsRequest.data;
+
+          todayLessons = bookings
+            .filter(booking => booking.slotDate.split("T")[0] === formatDate(new Date().toLocaleDateString("en-US")))
+            .sort((a, b) => getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime));
+
+          upcommingLessons = bookings
+            .filter(booking => new Date(booking.slotDate.split("T")[0]) > new Date(formatDate(new Date().toLocaleDateString("en-US"))))
+            .sort((a, b) => new Date(a.slotDate.split("T")[0]) - new Date(b.slotDate.split("T")[0]));
+
+          const teacherInfoRequest = await (await api.get(
+            "/api/teacher/profile"
+            , {
+              headers: {
+                authorization: `Bearer ${teacherToken}`
+              }
+            }
+          )).data;
+
+          if (teacherInfoRequest.success === true) {
+            const teacherInfo = teacherInfoRequest.data;
+
+            return { statis, todayLessons, upcommingLessons, teacherInfo, bookings };
+          }
+        }
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
+  } else {
+    window.location.href = "/login";
+  }
+}
 
 export default TeacherDashboard;

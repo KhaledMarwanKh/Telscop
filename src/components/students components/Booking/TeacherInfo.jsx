@@ -19,7 +19,7 @@ const TeacherInfo = ({ teacher }) => {
                     <p className="text-lg text-primary mb-2">معلم {teacher.subject}</p>
                     <p className="text-gray-600 mb-2">خبرة {teacher.experience}</p>
                     <p className="text-gray-600 mb-4">
-                        يدرس للصفوف: {new Array(teacher.grades).join('-')}
+                        يدرس للصفوف: {new Array(teacher.Class).join('-')}
                     </p>
 
                     <div className="flex items-center space-x-4 space-x-reverse mb-4">
@@ -32,7 +32,7 @@ const TeacherInfo = ({ teacher }) => {
                     <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                         <div className="flex items-center space-x-2 space-x-reverse">
                             <FiMapPin className="w-4 h-4" />
-                            <span>{teacher.address}</span>
+                            <span>{`${teacher.address?.city},${teacher.address?.region},${teacher.address?.street}`}</span>
                         </div>
                         <div className="flex items-center space-x-2 space-x-reverse">
                             <FiPhone className="w-4 h-4" />
@@ -47,12 +47,12 @@ const TeacherInfo = ({ teacher }) => {
 
                         <div className="mt-6">
                             <h3 className="font-semibold text-gray-800 mb-2">الشهادة والمؤهلات</h3>
-                            <p className="text-gray-600">{teacher.qualification}</p>
+                            <p className="text-gray-600">{teacher.degree}</p>
                         </div>
 
                         <div className="mt-4">
                             <h3 className="font-semibold text-gray-800 mb-2">نبذة عن المعلم</h3>
-                            <p className="text-gray-600">{teacher.bio}</p>
+                            <p className="text-gray-600">{teacher.about}</p>
                         </div>
                     </>
                 )

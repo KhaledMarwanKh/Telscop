@@ -1,5 +1,7 @@
 import { FiChevronDown, FiEdit3, FiHelpCircle, FiHome, FiLogOut, FiUser } from 'react-icons/fi'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import api from '../../../lib/api'
 
 const Header = (
     {
@@ -10,9 +12,37 @@ const Header = (
 ) => {
     const navigate = useNavigate()
 
+    const handleLogout = async () => {
+        const { teacherToken } = localStorage;
+
+        try {
+            const logoutRequest = await (await api.post(
+                "/api/teacher/logout"
+                , {}
+                ,
+                {
+                    headers: {
+                        authorization: "Bearer " + teacherToken
+                    }
+                }
+            )).data;
+
+            console.log(logoutRequest)
+
+            toast.success("تم تسجيل الخروج بنجاح");
+
+            localStorage.removeItem("teacherToken");
+
+            window.location.href = "/login";
+        } catch (e) {
+            toast.error(e.message);
+            console.log(e);
+        }
+    }
+
     const reschedualLessons = () => {
         setIsProfileMenuOpen(false)
-        localStorage.setItem('activeTab','schedule');
+        localStorage.setItem('activeTab', 'schedule');
         navigate('/teacher/profile')
     }
 
@@ -98,9 +128,9 @@ const Header = (
                                         </Link>
 
                                         <Link
-                                            to="/teacher/login"
+                                            to="/login"
                                             className="flex items-center space-x-3 space-x-reverse px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                            onClick={() => setIsProfileMenuOpen(false)}
+                                            onClick={handleLogout}
                                         >
                                             <FiLogOut className="w-4 h-4 text-red-500" />
                                             <span>تسجيل الخروج</span>

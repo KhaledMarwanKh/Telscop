@@ -29,13 +29,6 @@ const Header = () => {
                             >
                                 <FiHome className="w-5 h-5" />
                             </Link>
-                            <Link
-                                to="/teacher/login"
-                                className="p-2 text-gray-500 hover:text-red-600 transition-colors"
-                                title="تسجيل الخروج"
-                            >
-                                <FiLogOut className="w-5 h-5" />
-                            </Link>
                         </div>
                     </div>
                 </div>

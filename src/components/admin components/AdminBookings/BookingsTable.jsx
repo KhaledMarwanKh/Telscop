@@ -1,13 +1,12 @@
 import React from 'react'
-import { FiEye, FiX } from 'react-icons/fi';
+import { FiX } from 'react-icons/fi';
+import { formatTime,formatDate, getGradeNameByNumber } from '../../../data/assests';
 
 const BookingsTable = (
     {
         handleCancelBooking,
-        handleViewBooking,
         filteredBookings,
         getStatusBadge,
-        formatDate
     }
 ) => {
     return (
@@ -27,44 +26,43 @@ const BookingsTable = (
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                    {filteredBookings.map((booking) => {
-                        const statusBadge = getStatusBadge(booking.status);
+                    {filteredBookings?.map((booking) => {
+                        const statusBadge = getStatusBadge(
+                            (booking?.isCompleted) ? "completed"
+                                : (booking?.cancelled) ? "cancelled"
+                                    : "confirmed"
+                        );
                         return (
-                            <tr key={booking.id} className="hover:bg-gray-50 transition-colors">
+                            <tr key={booking._id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center space-x-3 space-x-reverse">
                                         <img
-                                            src={booking.studentImage}
-                                            alt={booking.studentName}
+                                            src={booking?.userId?.image}
+                                            alt=""
                                             className="w-10 h-10 rounded-full object-cover"
                                         />
-                                        <div className="text-sm font-medium text-gray-900">{booking.studentName}</div>
+                                        <div className="text-sm font-medium text-gray-900">{booking?.userId?.name}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center space-x-3 space-x-reverse">
-                                        <img
-                                            src={booking.teacherImage}
-                                            alt={booking.teacherName}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div className="text-sm font-medium text-gray-900">{booking.teacherName}</div>
+                                        <div className="text-sm font-medium text-gray-900">{booking?.teacherId?.name}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div>
-                                        <div className="text-sm font-medium text-gray-900">{booking.subject}</div>
-                                        <div className="text-sm text-gray-500">الصف {booking.grade}</div>
+                                        <div className="text-sm font-medium text-gray-900">{booking?.subject}</div>
+                                        <div className="text-sm text-gray-500">{getGradeNameByNumber(booking?.userId?.Class)}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div>
-                                        <div className="text-sm font-medium text-gray-900">{formatDate(booking.date)}</div>
-                                        <div className="text-sm text-gray-500">{booking.time}</div>
+                                        <div className="text-sm font-medium text-gray-900">{formatDate(booking?.slotDate?.split("T")[0])}</div>
+                                        <div className="text-sm text-gray-500">{formatTime(booking?.slotTime)}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="text-sm text-gray-900">{booking.duration} دقيقة</span>
+                                    <span className="text-sm text-gray-900">{60} دقيقة</span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="text-sm font-medium text-emerald-600">
@@ -73,7 +71,7 @@ const BookingsTable = (
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="text-sm text-gray-900">
-                                        {new Date(booking.bookingDate).toLocaleDateString('en-US')}
+                                        {formatDate(new Date(booking?.createdAt).toLocaleDateString('en-US'))}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -83,9 +81,9 @@ const BookingsTable = (
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                     <div className="flex items-center justify-center space-x-2 space-x-reverse">
-                                        {(booking.status === 'confirmed') && (
+                                        {(!booking?.isCompleted && !booking?.cancelled) && (
                                             <button
-                                                onClick={() => handleCancelBooking(booking.id)}
+                                                onClick={() => handleCancelBooking(booking?._id)}
                                                 className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
                                                 title="إلغاء الحجز"
                                             >

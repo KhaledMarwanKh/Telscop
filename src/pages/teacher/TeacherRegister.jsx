@@ -1,43 +1,43 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiArrowRight, FiCheck, FiBookOpen, FiUpload, FiClock, FiAward } from 'react-icons/fi';
+import { FiUser, FiCheck, FiBookOpen, FiUpload, FiClock, FiAward, FiArrowLeft } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import RenderStep1 from '../../components/teacher component/Register/RenderStep1';
 import RenderStep2 from '../../components/teacher component/Register/RenderStep2';
 import RenderStep3 from '../../components/teacher component/Register/RenderStep3';
 import RenderStep4 from '../../components/teacher component/Register/RenderStep4';
+import { formatDate, getGeoLocation } from '../../data/assests';
+import api from '../../lib/api';
 
 const TeacherRegister = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Personal Information
     name: '',
     email: '',
+    about: '',
+    location: {
+      coordinates: []
+    },
     phone: '',
-    birthDate: '',
-    gender: '',
-    address: '',
-
-    // Professional Information
+    slots_booked: {},
+    availableTimes: [
+    ],
+    Class: [],
+    degree: '',
+    experience: 0,
     subject: '',
-    grades: [],
-    experience: '',
-    qualification: '',
-    bio: '',
-    price: '',
-
-    // Schedule
-    availability: {},
-
-    // Documents
+    gender: '',
+    address: {
+      city: "",
+      region: "",
+      street: ""
+    },
+    birthDate: '',
+    price: 0,
     image: null,
-    IdImage: null,
-    certifications: null,
-
-    // Security
     password: '',
-    confirmPassword: '',
-    agreeToTerms: false
+    passwordConfirm: '',
+    certificates: []
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -45,119 +45,139 @@ const TeacherRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.alert("قم بتشغيل الموقع من فضلك لتخزين موقعك الجغرافي");
+  }, [])
+
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: name === 'experience' ? parseInt(value) : (name === "price") ? parseInt(value) : value
     }));
   };
 
   const handleGradeChange = (gradeValue) => {
     setFormData(prev => ({
       ...prev,
-      grades: prev.grades.includes(gradeValue)
-        ? prev.grades.filter(g => g !== gradeValue)
-        : [...prev.grades, gradeValue]
+      Class: prev.Class.includes(gradeValue)
+        ? prev.Class.filter(g => g !== gradeValue)
+        : [...prev.Class, gradeValue]
     }));
   };
 
   const handleAvailabilityChange = (day, slot) => {
+    console.log(day)
+    if (!formData.availableTimes.map(e => e.day).includes(day)) {
+      console.log(formData.availableTimes)
+      setFormData((prev) => ({
+        ...prev,
+        availableTimes: [
+          ...prev.availableTimes,
+          { day, slots: [slot] }
+        ]
+      }))
+
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
-      availability: {
-        ...prev.availability,
-        [day]: prev.availability[day]?.includes(slot)
-          ? prev.availability[day].filter(s => s !== slot)
-          : [...(prev.availability[day] || []), slot]
-      }
+      availableTimes: prev.availableTimes.map(daySchedule =>
+        daySchedule.day === day
+          ? {
+            ...daySchedule,
+            slots: daySchedule.slots.includes(slot)
+              ? daySchedule.slots.filter(s => s !== slot)
+              : [...daySchedule.slots, slot]
+          }
+          : daySchedule
+      )
     }));
   };
 
   const handleFileUpload = (e) => {
     const files = e.target.files;
+    console.log(files, e.target.name)
     setFormData(prev => ({
       ...prev,
-      image: (e.target.name === 'image') ? files : null,
-      IdImage: (e.target.name === 'IdImage') ? files : null,
-      certifications: (e.target.name === 'certifications') ? files : null
+      image: (e.target.name === 'image') ? files[0] : prev.image,
+      certificates: (e.target.name === 'certifications') ? files : prev.certificates
     }));
   };
 
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        // if (!formData.name.trim()) {
-        //   toast.error('يرجى إدخال الاسم الكامل');
-        //   return false;
-        // }
-        // if (!formData.email.trim()) {
-        //   toast.error('يرجى إدخال البريد الإلكتروني');
-        //   return false;
-        // }
-        // if (!formData.phone.trim()) {
-        //   toast.error('يرجى إدخال رقم الهاتف');
-        //   return false;
-        // }
-        // if (!formData.birthDate) {
-        //   toast.error('يرجى إدخال تاريخ الميلاد');
-        //   return false;
-        // }
-        // if (!formData.gender) {
-        //   toast.error('يرجى اختيار الجنس');
-        //   return false;
-        // }
-        // if (!formData.address.trim()) {
-        //   toast.error('يرجى إدخال العنوان');
-        //   return false;
-        // }
+        if (!formData.name.trim()) {
+          toast.error('يرجى إدخال الاسم الكامل');
+          return false;
+        }
+        if (!formData.email.trim()) {
+          toast.error('يرجى إدخال البريد الإلكتروني');
+          return false;
+        }
+        if (!formData.phone.trim()) {
+          toast.error('يرجى إدخال رقم الهاتف');
+          return false;
+        }
+        if (!formData.birthDate) {
+          toast.error('يرجى إدخال تاريخ الميلاد');
+          return false;
+        }
+        if (!formData.gender) {
+          toast.error('يرجى اختيار الجنس');
+          return false;
+        }
+
+        if (formData.address.city === '' || formData.address.region === '') {
+          toast.error("يرجى اختيار المنطقة والمحافظة");
+          return false;
+        }
+
         return true;
       case 2:
-        // if (!formData.subject) {
-        //   toast.error('يرجى اختيار المادة التي تدرسها');
-        //   return false;
-        // }
-        // if (formData.grades.length === 0) {
-        //   toast.error('يرجى اختيار الصفوف التي تدرس لها');
-        //   return false;
-        // }
-        // if (!formData.experience) {
-        //   toast.error('يرجى إدخال سنوات الخبرة');
-        //   return false;
-        // }
-        // if (!formData.qualification.trim()) {
-        //   toast.error('يرجى إدخال المؤهل العلمي');
-        //   return false;
-        // }
-        // if (!formData.price) {
-        //   toast.error('يرجى تحديد تكلفة الجلسة');
+        if (!formData.subject) {
+          toast.error('يرجى اختيار المادة التي تدرسها');
+          return false;
+        }
+        if (formData.Class.length === 0) {
+          toast.error('يرجى اختيار الصفوف التي تدرس لها');
+          return false;
+        }
+        if (!formData.experience) {
+          toast.error('يرجى إدخال سنوات الخبرة');
+          return false;
+        }
+        if (!formData.degree.trim()) {
+          toast.error('يرجى إدخال المؤهل العلمي');
+          return false;
+        }
+        if (!formData.price) {
+          toast.error('يرجى تحديد تكلفة الجلسة');
+          return false;
+        }
+        return true;
+      case 3:
+        // const hasAvailability = Object.values(formData.availableTimes).some(slots => slots.length > 0);
+        // if (!hasAvailability) {
+        //   toast.error('يرجى تحديد الأوقات المتاحة للتدريس');
         //   return false;
         // }
         return true;
-      case 3:
-        //   const hasAvailability = Object.values(formData.availability).some(slots => slots.length > 0);
-        //   if (!hasAvailability) {
-        //     toast.error('يرجى تحديد الأوقات المتاحة للتدريس');
-        //     return false;
-        //   }
-        //   return true;
-        // case 4:
-        //   if (!formData.documents || formData.documents.length === 0) {
-        //     toast.error('يرجى رفع الوثائق المطلوبة');
-        //     return false;
-        //   }
-        //   if (formData.password.length < 6) {
-        //     toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-        //     return false;
-        //   }
-        //   if (formData.password !== formData.confirmPassword) {
-        //     toast.error('كلمة المرور وتأكيد كلمة المرور غير متطابقتين');
-        //     return false;
-        //   }
-        //   if (!formData.agreeToTerms) {
-        //     toast.error('يرجى الموافقة على شروط الخدمة');
-        //     return false;
-        //   }
+      case 4:
+        if (!formData.certificates || formData.certificates.length === 0) {
+          toast.error('يرجى رفع الوثائق المطلوبة');
+          return false;
+        }
+        if (formData.password.length < 6) {
+          toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+          return false;
+        }
+        if (formData.password !== formData.passwordConfirm) {
+          toast.error('كلمة المرور وتأكيد كلمة المرور غير متطابقتين');
+          return false;
+        }
         return true;
       default:
         return true;
@@ -181,16 +201,80 @@ const TeacherRegister = () => {
       return;
     }
 
-    console.log(formData)
+    const geo = await getGeoLocation();
+
+    formData.location.coordinates = geo;
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      toast.success('تم تقديم طلبك بنجاح! سيتم مراجعة بياناتك والتواصل معك خلال 48 ساعة');
-      setIsLoading(false);
-      navigate('/teacher/login');
-    }, 2000);
+    try {
+      const sendFormData = new FormData();
+
+      sendFormData.append("name", formData.name);
+      sendFormData.append("email", formData.email);
+      sendFormData.append("phone", formData.phone);
+      sendFormData.append("gender", formData.gender);
+      sendFormData.append("birthDate", formData.birthDate);
+      sendFormData.append("address", JSON.stringify(formData.address));
+      sendFormData.append("subject", formData.subject);
+      sendFormData.append("price", formData.price);
+      sendFormData.append("Class", JSON.stringify(formData.Class));
+      sendFormData.append("experience", formData.experience);
+      sendFormData.append("about", formData.about);
+      sendFormData.append("degree", formData.degree);
+      sendFormData.append("availableTimes", JSON.stringify(formData.availableTimes));
+      sendFormData.append("image", formData.image);
+
+      for (let i of formData.certificates) {
+        sendFormData.append("certificates", i);
+      }
+
+      sendFormData.append("password", formData.password);
+      sendFormData.append("passwordConfirm", formData.passwordConfirm);
+      sendFormData.append("location", JSON.stringify(formData.location));
+
+      console.log(formData.location.coordinates);
+      console.log(sendFormData);
+
+      const signupRequest = await (await api.post(
+        "/api/teacher/signup-teacher"
+        , sendFormData
+        , {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
+          timeout: 100000
+        }
+      )).data;
+
+      if (signupRequest.success) {
+        toast.success("تم ارسال بيانات الحساب. بانتظار موافقة");
+        navigate("/");
+      }
+
+    } catch (error) {
+      toast.error(error.message);
+    }
+
+    setIsLoading(false);
+
   };
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
+
+  const handleAddressChange = ({ target: { value, name } }) => {
+    setFormData((prev) => (
+      {
+        ...prev,
+        address: {
+          ...prev.address,
+          [name]: value
+        }
+      }
+    ))
+  }
 
   const calculateAge = (birthDate) => {
     if (!birthDate) return '';
@@ -302,6 +386,7 @@ const TeacherRegister = () => {
                 handleInputChange={handleInputChange}
                 formData={formData}
                 calculateAge={calculateAge}
+                handleAddressChange={handleAddressChange}
               />}
               {currentStep === 2 && <RenderStep2
                 handleGradeChange={handleGradeChange}
@@ -344,7 +429,7 @@ const TeacherRegister = () => {
                   >
                     <div className="flex items-center justify-center space-x-2 space-x-reverse">
                       <span>التالي</span>
-                      <FiArrowRight className="w-5 h-5" />
+                      <FiArrowLeft className="w-5 h-5" />
                     </div>
                   </button>
                 ) : (

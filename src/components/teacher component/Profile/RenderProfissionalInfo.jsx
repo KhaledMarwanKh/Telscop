@@ -1,5 +1,5 @@
 import { FiAward, FiBookOpen, FiDollarSign } from 'react-icons/fi'
-import { grades, teacherSubjects } from '../../../data/teacherMockData'
+import { grades, subjects } from '../../../data/assests'
 
 const RenderProfissionalInfo = (
     {
@@ -26,8 +26,8 @@ const RenderProfissionalInfo = (
                             }`}
                         required
                     >
-                        {teacherSubjects.map((subject) => (
-                            <option key={subject.key} value={subject.key}>
+                        {subjects.map((subject) => (
+                            <option key={subject.key} value={subject.name}>
                                 {subject.name}
                             </option>
                         ))}
@@ -56,23 +56,16 @@ const RenderProfissionalInfo = (
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         سنوات الخبرة
                     </label>
-                    <select
+                    <input
+                        type="text"
                         name="experience"
                         value={formData.experience}
                         onChange={handleInputChange}
-                        disabled={!isEditing}
+                        disabled={true}
                         className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : ''
                             }`}
                         required
-                    >
-                        <option value="1">سنة واحدة</option>
-                        <option value="2">سنتان</option>
-                        <option value="3">3 سنوات</option>
-                        <option value="4">4 سنوات</option>
-                        <option value="5">5 سنوات</option>
-                        <option value="6-10">6-10 سنوات</option>
-                        <option value="10+">أكثر من 10 سنوات</option>
-                    </select>
+                    />
                 </div>
 
                 <div>
@@ -82,8 +75,8 @@ const RenderProfissionalInfo = (
                     </label>
                     <input
                         type="text"
-                        name="qualification"
-                        value={formData.qualification}
+                        name="degree"
+                        value={formData.degree}
                         onChange={handleInputChange}
                         disabled={true}
                         className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : ''
@@ -104,7 +97,7 @@ const RenderProfissionalInfo = (
                             type="button"
                             onClick={() => isEditing && handleGradeChange(parseInt(grade.value))}
                             disabled={!isEditing}
-                            className={`p-3 border-2 rounded-lg transition-all duration-300 text-sm font-medium ${formData.grades.includes(parseInt(grade.value))
+                            className={`p-3 border-2 rounded-lg transition-all duration-300 text-sm font-medium ${formData.Class.includes(parseInt(grade.value))
                                 ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
                                 : 'border-gray-200 text-gray-700'
                                 } ${!isEditing ? 'cursor-not-allowed opacity-60' : 'hover:border-emerald-300'}`}
@@ -120,8 +113,8 @@ const RenderProfissionalInfo = (
                     نبذة عنك
                 </label>
                 <textarea
-                    name="bio"
-                    value={formData.bio}
+                    name="about"
+                    value={formData.about}
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     rows="4"

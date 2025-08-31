@@ -9,15 +9,14 @@ import {
   Legend,
 } from 'chart.js';
 
-import { studentsByGrade as sbg, lessonsBySubject as lbs, teachersByGrade as tbg,
-  activeTeachers as at, subjects, monthlyStats as ms
-} from '../../data/adminMockData';
-
 import RenderOverview from '../../components/admin components/Dashboared/RenderOverview';
 import TabsMenu from '../../components/admin components/Dashboared/TabsMenu';
 import RenderTeacherStats from '../../components/admin components/Dashboared/RenderTeacherStats';
 import RenderLessonsStats from '../../components/admin components/Dashboared/RenderLessonsStats';
 import RenderStudentsStats from '../../components/admin components/Dashboared/RenderStudentsStats';
+import { formatDate, getGradeNameByNumber, subjects } from '../../data/assests';
+import api from '../../lib/api';
+import { toast } from 'react-toastify';
 
 ChartJS.register(
   CategoryScale,
@@ -29,24 +28,28 @@ ChartJS.register(
 );
 
 const AdminDashboard = () => {
+
   const [activeTab, setActiveTab] = useState('overview');
+
   const [filters, setFilters] = useState({
     subject: 'all',
     dateRange: {
-      start: '',
-      end: ''
+      start: "",
+      end: ""
     }
   });
 
-  const [monthlyStats, setMonthlyStats] = useState({ n: 1 });
+  const [monthlyStats, setMonthlyStats] = useState({});
 
-  const [studentsByGrade, setStudentsByGrade] = useState({ n: 1 });
+  const [studentsByGrade, setStudentsByGrade] = useState({});
 
-  const [lessonsBySubject, setLessonsBySubject] = useState({ n: 1 });
+  const [lessonsBySubject, setLessonsBySubject] = useState({});
 
-  const [teachersByGrade, setTeachersByGrade] = useState({ n: 1 });
+  const [teachersByGrade, setTeachersByGrade] = useState({});
 
-  const [activeTeachers, setActiveTeachers] = useState({ n: 1 });
+  const [activeTeachers, setActiveTeachers] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const [stats, setStats] = useState({
     totalEarnings: 0,
@@ -55,40 +58,187 @@ const AdminDashboard = () => {
     totalTeachers: 0
   })
 
-  useEffect(() => {
-    setMonthlyStats(ms);
-  }, [])
+  const fetchData = async () => {
+    const { adminToken } = localStorage;
+    if (activeTab === "overview") {
+      const generalStatisRequest = await (await api.get(
+        "/api/admin/general-info"
+        ,
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      const getMonthlyStatis = await (await api.get(
+        "/api/admin/get-monthly-count"
+        ,
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+
+
+      const generalInfo = {
+        totalEarnings: generalStatisRequest.totalRevenue,
+        totalLessons: generalStatisRequest.completedAppointmentsCount,
+        totalStudents: generalStatisRequest.studentsCount,
+        totalTeachers: generalStatisRequest.completedAppointmentsCount
+      }
+
+      const monthStatis = {
+        labels: Object.keys(getMonthlyStatis.data),
+        students: Object.keys(getMonthlyStatis.data)?.map(ele => getMonthlyStatis.data[ele].students),
+        teachers: Object.keys(getMonthlyStatis.data)?.map(ele => getMonthlyStatis.data[ele].teachers)
+      }
+
+      setStats(generalInfo);
+      setMonthlyStats(monthStatis);
+    } else if (activeTab === "students") {
+      const getStudentsByGradeStatis = await (await api.get(
+        "/api/admin/students-by-class"
+        ,
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      const studentsChartData = {
+        labels: getStudentsByGradeStatis.data.map(ele => getGradeNameByNumber(ele["class"])).filter(e => e),
+        data: getStudentsByGradeStatis.data.map(ele => ele.count)
+      }
+
+      setStudentsByGrade(studentsChartData);
+    } else if (activeTab === "lessons") {
+      const getCompletedLessonsBySubjectStatis = await (await api.post(
+        "/api/admin/stats-by-date-range"
+        , {}
+        ,
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      const lessonsBySubject = {
+        lessonsNumberData: getCompletedLessonsBySubjectStatis.data.map(ele => ele.lessonsCount),
+        lessonsAwardsData: getCompletedLessonsBySubjectStatis.data.map(ele => ele.totalRevenue),
+        labels: getCompletedLessonsBySubjectStatis.data.map(ele => ele.subject)
+      }
+
+      setLessonsBySubject(lessonsBySubject);
+    } else {
+      const getTeachersByGradeStatis = await (await api.get(
+        "/api/admin/teachers-by-class"
+        , {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      const getTeacherStatis = await (await api.get(
+        "/api/admin/stats-by-teacher"
+        , {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+
+      const teachersByGrade = {
+        labels: getTeachersByGradeStatis.data.map(ele => getGradeNameByNumber(ele["class"])),
+        data: getTeachersByGradeStatis.data.map(ele => ele.count)
+      }
+
+      const activeTeachers = getTeacherStatis.data;
+
+      setActiveTeachers(activeTeachers);
+
+      setTeachersByGrade(teachersByGrade);
+    }
+  }
+
+  const applyFilter = async () => {
+    try {
+      const { adminToken } = localStorage;
+
+      let sendFilters = {};
+
+      if (filters.subject !== "all") {
+      }
+
+      if (filters.dateRange.end !== "" && filters.dateRange.start !== "") {
+        if (new Date(filters.dateRange.end) < new Date(filters.dateRange.start)) {
+          [filters.dateRange.start, filters.dateRange.end] = [filters.dateRange.end, filters.dateRange.start];
+        }
+        sendFilters.startDate = formatDate(new Date(filters.dateRange.start).toLocaleDateString("en-US"));
+        sendFilters.endDate = formatDate(new Date(filters.dateRange.end).toLocaleDateString("en-US"));
+      }
+
+      const getCompletedLessonsBySubjectStatis = await (await api.post(
+        "/api/admin/stats-by-date-range"
+        ,
+        sendFilters
+        ,
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      let lessonsNumberData = getCompletedLessonsBySubjectStatis.data.map(ele => ele.lessonsCount);
+      let lessonsAwardsData = getCompletedLessonsBySubjectStatis.data.map(ele => ele.totalRevenue);
+      let labels = getCompletedLessonsBySubjectStatis.data.map(ele => ele.subject);
+
+      if (filters.subject !== "all") {
+        labels = labels.filter(label => label === filters.subject)
+      }
+
+      setLessonsBySubject({
+        labels,
+        lessonsAwardsData,
+        lessonsNumberData
+      });
+
+    } catch (e) {
+      toast.error(e);
+      console.log(e);
+    }
+
+  }
 
   useEffect(() => {
-    setActiveTeachers(at);
-  }, [])
+    try {
+      applyFilter();
+    } catch (error) {
+      console.log(error)
+    }
+    console.log(1);
+  }, [filters])
 
   useEffect(() => {
-    setLessonsBySubject(lbs);
-    setStats(prev => (
-      { ...prev, totalLessons: lbs.data.reduce((sum, count) => sum + count, 0) }
-    ))
-  }, [])
+    setIsLoading(true);
 
-  useEffect(() => {
-    setStudentsByGrade(sbg);
-    setStats(prev => (
-      { ...prev, totalStudents: sbg.data.reduce((sum, count) => sum + count, 0) }
-    ))
-  }, [])
+    try {
+      fetchData();
+    } catch (e) {
+      console.log(e);
+      toast.error(e.messege);
+    }
 
-  useEffect(() => {
-    setTeachersByGrade(tbg);
-    setStats(prev => (
-      { ...prev, totalTeachers: tbg.data.reduce((sum, count) => sum + count, 0) }
-    ))
-  }, [])
+    setIsLoading(false);
 
-  useEffect(() => {
-    setStats(prev => (
-      { ...prev, totalEarnings: at.reduce((sum, teacher) => sum + teacher.totalEarnings, 0) }
-    ))
-  }, [])
+  }, [activeTab])
 
   // Chart options
   const chartOptions = {
@@ -106,88 +256,6 @@ const AdminDashboard = () => {
         beginAtZero: true,
       },
     },
-  };
-
-  // Students by grade chart data
-  const studentsChartData = {
-    labels: studentsByGrade.labels,
-    datasets: [
-      {
-        label: 'عدد الطلاب',
-        data: studentsByGrade.data,
-        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-        borderColor: 'rgba(16, 185, 129, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  // Lessons by subject chart data (filtered)
-  const getFilteredLessonsData = () => {
-    let data = lessonsBySubject.data;
-    let labels = lessonsBySubject.labels;
-
-    if (filters.subject !== 'all') {
-      const subjectIndex = subjects.findIndex(s => s.key === filters.subject) - 1;
-      if (subjectIndex >= 0) {
-        data = [data[subjectIndex]];
-        labels = [labels[subjectIndex]];
-      }
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: 'الدروس المكتملة',
-          data,
-          backgroundColor: 'rgba(59, 130, 246, 0.8)',
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 1,
-        },
-      ],
-    };
-  };
-
-  const teachersChartData = {
-    labels: teachersByGrade.labels,
-    datasets: [
-      {
-        label: 'عدد المعلمين',
-        data: teachersByGrade.data,
-        backgroundColor: 'rgba(168, 85, 247, 0.8)',
-        borderColor: 'rgba(168, 85, 247, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  // Monthly stats chart data
-  const monthlyChartData = {
-    labels: monthlyStats.labels,
-    datasets: [
-      {
-        label: 'الطلاب',
-        data: monthlyStats.students,
-        backgroundColor: 'rgba(16, 185, 129, 0.8)',
-        borderColor: 'rgba(16, 185, 129, 1)',
-        borderWidth: 1,
-      },
-      {
-        label: 'المعلمين',
-        data: monthlyStats.teachers,
-        backgroundColor: 'rgba(59, 130, 246, 0.8)',
-        borderColor: 'rgba(59, 130, 246, 1)',
-        borderWidth: 1,
-      },
-      {
-        label: 'الدروس',
-        data: monthlyStats.lessons,
-        backgroundColor: 'rgba(168, 85, 247, 0.8)',
-        borderColor: 'rgba(168, 85, 247, 1)',
-        borderWidth: 1,
-      },
-    ],
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -222,30 +290,45 @@ const AdminDashboard = () => {
         />
 
         <div>
-          {activeTab === 'overview' && <RenderOverview
-            monthlyChartData={monthlyChartData}
-            stats={stats}
-            chartOptions={chartOptions}
-          />}
 
-          {activeTab === 'students' && <RenderStudentsStats
-            chartOptions={chartOptions}
-            studentsChartData={studentsChartData}
-          />}
+          {
+            isLoading ? (
+              <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+                  <div className="text-6xl mb-4">⏳</div>
+                  <h2 className="text-xl font-semibold text-gray-600">جاري التحميل...</h2>
+                </div>
+              </div>
+            ) : (
+              <>
+                {activeTab === 'overview' && <RenderOverview
+                  stats={stats}
+                  monthlyStats={monthlyStats}
+                  chartOptions={chartOptions}
+                />}
 
-          {activeTab === 'lessons' && <RenderLessonsStats
-            getFilteredLessonsData={getFilteredLessonsData}
-            handleDateRangeChange={handleDateRangeChange}
-            handleFilterChange={handleFilterChange}
-            filters={filters}
-            chartOptions={chartOptions}
-          />}
+                {activeTab === 'students' && <RenderStudentsStats
+                  studentsByGrade={studentsByGrade}
+                  chartOptions={chartOptions}
+                />}
 
-          {activeTab === 'teachers' && <RenderTeacherStats
-            teachersChartData={teachersChartData}
-            chartOptions={chartOptions}
-            activeTeachers={activeTeachers}
-          />}
+                {activeTab === 'lessons' && <RenderLessonsStats
+                  lessonsBySubject={lessonsBySubject}
+                  handleDateRangeChange={handleDateRangeChange}
+                  handleFilterChange={handleFilterChange}
+                  filters={filters}
+                  chartOptions={chartOptions}
+                  setFilters={setFilters}
+                />}
+
+                {activeTab === 'teachers' && <RenderTeacherStats
+                  teachersByGrade={teachersByGrade}
+                  chartOptions={chartOptions}
+                  activeTeachers={activeTeachers}
+                />}
+              </>
+            )
+          }
         </div>
       </div>
     </div>

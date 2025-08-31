@@ -1,15 +1,13 @@
 import React from 'react'
 import { FiCheck, FiX } from 'react-icons/fi'
+import { formatDate } from '../../../data/assests'
 
 const ComplaintDetailes = (
     {
         setResponseText,
         setSelectedComplaint,
-        handleMarkInProgress,
         handleResolveComplaint,
         selectedComplaint,
-        formatDate,
-        getSenderTypeBadge,
         responseText
     }
 ) => {
@@ -35,21 +33,15 @@ const ComplaintDetailes = (
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <span className="text-sm text-gray-500">الاسم:</span>
-                                <p className="font-medium">{selectedComplaint.senderName}</p>
+                                <p className="font-medium">{selectedComplaint?.name}</p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-500">البريد الإلكتروني:</span>
-                                <p className="font-medium">{selectedComplaint.senderEmail}</p>
+                                <p className="font-medium">{selectedComplaint?.email}</p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-500">رقم الهاتف:</span>
-                                <p style={{ direction: 'ltr' }} className="font-medium">{selectedComplaint.senderPhone}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-500">النوع:</span>
-                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSenderTypeBadge(selectedComplaint.senderType).color}`}>
-                                    {getSenderTypeBadge(selectedComplaint.senderType).text}
-                                </span>
+                                <p style={{ direction: 'ltr' }} className="font-medium">{selectedComplaint?.phone}</p>
                             </div>
                         </div>
                     </div>
@@ -60,17 +52,17 @@ const ComplaintDetailes = (
                         <div className="space-y-3">
                             <div>
                                 <span className="text-sm text-gray-500">الموضوع:</span>
-                                <p className="font-medium">{selectedComplaint.subject}</p>
+                                <p className="font-medium">{selectedComplaint?.subject}</p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-500">المحتوى:</span>
-                                <p className="text-gray-700 leading-relaxed mt-1">{selectedComplaint.message}</p>
+                                <p className="text-gray-700 leading-relaxed mt-1">{selectedComplaint?.message}</p>
                             </div>
                             <div className="grid md:grid-cols-3 gap-4">
 
                                 <div>
                                     <span className="text-sm text-gray-500">التاريخ:</span>
-                                    <p className="font-medium">{formatDate(selectedComplaint.date)}</p>
+                                    <p className="font-medium">{formatDate(selectedComplaint?.createdAt?.split("T")[0])}</p>
                                 </div>
                             </div>
                         </div>
@@ -79,10 +71,9 @@ const ComplaintDetailes = (
                     {/* Response Section */}
                     <div>
                         <h4 className="font-medium text-gray-800 mb-3">الرد</h4>
-                        {selectedComplaint.response ? (
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <p className="text-green-800">{selectedComplaint.response}</p>
-                            </div>
+                        {selectedComplaint?.status ? (
+                            <>
+                            </>
                         ) : (
                             <div className="space-y-4">
                                 <textarea
@@ -94,17 +85,11 @@ const ComplaintDetailes = (
                                 />
                                 <div className="flex space-x-3 space-x-reverse">
                                     <button
-                                        onClick={() => handleResolveComplaint(selectedComplaint.id)}
+                                        onClick={() => handleResolveComplaint(selectedComplaint?._id)}
                                         className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2 space-x-reverse"
                                     >
                                         <FiCheck className="w-4 h-4" />
                                         <span>حل وإرسال الرد</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleMarkInProgress(selectedComplaint.id)}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        قيد المراجعة
                                     </button>
                                 </div>
                             </div>

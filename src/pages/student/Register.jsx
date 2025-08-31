@@ -1,28 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiArrowRight, FiCheck } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import RenderStep1 from '../../components/students components/Register/RenderStep1';
 import RenderStep3 from '../../components/students components/Register/RenderStep3';
 import RenderStep2 from '../../components/students components/Register/RenderStep2';
+import api from '../../lib/api';
+import { getGeoLocation } from '../../data/assests';
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+    address: {
+      city: "",
+      street: "",
+      region: ''
+    },
+    location: {
+      coordinates: []
+    },
+    Class: "",
+    gender: "",
+    phone: "",
     birthDate: '',
-    gender: '',
-    grade: '',
-    address: '',
-    password: '',
-    confirmPassword: '',
     agreeToTerms: false
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [sendImage, setSendImage] = useState(null);
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -33,53 +44,71 @@ const Register = () => {
     }));
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+
+    setSendImage(file);
+  };
+
+  const handleAddressChange = ({ target: { value, name } }) => {
+    setFormData((prev) => (
+      {
+        ...prev,
+        address: {
+          ...prev.address,
+          [name]: value
+        }
+      }
+    ))
+  };
+
   const validateStep = (step) => {
     switch (step) {
       case 1:
-        // if (!formData.name.trim()) {
-        //   toast.error('يرجى إدخال الاسم الكامل');
-        //   return false;
-        // }
-        // if (!formData.email.trim()) {
-        //   toast.error('يرجى إدخال البريد الإلكتروني');
-        //   return false;
-        // }
-        // if (!formData.phone.trim()) {
-        //   toast.error('يرجى إدخال رقم الهاتف');
-        //   return false;
-        // }
+        if (!formData.name.trim()) {
+          toast.error('يرجى إدخال الاسم الكامل');
+          return false;
+        }
+        if (!formData.email.trim()) {
+          toast.error('يرجى إدخال البريد الإلكتروني');
+          return false;
+        }
+        if (!formData.phone.trim()) {
+          toast.error('يرجى إدخال رقم الهاتف');
+          return false;
+        }
         return true;
       case 2:
-        // if (!formData.birthDate) {
-        //   toast.error('يرجى إدخال تاريخ الميلاد');
-        //   return false;
-        // }
-        // if (!formData.gender) {
-        //   toast.error('يرجى اختيار الجنس');
-        //   return false;
-        // }
-        // if (!formData.grade) {
-        //   toast.error('يرجى اختيار الصف');
-        //   return false;
-        // }
-        // if (!formData.address.trim()) {
-        //   toast.error('يرجى إدخال العنوان');
-        //   return false;
-        // }
+        if (!formData.birthDate) {
+          toast.error('يرجى إدخال تاريخ الميلاد');
+          return false;
+        }
+        if (!formData.gender) {
+          toast.error('يرجى اختيار الجنس');
+          return false;
+        }
+        if (!formData.Class) {
+          toast.error('يرجى اختيار الصف');
+          return false;
+        }
+        if (formData.address.city === '' || formData.address.region === '' || formData.address.street === '') {
+          toast.error("يرجى اختيار المنطقة والمحافظة");
+          return false;
+        }
         return true;
       case 3:
-        // if (formData.password.length < 6) {
-        //   toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
-        //   return false;
-        // }
-        // if (formData.password !== formData.confirmPassword) {
-        //   toast.error('كلمة المرور وتأكيد كلمة المرور غير متطابقتين');
-        //   return false;
-        // }
-        // if (!formData.agreeToTerms) {
-        //   toast.error('يرجى الموافقة على شروط الخدمة وسياسة الخصوصية');
-        //   return false;
-        // }
+        if (formData.password.length < 6) {
+          toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+          return false;
+        }
+        if (formData.password !== formData.passwordConfirm) {
+          toast.error('كلمة المرور وتأكيد كلمة المرور غير متطابقتين');
+          return false;
+        }
+        if (!formData.agreeToTerms) {
+          toast.error('يرجى الموافقة على شروط الخدمة وسياسة الخصوصية');
+          return false;
+        }
         return true;
       default:
         return true;
@@ -96,20 +125,94 @@ const Register = () => {
     setCurrentStep(prev => Math.max(prev - 1, 1));
   };
 
+  const resetInput = () => {
+    setCurrentStep(1);
+    setIsLoading(false);
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
+      address: {
+        city: "",
+        street: "",
+        region: ''
+      },
+      location: {
+        coordinates: []
+      },
+      Class: "",
+      gender: "",
+      phone: "",
+      birthDate: '',
+      agreeToTerms: false
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateStep(3)) {
       return;
     }
 
+    const location = {
+      type: "Point",
+      coordinates: []
+    };
+
+    const geo = await getGeoLocation();
+
+    formData.location.coordinates = geo;
+
+    formData.Class = parseInt(formData.Class);
+
     setIsLoading(true);
 
-    setTimeout(() => {
-      toast.success('تم إنشاء الحساب بنجاح! مرحباً بك في تلسكوب');
-      setIsLoading(false);
-      navigate('/');
-    }, 1500);
+    try {
+
+      const responseData = await (await api.post("/api/user/register", formData)).data;
+
+      if (!responseData) {
+        toast.error("حدث خطا ما");
+        resetInput();
+      }
+
+      if (responseData.status === "success") {
+        localStorage.setItem("userToken", responseData.token);
+        toast.success("تم انشاء الحساب بنجاح");
+        if (sendImage) {
+          const { userToken } = localStorage;
+
+          const formData = new FormData();
+
+          formData.append("image", sendImage);
+
+          if (userToken) {
+            const sendImageRequest = await (await api.post(
+              "/api/user/update-Profile"
+              , formData
+              , {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                  authorization: `Bearer ${userToken}`
+                }
+              }
+            )).data
+
+            if (sendImageRequest.status === "success") {
+              toast.success("تم رفع صورة بنجاح");
+            }
+          }
+        }
+        navigate('/');
+      }
+
+    } catch (e) {
+      toast.error(e.message);
+      resetInput();
+    }
+
   };
 
   const calculateAge = (birthDate) => {
@@ -118,7 +221,7 @@ const Register = () => {
     const birth = new Date(birthDate);
     const age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       return age - 1;
     }
@@ -128,13 +231,23 @@ const Register = () => {
   const getPasswordStrength = () => {
     const password = formData.password;
     let strength = 0;
-    
+
     if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
     if (/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) strength++;
-    
+
     return strength;
   };
+
+  useEffect(() => {
+    (async () => {
+      let geo = await getGeoLocation();
+
+      console.log(geo);
+
+      setFormData((prv) => ({ ...prv, location: { coordinates: geo } }));
+    })();
+  }, []);
 
 
   const stepTitles = [
@@ -152,7 +265,7 @@ const Register = () => {
           <div className="absolute top-60 right-32 w-80 h-80 bg-primary rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
           <div className="absolute -bottom-16 left-48 w-72 h-72 bg-accent rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
         </div>
-        
+
         {/* Floating Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/5 left-1/5 animate-float">
@@ -183,26 +296,24 @@ const Register = () => {
               </Link>
               <h2 className="text-xl font-bold mb-2">انضم إلى عائلة تلسكوب</h2>
               <p className="text-green-100 text-sm">ابدأ رحلتك التعليمية معنا</p>
-              
+
               {/* Step Indicator */}
               <div className="flex justify-center space-x-4 space-x-reverse mt-6">
                 {[1, 2, 3].map((step) => (
                   <div key={step} className="flex items-center">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                      step === currentStep ? 'bg-white text-secondary' :
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${step === currentStep ? 'bg-white text-secondary' :
                       step < currentStep ? 'bg-green-400 text-white' : 'bg-white/30 text-white/70'
-                    }`}>
+                      }`}>
                       {step < currentStep ? <FiCheck className="w-4 h-4" /> : step}
                     </div>
                     {step < 3 && (
-                      <div className={`w-8 h-1 mx-2 rounded transition-all duration-300 ${
-                        step < currentStep ? 'bg-green-400' : 'bg-white/30'
-                      }`}></div>
+                      <div className={`w-8 h-1 mx-2 rounded transition-all duration-300 ${step < currentStep ? 'bg-green-400' : 'bg-white/30'
+                        }`}></div>
                     )}
                   </div>
                 ))}
               </div>
-              
+
               <p className="text-xs text-green-100 mt-3">{stepTitles[currentStep - 1]}</p>
             </div>
           </div>
@@ -211,8 +322,8 @@ const Register = () => {
           <div className="p-8">
             <form onSubmit={handleSubmit}>
               {currentStep === 1 && <RenderStep1 formData={formData} handleInputChange={handleInputChange} />}
-              {currentStep === 2 && <RenderStep2 formData={formData} handleInputChange={handleInputChange} calculateAge={calculateAge} />}
-              {currentStep === 3 && <RenderStep3 formData={formData} handleInputChange={handleInputChange} getPasswordStrength={getPasswordStrength} setShowConfirmPassword={setShowConfirmPassword} setShowPassword={setShowPassword} showPassword={showPassword} showConfirmPassword={showConfirmPassword} />}
+              {currentStep === 2 && <RenderStep2 formData={formData} handleAddressChange={handleAddressChange} handleInputChange={handleInputChange} calculateAge={calculateAge} />}
+              {currentStep === 3 && <RenderStep3 formData={formData} handleInputChange={handleInputChange} handleFileUpload={handleFileUpload} getPasswordStrength={getPasswordStrength} setShowConfirmPassword={setShowConfirmPassword} setShowPassword={setShowPassword} showPassword={showPassword} showConfirmPassword={showConfirmPassword} />}
 
               {/* Navigation Buttons */}
               <div className="mt-8 flex gap-4">
@@ -225,7 +336,7 @@ const Register = () => {
                     السابق
                   </button>
                 )}
-                
+
                 {currentStep < 3 ? (
                   <button
                     type="button"
@@ -234,18 +345,17 @@ const Register = () => {
                   >
                     <div className="flex items-center justify-center space-x-2 space-x-reverse">
                       <span>التالي</span>
-                      <FiArrowRight className="w-5 h-5" />
+                      <FiArrowLeft className="w-5 h-5" />
                     </div>
                   </button>
                 ) : (
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className={`flex-1 py-4 px-6 rounded-xl font-bold text-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${
-                      isLoading
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-secondary to-green-600 hover:from-green-600 hover:to-secondary'
-                    }`}
+                    className={`flex-1 py-4 px-6 rounded-xl font-bold text-white transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl ${isLoading
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-secondary to-green-600 hover:from-green-600 hover:to-secondary'
+                      }`}
                   >
                     <div className="flex items-center justify-center space-x-3 space-x-reverse">
                       {isLoading ? (
@@ -283,6 +393,7 @@ const Register = () => {
       </div>
     </div>
   );
-};
+}
+
 
 export default Register;

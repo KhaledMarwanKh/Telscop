@@ -1,6 +1,6 @@
 import React from 'react'
-import { daysOfWeek, teacherTimeSlots } from '../../../data/teacherMockData'
 import { FiClock } from 'react-icons/fi'
+import { daysInArabic, timeSlots } from '../../../data/assests'
 
 const RenderStep3 = (
     {
@@ -16,16 +16,16 @@ const RenderStep3 = (
                 <p className="text-gray-600 text-sm">حدد الأيام والأوقات التي تفضل التدريس فيها</p>
             </div>
 
-            {daysOfWeek.map((day) => (
+            {daysInArabic.map((day) => (
                 <div key={day.key} className="bg-gray-50/50 p-4 rounded-xl">
-                    <h4 className="font-semibold text-gray-800 mb-3">{day.name}</h4>
+                    <h4 className="font-semibold text-gray-800 mb-3">{day.day}</h4>
                     <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                        {teacherTimeSlots.map((slot) => (
+                        {timeSlots.map((slot) => (
                             <button
                                 key={slot.value}
                                 type="button"
                                 onClick={() => handleAvailabilityChange(day.key, slot.value)}
-                                className={`p-2 border-2 rounded-lg transition-all duration-300 text-sm ${formData.availability[day.key]?.includes(slot.value)
+                                className={`p-2 border-2 rounded-lg transition-all duration-300 text-sm ${formData.availableTimes.filter(days => days.day === day.key)[0]?.slots?.includes(slot.value)
                                     ? 'border-emerald-600 bg-emerald-50 text-emerald-700'
                                     : 'border-gray-200 hover:border-emerald-300 text-gray-700'
                                     }`}

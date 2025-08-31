@@ -18,7 +18,6 @@ const FilterTab = (
                 >
                     <option value="all">جميع الحالات</option>
                     <option value="pending">في الانتظار</option>
-                    <option value="in_progress">قيد المراجعة</option>
                     <option value="resolved">تم الحل</option>
                 </select>
 

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { toast } from 'react-toastify';
+import { subjects } from '../data/assests';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -48,33 +50,33 @@ const TeacherMap = ({ teachers, onTeacherSelect }) => {
         iconAnchor: [15, 15]
       });
 
-      const marker = L.marker([teacher.lat, teacher.lng], { icon: customIcon })
+      const marker = L.marker([teacher?.location?.coordinates[1], teacher?.location?.coordinates[0]], { icon: customIcon })
         .addTo(mapInstance.current);
 
       const popupContent = `
         <div class="p-3 flex flex-col items-center rounded-[10px] text-black text-right" dir="rtl">
             <div class="flex justify-around items-center min-w-64">
-                <img class="w-[100px] h-[100px] rounded-full " style="border:3px groove blue" src="${teacher.image}" />
+                <img class="w-[100px] h-[100px] rounded-full " style="border:3px groove blue" src="${teacher?.image}" />
                 <div>
-                  <p class="font-bold text-[1.1rem]">${teacher.name}</p>
-                  <p class="font-semibold text-[0.9rem]">${teacher.subject}</p>
+                  <p class="font-bold text-[1.1rem]">${teacher?.name}</p>
+                  <p class="font-semibold text-[0.9rem]">${teacher?.subject}</p>
                 </div>
             </div>
 
-            <div class="flex items-center justify-between w-full">
+            <div class="flex items-center justify-between flex-col w-full">
                 <div class="flex justify-center items-center gap-x-1">
                     <p class="text-[1.0rem] font-bold">
                     الصفوف :
                     </p>
                     <p class="text-[0.9rem] font-normal"">
-                        ${teacher.grades.join(',')}
+                        ${teacher?.Class?.join(',')}
                     </p>
                 </div>
 
-                <p class="text-[0.9rem]">${teacher.price}  ل.س / الجلسة  </p>
+                <p class="text-[0.9rem]">${teacher?.price}  ل.س / الجلسة  </p>
             </div>
 
-            <button onclick="window.selectTeacher(${teacher.id})">
+            <button onclick="window.selectTeacher('${teacher?._id}')">
                 احجز الان
             </button>
         </div>
@@ -95,8 +97,10 @@ const TeacherMap = ({ teachers, onTeacherSelect }) => {
 
   useEffect(() => {
     window.selectTeacher = (teacherId) => {
-      if (onTeacherSelect) {
+      if (onTeacherSelect && localStorage.userToken) {
         onTeacherSelect(teacherId);
+      } else {
+        toast.warn('يجب عليك تسجيل الدخول اولا')
       }
     };
 

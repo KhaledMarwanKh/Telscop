@@ -1,21 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit2, FiSave } from 'react-icons/fi';
-import { mockStudent, grades } from '../../data/mockData';
+import { useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { city, formatDate, grades, homes } from '../../data/assests';
+import api from '../../lib/api';
 
 const Profile = () => {
+  const studentInfo = useLoaderData();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: mockStudent.name,
-    email: mockStudent.email,
-    phone: mockStudent.phone,
-    birthDate: mockStudent.birthDate,
-    gender: mockStudent.gender,
-    grade: mockStudent.grade,
-    address: mockStudent.address
+    name: studentInfo?.name,
+    email: studentInfo?.email,
+    phone: studentInfo?.phone,
+    birthDate: studentInfo?.birthDate,
+    gender: studentInfo?.gender,
+    Class: studentInfo?.Class,
+    address: {
+      city: studentInfo?.address?.city,
+      region: studentInfo?.address?.region,
+      street: studentInfo?.address?.street
+    },
   });
 
-  const [profileImage, setProfileImage] = useState(mockStudent.image);
+  const [imageProf, setImageProf] = useState(studentInfo.image);
+
+  const [sendImage, setSendImage] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,37 +34,117 @@ const Profile = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setProfileImage(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  useEffect(() => {
+    console.log(formData)
+  }, [formData])
+
+  const handleImageChange = ({ target: { name, files } }) => {
+    const file = files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageProf(e.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    setSendImage(file);
+  }
+
+  const handleAddressChange = ({ target: { value, name } }) => {
+    setFormData((prev) => (
+      {
+        ...prev,
+        address: {
+          ...prev.address,
+          [name]: value
+        }
+      }
+    ))
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simulate saving changes
-    toast.success('تم حفظ التغييرات بنجاح!');
+    const { userToken } = localStorage;
+
+    if (userToken) {
+      try {
+        console.log(formData, "update profile")
+
+        const updateRequest = await (await api.post(
+          "/api/user/update-Profile"
+          , formData
+          , {
+            headers: {
+              authorization: `Bearer ${userToken}`
+            }
+          }
+        )).data;
+
+        console.log(updateRequest, "update profile");
+
+        if (updateRequest.status === "success") {
+          toast.success("تم تعديل البيانات بنجاح");
+        } else {
+          toast.error("لقد حدث خطا ما");
+          handleCancel();
+        }
+      } catch (e) {
+        toast.error(e.message);
+      }
+    }
+
+    try {
+      if (sendImage) {
+        const formData = new FormData();
+
+        formData.append("image", sendImage);
+
+        const imageUpdateRequest = await (await api.post(
+          "/api/user/update-Profile"
+          , formData
+          , {
+            timeout: 1000000,
+            headers: {
+              authorization: `Bearer ${userToken}`,
+              "Content-Type": "multipart/form-data"
+            }
+          }
+        )).data;
+
+        if (imageUpdateRequest.status === "success") {
+          toast.success("تم تعديل البيانات بنجاح");
+        } else {
+          toast.error("لقد حدث خطا ما");
+          handleCancel();
+        }
+
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
     setIsEditing(false);
-  };
+  }
 
   const handleCancel = () => {
     // Reset form data
     setFormData({
-      name: mockStudent.name,
-      email: mockStudent.email,
-      phone: mockStudent.phone,
-      birthDate: mockStudent.birthDate,
-      gender: mockStudent.gender,
-      grade: mockStudent.grade,
-      address: mockStudent.address
+      name: studentInfo?.name,
+      email: studentInfo?.email,
+      phone: studentInfo?.phone,
+      birthDate: studentInfo?.birthDate,
+      gender: studentInfo?.gender,
+      Class: studentInfo?.Class,
+      address: {
+        city: studentInfo?.address?.city,
+        region: studentInfo?.address?.region,
+        street: studentInfo?.address?.street
+      },
     });
-    setProfileImage(mockStudent.image);
+
+    setImageProf(studentInfo?.image);
+
+    setSendImage(null);
+
     setIsEditing(false);
   };
 
@@ -80,7 +169,7 @@ const Profile = () => {
           <div className="text-center mb-8">
             <div className="relative inline-block">
               <img
-                src={profileImage}
+                src={imageProf}
                 alt="صورة الطالب"
                 className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-200"
               />
@@ -89,6 +178,7 @@ const Profile = () => {
                   <FiEdit2 className="w-4 h-4" />
                   <input
                     type="file"
+                    name="image"
                     accept="image/*"
                     onChange={handleImageChange}
                     className="hidden"
@@ -163,7 +253,7 @@ const Profile = () => {
               <input
                 type="date"
                 name="birthDate"
-                value={formData.birthDate}
+                value={formData.birthDate.split("T")[0]}
                 onChange={handleInputChange}
                 disabled={!isEditing}
                 className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : ''
@@ -195,16 +285,16 @@ const Profile = () => {
                 الصف
               </label>
               <select
-                name="grade"
-                value={formData.grade}
+                name="Class"
+                value={formData.Class}
                 onChange={handleInputChange}
                 disabled={!isEditing}
                 className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : ''
                   }`}
                 required
               >
-                {grades.map((grade) => (
-                  <option key={grade.value} value={grade.value}>
+                {grades.slice(1).map((grade) => (
+                  <option key={grade.value} value={parseInt(grade.value)}>
                     {grade.name}
                   </option>
                 ))}
@@ -216,17 +306,62 @@ const Profile = () => {
                 <FiMapPin className="w-4 h-4 inline ml-2" />
                 العنوان
               </label>
-              <textarea
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                rows="3"
-                className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent ${!isEditing ? 'bg-gray-50 cursor-not-allowed' : ''
-                  }`}
-                required
-                style={{ resize: 'none' }}
-              />
+              <div>
+                <label className='block text-[0.8rem] font-medium text-gray-700 mb-2'>
+                  محافظة
+                </label>
+                <select
+                  name="city"
+                  value={formData.address.city}
+                  onChange={handleAddressChange}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
+                  required
+                  disabled={!isEditing}
+                >
+                  {city.map((city) => (
+                    <option key={city.key} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className='block text-[0.8rem] font-medium text-gray-700 mb-2'>
+                  منطقة
+                </label>
+                <select
+                  name="region"
+                  value={formData.address.region}
+                  onChange={handleAddressChange}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
+                  required
+                  disabled={!isEditing}
+                >
+                  {homes.map((region) => (
+                    <option key={region.translation} value={region.region}>
+                      {region.region}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="group">
+                <label className='block text-[0.8rem] font-medium text-gray-700 mb-2'>
+                  الشارع
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="street"
+                    value={formData.address.street}
+                    onChange={handleAddressChange}
+                    className="w-full pl-4 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400"
+                    placeholder="أدخل الشارع"
+                    required
+                    disabled={!isEditing}
+                  />
+                </div>
+              </div>
+
             </div>
           </div>
 
@@ -250,30 +385,50 @@ const Profile = () => {
             </div>
           )}
         </form>
-
-        {/* Account Statistics */}
-        {!isEditing && (
-          <div className="mt-8 pt-8 border-t">
-            <h2 className="text-xl font-semibold mb-6">إحصائيات الحساب</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-primary bg-opacity-5 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-white mb-1">12</div>
-                <div className="text-white text-sm">إجمالي الدروس</div>
-              </div>
-              <div className="bg-secondary bg-opacity-5 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-white mb-1">1</div>
-                <div className="text-white text-sm"> عدد الدروس التي تم الغائها </div>
-              </div>
-              <div className="bg-accent bg-opacity-5 p-4 rounded-lg text-center">
-                <div className="text-2xl font-bold text-white mb-1">1</div>
-                <div className="text-white text-sm"> عدد الدروس التي تمت </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
+
+export const userInfoLoader = async () => {
+  const { userToken } = localStorage;
+  try {
+    if (userToken) {
+      const studentInfo = await (await api.get(
+        '/api/user/get-profile',
+        {
+          headers: {
+            authorization: `Bearer ${userToken}`
+          }
+        }
+      )).data;
+
+      console.log(studentInfo);
+
+      if (studentInfo?.status === "success") {
+        return studentInfo.data;
+      } else {
+        throw new Error("لقد حدث خطا ما");
+      }
+    }
+  } catch (e) {
+    console.log(e);
+    return {
+      name: '',
+      email: '',
+      phone: '',
+      birthDate: '',
+      gender: '',
+      Class: '',
+      address: {
+        city: '',
+        region: '',
+        street: ''
+      },
+      image: ''
+    }
+  }
+
+}
 
 export default Profile;

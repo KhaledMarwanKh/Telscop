@@ -1,13 +1,11 @@
-import React from 'react'
 import { FiArrowLeft } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
-import header_image_1 from '../../../data/images/header_image_1.jpg'
-
+import { assets } from '../../../data/assests'
 const Header = () => {
     return (
         <section style={
             {
-                backgroundImage: `url("${header_image_1}")`
+                backgroundImage: `url("${assets.header_image_1}")`
                 , backgroundSize: '100% 100%'
                 , backgroundRepeat: 'no-repeat'
                 , backgroundAttachment: 'fixed'

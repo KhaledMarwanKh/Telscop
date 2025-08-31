@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { NavLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import { FiMenu, FiX, FiLogOut } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import api from '../../lib/api';
 
 
 const AdminNavbar = () => {
@@ -21,6 +23,36 @@ const AdminNavbar = () => {
     const handler_2 = () => {
         window.scrollTo(0, 0);
         setIsProfileMenuOpen(false)
+    }
+
+    const handleLogOut = async () => {
+        try {
+
+            const { adminToken } = localStorage;
+
+            const logoutRequest = await (await api.post(
+                "/api/admin/logout"
+                , {}
+                , {
+                    headers: {
+                        authorization: `Bearer ${adminToken}`
+                    }
+                }
+            )).data;
+
+            if (logoutRequest.status === "success") {
+                localStorage.removeItem("adminToken");
+                toast.success("تم تسجيل الخروج بنجاح");
+                setTimeout(() => {
+                    navigate("/");
+                    window.scrollTo(0, 0);
+                    window.location.reload();
+                }, 1000)
+            }
+        } catch (e) {
+            toast.error(e.message);
+            console.log(e);
+        }
     }
 
     const navLinks = [
@@ -68,7 +100,7 @@ const AdminNavbar = () => {
                         ))}
                     </div>
 
-                    <FiLogOut onClick={() => navigate('/login')} className='hidden lg:block w-5 h-5 cursor-pointer' title='تسجيل الخروج' />
+                    <FiLogOut onClick={handleLogOut} className='hidden lg:block w-5 h-5 cursor-pointer' title='تسجيل الخروج' />
 
                     <div className="lg:hidden">
                         <button
@@ -103,7 +135,7 @@ const AdminNavbar = () => {
                         <Link
                             to="/login"
                             className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
-                            onClick={handler}
+                            onClick={handleLogOut}
                         >
                             تسجيل خروج
                         </Link>

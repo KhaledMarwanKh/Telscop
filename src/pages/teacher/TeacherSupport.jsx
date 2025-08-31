@@ -1,27 +1,53 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  FiMessageSquare, FiPhone, FiMail, FiBookOpen, FiHelpCircle, 
+import {
+  FiMessageSquare, FiPhone, FiMail, FiBookOpen, FiHelpCircle,
   FiHome, FiLogOut, FiSend, FiChevronDown, FiChevronRight,
   FiVideo, FiFileText, FiUsers, FiDollarSign, FiSettings,
   FiAlertCircle, FiCheckCircle, FiClock
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import api from '../../lib/api';
 
 const TeacherSupport = () => {
   const [activeTab, setActiveTab] = useState('faq');
   const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
     subject: '',
-    category: '',
-    message: '',
+    message: ''
   });
   const [expandedFaq, setExpandedFaq] = useState(null);
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    toast.success('تم إرسال رسالتك بنجاح! سنرد عليك خلال 24 ساعة');
-    setContactForm({ subject: '', category: '', message: '' });
+
+    try {
+      const contactRequest = await (await api.post(
+        "/api/user/connect"
+        , contactForm
+      )).data;
+
+      if (contactRequest.success === true) {
+        toast.success("تم تسجيل طلبك سيتم الرد خلال ال 24 ساعة القادمة");
+      } else {
+        toast.error("حدث خطا ما");
+      }
+    } catch (e) {
+      toast.error(e.message);
+    }
+
+    // Reset form
+    setContactForm({
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
+    });
   };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -161,7 +187,7 @@ const TeacherSupport = () => {
                 <FiChevronRight className="w-5 h-5 text-gray-500 flex-shrink-0" />
               )}
             </button>
-            
+
             {expandedFaq === faq.id && (
               <div className="px-6 pb-6 border-t border-gray-100">
                 <p className="text-gray-600 leading-relaxed mt-4">{faq.answer}</p>
@@ -199,65 +225,89 @@ const TeacherSupport = () => {
           <h3 className="text-lg font-semibold text-gray-800">إرسال رسالة</h3>
           <p className="text-gray-600 text-sm mt-1">سنرد على رسالتك خلال 24 ساعة</p>
         </div>
-        
+
         <div className="p-6">
           <form onSubmit={handleFormSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  موضوع الرسالة *
+                  الاسم الكامل *
                 </label>
                 <input
                   type="text"
-                  name="subject"
-                  value={contactForm.subject}
+                  name="name"
+                  value={contactForm.name}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  placeholder="اكتب موضوع رسالتك"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  الفئة *
+                  البريد الإلكتروني *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={contactForm.email}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  رقم الهاتف
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={contactForm.phone}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الموضوع *
                 </label>
                 <select
-                  name="category"
-                  value={contactForm.category}
+                  name="subject"
+                  value={contactForm.subject}
                   onChange={handleInputChange}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   required
                 >
                   <option value="">اختر الفئة</option>
-                  <option value="account">مشاكل الحساب</option>
-                  <option value="bookings">الحجوزات والدروس</option>
-                  <option value="payments">المدفوعات</option>
-                  <option value="technical">مشاكل تقنية</option>
-                  <option value="other">أخرى</option>
+                  <option value="مشاكل الحساب">مشاكل الحساب</option>
+                  <option value="الحجوزات والدروس">الحجوزات والدروس</option>
+                  <option value="المدفوعات">المدفوعات</option>
+                  <option value="مشاكل تقنية">مشاكل تقنية</option>
+                  <option value="أخرى">أخرى</option>
                 </select>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                الرسالة *
-              </label>
-              <textarea
-                name="message"
-                value={contactForm.message}
-                onChange={handleInputChange}
-                rows="6"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="اكتب رسالتك بالتفصيل..."
-                required
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الرسالة *
+                </label>
+                <textarea
+                  name="message"
+                  value={contactForm.message}
+                  onChange={handleInputChange}
+                  rows="5"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="اكتب رسالتك هنا..."
+                  required
+                />
+              </div>
 
-            <div className="flex justify-end">
               <button
                 type="submit"
-                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2 space-x-reverse"
+                className="w-full h-[50px] mt-[120px] bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center space-x-2 space-x-reverse"
               >
                 <FiSend className="w-5 h-5" />
                 <span>إرسال الرسالة</span>
@@ -308,7 +358,7 @@ const TeacherSupport = () => {
           <h3 className="text-lg font-semibold text-gray-800">حالة النظام</h3>
           <p className="text-gray-600 text-sm mt-1">الحالة الحالية لخدمات المنصة</p>
         </div>
-        
+
         <div className="p-6 space-y-4">
           <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
             <div className="flex items-center space-x-3 space-x-reverse">
@@ -360,7 +410,7 @@ const TeacherSupport = () => {
         <div className="p-6 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800">التحديثات الأخيرة</h3>
         </div>
-        
+
         <div className="p-6 space-y-4">
           <div className="flex items-start space-x-3 space-x-reverse">
             <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
@@ -369,7 +419,7 @@ const TeacherSupport = () => {
               <p className="text-xs text-gray-500">منذ 3 ساعات</p>
             </div>
           </div>
-          
+
           <div className="flex items-start space-x-3 space-x-reverse">
             <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
             <div>
@@ -377,7 +427,7 @@ const TeacherSupport = () => {
               <p className="text-xs text-gray-500">منذ يومين</p>
             </div>
           </div>
-          
+
           <div className="flex items-start space-x-3 space-x-reverse">
             <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
             <div>
@@ -417,7 +467,7 @@ const TeacherSupport = () => {
               >
                 العودة للوحة التحكم
               </Link>
-              
+
               <div className="flex items-center space-x-2 space-x-reverse">
                 <Link
                   to="/"
@@ -457,11 +507,10 @@ const TeacherSupport = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 space-x-reverse px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${
-                    activeTab === tab.id
-                      ? 'bg-white text-emerald-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
+                  className={`flex items-center space-x-2 space-x-reverse px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === tab.id
+                    ? 'bg-white text-emerald-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{tab.label}</span>

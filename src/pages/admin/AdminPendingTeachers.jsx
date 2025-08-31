@@ -2,48 +2,118 @@ import { useEffect, useState } from 'react';
 import {
   FiUsers, FiClock
 } from 'react-icons/fi';
-import { pendingTeachers, subjects } from '../../data/adminMockData';
 import { toast } from 'react-toastify';
 import StatisBar from '../../components/admin components/AdminPendingTeachers/StatisBar';
 import PendingTeachersTable from '../../components/admin components/AdminPendingTeachers/PendingTeachersTable';
+import FilterTab from '../../components/admin components/AdminTeachers/FilterTab';
+import api from '../../lib/api';
+import { useNavigate } from "react-router-dom";
 
 const AdminPendingTeachers = () => {
+  const navigate = useNavigate();
   const [subjectFilter, setSubjectFilter] = useState('all');
+  const [gradeFilter, setGradeFilter] = useState("all");
+  const [regionFilter, setRegionFilter] = useState("all");
   const [filteredTeachers, setFilteredTeachers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    applyFilter();
-  }, [subjectFilter])
+    setIsLoading(true);
+    try {
+      applyFilter();
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
+  }, [subjectFilter, gradeFilter, regionFilter])
 
-  const applyFilter = () => {
-    const filteredTeachers = (subjectFilter !== 'all') ? pendingTeachers.filter(
-      teacher => teacher.subjectKey === subjectFilter
-    ) : pendingTeachers;
+  const applyFilter = async () => {
 
-    setFilteredTeachers(filteredTeachers);
+    const { adminToken } = localStorage;
+
+    try {
+      const getAllTeacherRequest = await (await api.get(
+        "/api/admin/get-new-teachers"
+        , {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      let filteredTeachers = getAllTeacherRequest.data;
+
+      console.log(filteredTeachers)
+
+      if (regionFilter !== "all") {
+        filteredTeachers = filteredTeachers?.filter(teacher => teacher?.address?.region === regionFilter);
+      }
+
+      if (gradeFilter !== "all") {
+        filteredTeachers = filteredTeachers?.filter(teacher => teacher?.Class?.includes(parseInt(gradeFilter)));
+      }
+
+      if (subjectFilter !== "all") {
+        filteredTeachers = filteredTeachers?.filter(teacher => teacher?.subject === subjectFilter);
+      }
+
+      console.log(filteredTeachers);
+
+
+      setFilteredTeachers(filteredTeachers);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
-  const handleApproveTeacher = (teacherId) => {
-    if (window.confirm('هل أنت متأكد من الموافقة على هذا المعلم؟')) {
-      setFilteredTeachers(prev => prev.filter(t => t.id !== teacherId));
-      toast.success('تم قبول المعلم وتفعيل حسابه بنجاح');
+  const handleApproveTeacher = async (teacherId) => {
+    try {
+      const { adminToken } = localStorage;
+
+      const makeAvailableTrueRequest = await (await api.post(
+        "/api/admin/acceptOrRejectTeacher"
+        , {
+          state: true,
+          teacherId
+        },
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      toast.success("تم قبول طلب التدريس بنجاح");
+      applyFilter();
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
     }
   };
 
-  const handleRejectTeacher = (teacherId) => {
-    if (window.confirm('هل أنت متأكد من رفض طلب هذا المعلم؟')) {
-      setFilteredTeachers(prev => prev.filter(t => t.id !== teacherId));
-      toast.error('تم رفض طلب المعلم');
+  const handleRejectTeacher = async (teacherId) => {
+    try {
+      const { adminToken } = localStorage;
+
+      const makeAvailableTrueRequest = await (await api.post(
+        "/api/admin/acceptOrRejectTeacher"
+        , {
+          state: false,
+          teacherId
+        },
+        {
+          headers: {
+            authorization: `Bearer ${adminToken}`
+          }
+        }
+      )).data;
+
+      toast.success("تم رفض طلب التدريس بنجاح");
+      applyFilter();
+    } catch (error) {
+      toast.error(error.message);
+      console.log(error);
     }
-  };
-
-  const handleDownloadDocument = (teacherId, document) => {
-    toast.info(`تحميل ${document} للمعلم ${teacherId}`);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US');
   };
 
   const getDaysAgo = (dateString) => {
@@ -65,13 +135,13 @@ const AdminPendingTeachers = () => {
         </div>
 
         {/* Alert for pending applications */}
-        {filteredTeachers.length > 0 && (
+        {filteredTeachers?.length && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
             <div className="flex items-center">
               <FiClock className="w-5 h-5 text-yellow-600 ml-2" />
               <div>
                 <h3 className="text-sm font-medium text-yellow-800">
-                  يوجد {filteredTeachers.length} طلب في انتظار المراجعة
+                  يوجد {filteredTeachers?.length} طلب في انتظار المراجعة
                 </h3>
                 <p className="text-sm text-yellow-700 mt-1">
                   يرجى مراجعة الطلبات والوثائق المرفقة قبل اتخاذ القرار
@@ -82,39 +152,29 @@ const AdminPendingTeachers = () => {
         )}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-center gap-4">
-            <select
-              value={subjectFilter}
-              onChange={(e) => setSubjectFilter(e.target.value)}
-              className="w-[50%] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {subjects.map(subject => (
-                <option key={subject.key} value={subject.key}>{subject.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
 
-        <StatisBar
-          filteredTeachers={filteredTeachers}
+        <FilterTab
+          setGradeFilter={setGradeFilter}
+          setRegionFilter={setRegionFilter}
+          setSubjectFilter={setSubjectFilter}
+          subjectFilter={subjectFilter}
+          gradeFilter={gradeFilter}
+          regionFilter={regionFilter}
         />
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800">طلبات التدريس ({filteredTeachers.length})</h3>
+            <h3 className="text-lg font-semibold text-gray-800">طلبات التدريس ({filteredTeachers?.length})</h3>
           </div>
 
           <PendingTeachersTable
             handleApproveTeacher={handleApproveTeacher}
-            handleDownloadDocument={handleDownloadDocument}
             handleRejectTeacher={handleRejectTeacher}
             filteredTeachers={filteredTeachers}
             getDaysAgo={getDaysAgo}
-            formatDate={formatDate}
           />
 
-          {filteredTeachers.length === 0 && (
+          {!filteredTeachers?.length && (
             <div className="text-center py-12">
               <FiUsers className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-600 mb-2">لا توجد طلبات جديدة</h3>

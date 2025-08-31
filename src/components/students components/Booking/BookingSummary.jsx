@@ -1,9 +1,12 @@
+import { translateDayToArabic } from "../../../data/assests"
+
 const BookingSummary = (
     {
         teacher,
         selectedDate,
         selectedTime,
-        timeSlots
+        timeSlots,
+        selectedDay
     }
 ) => {
     return (
@@ -12,16 +15,16 @@ const BookingSummary = (
             <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                     <span>المعلم:</span>
-                    <span className="font-semibold">{teacher.name}</span>
+                    <span className="font-semibold">{teacher?.name}</span>
                 </div>
                 <div className="flex justify-between">
                     <span>المادة:</span>
-                    <span>{teacher.subject}</span>
+                    <span>{teacher?.subject}</span>
                 </div>
                 {selectedDate && (
                     <div className="flex justify-between">
-                        <span>التاريخ:</span>
-                        <span>{new Date(selectedDate).toLocaleDateString('en-US')}</span>
+                        <span>اليوم :</span>
+                        <span>{selectedDate} - {translateDayToArabic(selectedDay)}</span>
                     </div>
                 )}
                 {selectedTime && (
@@ -33,7 +36,7 @@ const BookingSummary = (
                 <hr className="my-3" />
                 <div className="flex justify-between font-semibold text-lg">
                     <span>المجموع:</span>
-                    <span className="text-secondary">{teacher.price} ل.س</span>
+                    <span className="text-secondary">{teacher?.price} ل.س</span>
                 </div>
             </div>
         </div>

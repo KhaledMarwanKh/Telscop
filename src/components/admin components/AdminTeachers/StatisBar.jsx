@@ -16,6 +16,7 @@ const StatisBar = (
                     <div className="mr-4">
                         <p className="text-sm font-medium text-gray-600">إجمالي المعلمين</p>
                         <p className="text-2xl font-bold text-blue-600">{statis.teachersNum}</p>
+                        <p className="text-xs text-gray-500">معلم</p>
                     </div>
                 </div>
             </div>
@@ -28,6 +29,7 @@ const StatisBar = (
                     <div className="mr-4">
                         <p className="text-sm font-medium text-gray-600">إجمالي الدروس</p>
                         <p className="text-2xl font-bold text-green-600">{statis.totalLessons}</p>
+                        <p className="text-xs text-gray-500">درس</p>
                     </div>
                 </div>
             </div>

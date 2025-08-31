@@ -1,11 +1,12 @@
-import React from 'react'
-import { FiMail, FiMapPin, FiPhone, FiUser } from 'react-icons/fi';
+import { FiMail, FiPhone, FiUser } from 'react-icons/fi';
+import { city, homes } from '../../../data/assests';
 
 const RenderStep1 = (
     {
         calculateAge,
         handleInputChange,
         formData,
+        handleAddressChange
     }
 ) => {
     return (
@@ -111,21 +112,57 @@ const RenderStep1 = (
                 </select>
             </div>
 
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    اختر المحافظة
+                </label>
+                <select
+                    name="city"
+                    value={formData.address.city}
+                    onChange={handleAddressChange}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
+                    required
+                >
+                    <option value="">اختر محافظة</option>
+                    {city.map((city) => (
+                        <option key={city.key} value={city.name}>
+                            {city.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    اختر المنطقة
+                </label>
+                <select
+                    name="region"
+                    value={formData.address.region}
+                    onChange={handleAddressChange}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white"
+                    required
+                >
+                    <option value="">اختر المنطقة</option>
+                    {homes.map((region) => (
+                        <option key={region.translation} value={region.region}>
+                            {region.region}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="group">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    العنوان *
+                    ادخل اسم الشارع*
                 </label>
                 <div className="relative">
-                    <div className="absolute top-4 right-4 pointer-events-none">
-                        <FiMapPin className="h-5 w-5 text-gray-400 group-focus-within:text-emerald-600 transition-colors" />
-                    </div>
-                    <textarea
-                        name="address"
-                        value={formData.address}
-                        onChange={handleInputChange}
-                        rows="3"
-                        className="w-full pl-4 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400"
-                        placeholder="أدخل عنوانك الكامل (المحافظة، المدينة، الحي، الشارع...)"
+                    <input
+                        type="text"
+                        name="street"
+                        value={formData.address.street}
+                        onChange={handleAddressChange}
+                        className="w-full pl-4 pr-12 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400"
+                        placeholder="أدخل الشارع"
                         required
                     />
                 </div>

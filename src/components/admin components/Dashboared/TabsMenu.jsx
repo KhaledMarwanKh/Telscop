@@ -16,7 +16,7 @@ const TabsMenu = (
 
     return (
         <div className="mb-8">
-            <div className="flex space-x-2 space-x-reverse bg-gray-100 p-1 rounded-lg">
+            <div className="flex flex-col md:flex-row space-x-2 space-x-reverse bg-gray-100 p-1 rounded-lg">
                 {tabs.map((tab) => {
                     const Icon = tab.icon;
                     return (

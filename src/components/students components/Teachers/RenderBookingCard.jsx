@@ -1,4 +1,4 @@
-import { FiCalendar, FiClock, FiEdit, FiRepeat, FiX } from 'react-icons/fi'
+import { FiCalendar, FiClock, FiEdit, FiMapPin, FiRepeat, FiX } from 'react-icons/fi'
 
 const RenderBookingCard = ({
     formatDate
@@ -6,44 +6,46 @@ const RenderBookingCard = ({
     , booking
     , statusBadge
     , handleBookAgain
-    , handleCancelBooking,
-    handleRescheduleBooking
+    , handleCancelBooking
+    , handleRescheduleBooking
+    , handleShowLocation
 }) => {
+
     return (
-        <div key={booking.id} className={`bg-white rounded-lg shadow-sm p-6 border-r-4 ${booking.status === 'upcoming' ? 'border-primary' :
-            booking.status === 'completed' ? 'border-secondary' :
+        <div key={booking?._id} className={`bg-white rounded-lg shadow-sm p-6 border-r-4 ${booking?.isCompleted === false && booking?.cancelled === false ? 'border-primary' :
+            booking?.isCompleted === true ? 'border-secondary' :
                 'border-red-600'
             }`}>
             <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4 space-x-reverse flex-1">
                     <img
-                        src={booking.teacherImage}
-                        alt={booking.teacherName}
+                        src={booking?.teacherId?.image}
+                        alt={booking?.teacherId?.name}
                         className="w-16 h-16 rounded-full object-cover"
                     />
                     <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-800 mb-1">
-                            {booking.teacherName}
+                            {booking?.teacherId?.name}
                         </h3>
-                        <p className="text-primary mb-2">{booking.subject}</p>
+                        <p className="text-primary mb-2">{booking?.subject}</p>
 
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                             <div className="flex items-center space-x-2 space-x-reverse">
                                 <FiCalendar className="w-4 h-4" />
-                                <span>{formatDate(booking.date)}</span>
+                                <span>{(booking.slotDate.includes("-")) ? booking.slotDate.split("T")[0] : formatDate(booking?.slotDate)}</span>
                             </div>
                             <div className="flex items-center space-x-2 space-x-reverse">
                                 <FiClock className="w-4 h-4" />
-                                <span>{formatTime(booking.time)}</span>
+                                <span>{formatTime(booking?.slotTime)}</span>
                             </div>
                             <div className="flex items-center space-x-2 space-x-reverse">
-                                <span>{booking.price.toLocaleString()} ل.س</span>
+                                <span>{booking?.price?.toLocaleString()} ل.س</span>
                             </div>
                         </div>
 
-                        {booking.notes && (
+                        {booking?.nots && (
                             <p className="text-sm text-gray-600 mb-3">
-                                <strong>ملاحظات:</strong> {booking.notes}
+                                <strong>ملاحظات:</strong> {booking?.nots}
                             </p>
                         )}
 
@@ -55,18 +57,26 @@ const RenderBookingCard = ({
 
                 {/* Action Buttons */}
                 <div className="flex flex-col space-y-2">
-                    {booking.status === 'upcoming' && (
+                    {booking?.isCompleted === false && booking?.cancelled === false && (
                         <>
                             <button
-                                onClick={() => handleRescheduleBooking(booking.id)}
-                                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center space-x-2 space-x-reverse"
+                                onClick={() => handleRescheduleBooking(booking?._id, booking?.teacherId?._id)}
+                                className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center justify-center space-x-2 space-x-reverse"
                             >
                                 <FiEdit className="w-4 h-4" />
                                 <span>تعديل</span>
                             </button>
+
                             <button
-                                onClick={() => handleCancelBooking(booking.id)}
-                                className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center space-x-2 space-x-reverse"
+                                onClick={() => handleShowLocation(booking?.teacherId?._id)}
+                                className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex gap-2 items-center space-x-2 space-x-reverse' >
+                                <FiMapPin />
+                                عرض موقع
+                            </button>
+
+                            <button
+                                onClick={() => handleCancelBooking(booking?._id)}
+                                className="bg-red-50 text-red-600 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors text-sm flex items-center justify-center space-x-2 space-x-reverse"
                             >
                                 <FiX className="w-4 h-4" />
                                 <span>إلغاء</span>
@@ -74,10 +84,10 @@ const RenderBookingCard = ({
                         </>
                     )}
 
-                    {booking.status === 'completed' && (
+                    {booking?.isCompleted === true && (
                         <>
                             <button
-                                onClick={() => handleBookAgain(booking.teacherId)}
+                                onClick={() => handleBookAgain(booking?.teacherId?._id)}
                                 className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center space-x-2 space-x-reverse"
                             >
                                 <FiRepeat className="w-4 h-4" />
@@ -86,9 +96,9 @@ const RenderBookingCard = ({
                         </>
                     )}
 
-                    {booking.status === 'cancelled' && (
+                    {booking?.cancelled === true && (
                         <button
-                            onClick={() => handleBookAgain(booking.teacherId)}
+                            onClick={() => handleBookAgain(booking?.teacherId?._id)}
                             className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center space-x-2 space-x-reverse"
                         >
                             <FiRepeat className="w-4 h-4" />

@@ -34,21 +34,6 @@ const RenderStep4 = (
                             type="file"
                             accept=".jpg,.jpeg,.png"
                             name='image'
-                            required
-                            onChange={handleFileUpload}
-                            className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-xl hover:border-emerald-500 transition-colors cursor-pointer"
-                        />
-                    </li>
-                    <li className="flex flex-col gap-y-3 space-x-2 space-x-reverse">
-                        <div className='flex space-x-2 space-x-reverse items-center'>
-                            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                            <span>صورة عن الهوية </span>
-                        </div>
-                        <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            name='IdImage'
-                            required
                             onChange={handleFileUpload}
                             className="w-full p-4 border-2 border-dashed border-emerald-300 rounded-xl hover:border-emerald-500 transition-colors cursor-pointer"
                         />
@@ -62,7 +47,7 @@ const RenderStep4 = (
                         <input
                             type="file"
                             multiple
-                            accept=".pdf,.doc,.docx,.png,.jpg.jpeg"
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
                             name='certifications'
                             required
                             onChange={handleFileUpload}
@@ -125,7 +110,7 @@ const RenderStep4 = (
                         </div>
                         <input
                             type={showConfirmPassword ? 'text' : 'password'}
-                            name="confirmPassword"
+                            name="passwordConfirm"
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
                             className={`w-full pl-12 pr-12 py-4 border-2 rounded-xl focus:ring-2 focus:ring-emerald-600/20 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400 ${formData.confirmPassword && formData.password !== formData.confirmPassword

@@ -1,11 +1,11 @@
 import { FiArrowLeft } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
-import header_image_3 from '../../../data/images/header_image_3.png'
+import { assets } from '../../../data/assests'
 
 const Footer = () => {
     return (
         <section style={{
-            backgroundImage: `url("${header_image_3}")`
+            backgroundImage: `url("${assets.header_image_3}")`
             , backgroundSize: '100% 100%'
             , backgroundAttachment: 'fixed'
         }} className="py-20 text-white">

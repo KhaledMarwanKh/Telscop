@@ -1,37 +1,103 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { mockTeachers } from '../../data/mockData';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import TeacherPanel from '../../components/students components/Teachers/TeacherPanel';
 import FilterTab from '../../components/students components/Teachers/FilterTab';
 import TeacherMap from '../../components/TeacherMap';
+import api from '../../lib/api';
 
 const Teachers = () => {
+  const allTeachers = useLoaderData();
   const [filteredTeachers, setFilteredTeachers] = useState([]);
-  const [subjectFilter, setSubjectFilter] = useState('');
-  const [gradeFilter, setGradeFilter] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('all');
+  const [gradeFilter, setGradeFilter] = useState('all');
+  const [distFilter, setDistFilter] = useState(0);
+  const [regionFilter, setRegionFilter] = useState('all')
   const navigate = useNavigate();
 
-  const applyFilters = () => {
-    let filtered = mockTeachers;
+  const applyFilters = async () => {
 
-    if (subjectFilter) {
-      filtered = filtered.filter(teacher => teacher.subjectKey === subjectFilter);
+    try {
+      let teachers = [];
+
+      const filter = {};
+
+      const { userToken } = localStorage;
+
+      if (distFilter > 0) {
+        try {
+          if (userToken) {
+            teachers = await (await api.post(
+              "/api/user/get-nearest-teacher"
+              , { maxDistanceKm: distFilter }
+              ,
+              {
+                headers: {
+                  authorization: `Bearer ${userToken}`
+                }
+              }
+            )).data;
+
+            if (teachers?.success === true) {
+              const teacher = teachers?.data?.filter(teacher => teacher?.subject === subjectFilter
+                || teacher?.Class?.includes(parseInt(gradeFilter))
+                || teacher?.address?.region === regionFilter);
+
+              setFilteredTeachers(teacher);
+              return
+            }
+          } else {
+            toast.warn("سجل دخولك اولا");
+            setDistFilter(0);
+          }
+
+        } catch (e) {
+          toast.error(e.message);
+        }
+
+      }
+
+      if (subjectFilter !== "all") {
+        filter.subject = subjectFilter;
+      }
+
+      if (gradeFilter !== "all") {
+        filter.Class = gradeFilter;
+      }
+
+      if (regionFilter !== "all") {
+        filter.region = regionFilter;
+      }
+
+      const filteredTeachers = await (await api.get(
+        "/api/teacher/list-teachers"
+        ,
+        {
+          params: filter
+        }
+      )).data;
+
+      if (filteredTeachers?.status === "success") {
+        setFilteredTeachers(filteredTeachers?.data?.filter(teacher => teacher.activate));
+      }
+
+    } catch (e) {
+      console.log(e);
+      setDistFilter("all");
+      setFilteredTeachers(allTeachers);
+      setGradeFilter("all");
+      setRegionFilter("all");
+      setDistFilter(0);
+      toast.error(e.message);
     }
-
-    if (gradeFilter) {
-      filtered = filtered.filter(teacher =>
-        teacher.grades.includes(parseInt(gradeFilter))
-      );
-    }
-
-    setFilteredTeachers(filtered);
   };
 
   const clearFilters = () => {
-    setSubjectFilter('');
-    setGradeFilter('');
-    setFilteredTeachers(mockTeachers);
+    setSubjectFilter('all');
+    setGradeFilter('all');
+    setRegionFilter('all')
+    setDistFilter(0);
+    setFilteredTeachers(allTeachers);
     toast.info('تم إلغاء جميع الفلاتر');
   };
 
@@ -41,7 +107,7 @@ const Teachers = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [subjectFilter, gradeFilter]);
+  }, [subjectFilter, gradeFilter, distFilter, regionFilter]);
 
   useEffect(() => {
     if (localStorage.filter) {
@@ -51,7 +117,7 @@ const Teachers = () => {
   }, [])
 
   useEffect(() => {
-    setFilteredTeachers(mockTeachers)
+    setFilteredTeachers(allTeachers);
   }, [])
 
   return (
@@ -65,6 +131,10 @@ const Teachers = () => {
         setSubjectFilter={setSubjectFilter}
         filteredTeachers={filteredTeachers}
         clearFilters={clearFilters}
+        distFilter={distFilter}
+        setDistFilter={setDistFilter}
+        regionFilter={regionFilter}
+        setRegionFilter={setRegionFilter}
       />
 
       <div className="p-6 rounded-lg py-2 px-3 bg-white shadow-lg mb-8">
@@ -72,6 +142,7 @@ const Teachers = () => {
           <span>🗺️</span>
           <span>خريطة المعلمين</span>
         </h2>
+
         <TeacherMap
           teachers={filteredTeachers}
           onTeacherSelect={handleTeacherSelect}
@@ -80,7 +151,7 @@ const Teachers = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-6">قائمة المعلمين</h2>
 
-          {filteredTeachers.length === 0 ? (
+          {filteredTeachers?.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-gray-600 mb-2">
@@ -99,5 +170,20 @@ const Teachers = () => {
     </div>
   );
 };
+
+export const teachersLoader = async () => {
+  try {
+    const allTeachers = await (await api.get(
+      "/api/teacher/list-teachers"
+    )).data;
+
+    if (allTeachers.status === "success") {
+      return allTeachers.data.filter(teacher => teacher.activate);
+    }
+  } catch (e) {
+    toast.error(e.message);
+    return [];
+  }
+}
 
 export default Teachers;

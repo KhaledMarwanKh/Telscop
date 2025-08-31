@@ -1,6 +1,5 @@
-import React from 'react'
 import { FiFilter } from 'react-icons/fi'
-import { grades, subjects } from '../../../data/mockData'
+import { grades, homes, subjects } from '../../../data/assests'
 
 const FilterTab = ({
     filteredTeachers
@@ -9,6 +8,10 @@ const FilterTab = ({
     , setGradeFilter
     , gradeFilter
     , clearFilters
+    , distFilter
+    , setDistFilter
+    , regionFilter
+    , setRegionFilter
 }) => {
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
@@ -17,7 +20,7 @@ const FilterTab = ({
                 <h2 className="text-lg font-semibold text-gray-800">فلترة النتائج</h2>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         المادة
@@ -27,9 +30,9 @@ const FilterTab = ({
                         onChange={(e) => setSubjectFilter(e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
-                        <option value="">جميع المواد</option>
+                        <option value="all">جميع المواد</option>
                         {subjects.map((subject) => (
-                            <option key={subject.key} value={subject.key}>
+                            <option key={subject.key} value={subject.name}>
                                 {subject.name}
                             </option>
                         ))}
@@ -45,10 +48,41 @@ const FilterTab = ({
                         onChange={(e) => setGradeFilter(e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
-                        <option value="">جميع الصفوف</option>
+                        <option value="all">جميع الصفوف</option>
                         {grades.map((grade) => (
                             <option key={grade.value} value={grade.value}>
                                 {grade.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className='flex flex-col'>
+                    <label htmlFor="dist" className="block text-sm font-medium text-gray-700 mb-2">
+                        المسافة
+                    </label>
+
+                    <div className='flex items-center gap-2 border border-gray-300 rounded-lg h-full px-2'>
+                        اقل من
+                        <input className='w-[75%] h-full border-none outline-none' type="number" name="dist" id="dist" value={distFilter} step={0.5} onChange={({ target: { value } }) => setDistFilter(value < 0 ? 0 : value)} />
+                        كم
+                    </div>
+
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        المنطقة
+                    </label>
+                    <select
+                        value={regionFilter}
+                        onChange={(e) => setRegionFilter(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    >
+                        <option value="all">جميع المناطق</option>
+                        {homes.map((region) => (
+                            <option key={region.translation} value={region.region}>
+                                {region.region}
                             </option>
                         ))}
                     </select>
@@ -69,6 +103,8 @@ const FilterTab = ({
                     </div>
                 </div>
             </div>
+
+
         </div>
     )
 }

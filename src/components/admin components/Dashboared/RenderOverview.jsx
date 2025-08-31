@@ -21,10 +21,31 @@ ChartJS.register(
 const RenderOverview = (
     {
         stats,
-        monthlyChartData,
+        monthlyStats,
         chartOptions
     }
 ) => {
+
+
+    const monthlyChartData = {
+        labels: monthlyStats.labels,
+        datasets: [
+            {
+                label: 'الطلاب',
+                data: monthlyStats.students,
+                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 1,
+            },
+            {
+                label: 'المعلمين',
+                data: monthlyStats.teachers,
+                backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -83,7 +104,7 @@ const RenderOverview = (
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm font-medium text-gray-600">إجمالي الأرباح</p>
-                            <p className="text-2xl font-bold text-orange-600">{(stats.totalEarnings / 1000000).toFixed(1)}M</p>
+                            <p className="text-2xl font-bold text-orange-600">{(stats.totalEarnings)}</p>
                             <p className="text-xs text-gray-500">ليرة سورية</p>
                         </div>
                         <div className="p-3 bg-orange-100 rounded-lg">

@@ -3,10 +3,24 @@ import { Bar } from 'react-chartjs-2'
 
 const RenderStudentsStats = (
     {
-        studentsChartData,
+        studentsByGrade,
         chartOptions
     }
 ) => {
+
+    const studentsChartData = {
+        labels: studentsByGrade.labels,
+        datasets: [
+            {
+                label: 'عدد الطلاب',
+                data: studentsByGrade.data,
+                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
     return (
         <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm p-6">

@@ -2,22 +2,27 @@ import React from 'react'
 import { FiCalendar, FiClock } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import BookingSummary from './BookingSummary'
+import { getNextDayDate, getTime, translateDayToArabic } from '../../../data/assests'
 
 const TeahcerBookingForm = ({
     handleBooking,
     handleTimeSelect,
-    availableDay,
-    avialableTimeSolt,
     setNotes,
-    setSelectedDate,
     selectedTime,
     notes,
     teacher,
     selectedDate,
-    timeSlots
+    handleDateSelect,
+    avTimes,
+    slotsBooked,
+    selectedDay,
+    isLoading,
+    isUpdateState,
+    handleUpdateBooking
 }) => {
+
     return (
-        <form onSubmit={handleBooking}>
+        <form onSubmit={isUpdateState ? handleUpdateBooking : handleBooking}>
             <div className="grid md:grid-cols-2 gap-8 border rounded shadow-lg py-4 px-5">
                 <div>
                     <h3 className="text-xl font-semibold mb-4 flex items-center space-x-2 space-x-reverse">
@@ -28,12 +33,12 @@ const TeahcerBookingForm = ({
                         required
                         name="date"
                         id="date"
-                        onChange={(e) => setSelectedDate(e.target.value)}
+                        onChange={handleDateSelect}
                         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                         {
-                            availableDay.map(day => (
-                                <option value={day.date}>{day.date} / {day.day}</option>
+                            avTimes?.sort((a, b) => new Date(getNextDayDate(a.day)) - new Date(getNextDayDate(b.day)))?.map((day) => (
+                                <option key={getNextDayDate(day.day)} value={getNextDayDate(day.day)}>{getNextDayDate(day.day) + " - " + translateDayToArabic(day.day)}</option>
                             ))
                         }
                     </select>
@@ -45,19 +50,28 @@ const TeahcerBookingForm = ({
                         <span>اختر الوقت</span>
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                        {timeSlots.map((slot) => (
-                            <button
-                                key={slot.value}
-                                type="button"
-                                onClick={() => handleTimeSelect(slot.value)}
-                                className={`p-3 ${(!avialableTimeSolt.find(s => s.value === slot.value)) ? "bg-red-100 pointer-events-none" : ""} border rounded-lg transition-colors ${selectedTime === slot.value
-                                    ? 'bg-primary text-white border-primary'
-                                    : 'border-gray-300 hover:bg-primary hover:text-white'
-                                    }`}
-                            >
-                                {slot.label}
-                            </button>
-                        ))}
+
+                        {
+                            avTimes?.filter(e => e.day === selectedDay).map(e => e.slots).map(slot => {
+                                const fin = [];
+                                slot.forEach(slot => {
+                                    fin.push((
+                                        <button
+                                            key={slot}
+                                            type="button"
+                                            onClick={() => handleTimeSelect(slot)}
+                                            className={`p-3 ${(!slotsBooked) ? "" : (slotsBooked?.find(e => e === slot)) ? 'bg-red-100 pointer-events-none' : ''} border rounded-lg transition-colors ${selectedTime === slot
+                                                ? 'bg-primary text-white border-primary'
+                                                : 'border-gray-300 hover:bg-primary hover:text-white'
+                                                }}`}
+                                        >
+                                            {getTime(slot)}
+                                        </button>
+                                    ))
+                                });
+                                return fin
+                            })
+                        }
                     </div>
                 </div>
             </div>
@@ -79,16 +93,39 @@ const TeahcerBookingForm = ({
                 selectedDate={selectedDate}
                 selectedTime={selectedTime}
                 teacher={teacher}
-                timeSlots={timeSlots}
+                timeSlots={teacher.availableTimes}
+                selectedDay={selectedDay}
             />
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <button
-                    type="submit"
-                    className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                >
-                    تأكيد الحجز
-                </button>
+
+                {isLoading ? (
+                    <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>جاري الحجز...</span>
+                    </>
+                ) : (
+                    <>
+                        {
+                            !isUpdateState ? (
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                                >
+                                    تأكيد الحجز
+                                </button>
+                            ) : (
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                                >
+                                    تحديث الموعد
+                                </button>
+                            )
+                        }
+                    </>
+                )}
+
                 <Link
                     to="/teachers"
                     className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors text-center"

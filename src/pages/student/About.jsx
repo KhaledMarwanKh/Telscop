@@ -8,15 +8,18 @@ import {
   HiOutlineTrendingUp,
   HiOutlineCash,
   HiOutlineSupport
-} from 'react-icons/hi'; import about_image from '../../data/images/about_image.jpg'
+} from 'react-icons/hi';
 import { FiUsers } from 'react-icons/fi'
+import { assets } from '../../data/assests';
+
 const About = () => {
+
   return (
     <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="rounded-lg  p-8 relative">
         <div className='mr-[-200px] w-[100%] h-[600px] p-3 rounded-[20px] absolute z-[-1] left-[50%] translate-x-[-50%] flex flex-col items-center justify-center' style={
           {
-            backgroundImage: `url("${about_image}")`,
+            backgroundImage: `url("${assets.about_image}")`,
             backgroundSize: '100% 100%',
             boxShadow: '600px 600px 10px 0 rgba(0,0,0,0.7) inset',
           }

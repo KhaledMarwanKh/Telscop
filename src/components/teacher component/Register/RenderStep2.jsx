@@ -98,7 +98,7 @@ const RenderStep2 = (
                 <input
                     type="text"
                     name="degree"
-                    value={formData.qualification}
+                    value={formData.degree}
                     onChange={handleInputChange}
                     className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 transition-all duration-300 bg-gray-50/50 hover:bg-white focus:bg-white placeholder:text-gray-400"
                     placeholder="مثال: بكالوريوس رياضيات - جامعة دمشق"

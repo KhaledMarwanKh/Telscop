@@ -105,14 +105,23 @@ const Bookings = () => {
   useEffect(() => {
     const fetchLocation = async () => {
       if (isLoading) {
-        const geo = await getGeoLocation();
-
-        setStudentLocation(
-          {
-            lat: geo[1],
-            lgt: geo[0]
-          }
-        );
+             if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords: { latitude, longitude } }) => {
+                      setStudentLocation({
+                        lat:latitude,
+                        lgt:longitude
+                      })
+                    },
+                    (error) => {
+                        console.log(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 1000000
+                    }
+                );
+       }
       }
     }
 

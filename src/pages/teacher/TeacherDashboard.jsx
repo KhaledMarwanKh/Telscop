@@ -75,11 +75,11 @@ const TeacherDashboard = () => {
   };
 
   useEffect(() => {
-    setStatis(dashboardInfo.statis);
-    setTeacherInfo(dashboardInfo.teacherInfo);
-    setTodayLessons(dashboardInfo.todayLessons);
-    setUpcommingLessons(dashboardInfo.upcommingLessons);
-    setTotalBookings(dashboardInfo.bookings);
+    setStatis(dashboardInfo?.statis);
+    setTeacherInfo(dashboardInfo?.teacherInfo);
+    setTodayLessons(dashboardInfo?.todayLessons);
+    setUpcommingLessons(dashboardInfo?.upcommingLessons);
+    setTotalBookings(dashboardInfo?.bookings);
   }, [dashboardInfo])
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const TeacherDashboard = () => {
 
   const renderTodayLessons = () => (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      {todayLessons.length === 0 ? (
+      {todayLessons?.length === 0 ? (
         <NoLessions />
       ) : (
         <TodayLessions
@@ -170,7 +170,7 @@ const TeacherDashboard = () => {
 
   const renderUpcomingLessons = () => (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      {upcommingLessons.length === 0 ? (
+      {upcommingLessons?.length === 0 ? (
         <NoLessions />
       ) : (
         <UpCommingLessions
@@ -210,7 +210,7 @@ const TeacherDashboard = () => {
                   : 'bg-white text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm'
                   }`}
               >
-                دروس اليوم ({todayLessons.length})
+                دروس اليوم ({todayLessons?.length})
               </button>
               <button
                 onClick={() => setActiveTab('upcoming')}
@@ -219,7 +219,7 @@ const TeacherDashboard = () => {
                   : 'bg-white text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 shadow-sm'
                   }`}
               >
-                الدروس القادمة ({upcommingLessons.length})
+                الدروس القادمة ({upcommingLessons?.length})
               </button>
             </div>
 

@@ -201,9 +201,25 @@ const TeacherRegister = () => {
       return;
     }
 
-    const geo = await getGeoLocation();
-
-    formData.location.coordinates = geo;
+         if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords: { latitude, longitude } }) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        location:{
+                          coordinates:[longitude,latitude]
+                        }
+                      }))
+                    },
+                    (error) => {
+                        console.log(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 1000000
+                    }
+                );
+       }
 
     setIsLoading(true);
 

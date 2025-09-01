@@ -13,7 +13,7 @@ const StatisBar = (
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">إجمالي الطلاب</p>
-            <p className="text-3xl font-bold text-emerald-600">{statis.studentsCount}</p>
+            <p className="text-3xl font-bold text-emerald-600">{statis?.studentsCount}</p>
           </div>
           <div className="p-3 bg-emerald-100 rounded-lg">
             <FiUsers className="w-8 h-8 text-emerald-600" />
@@ -30,7 +30,7 @@ const StatisBar = (
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">الدروس المكتملة</p>
-            <p className="text-3xl font-bold text-green-600">{statis.completedLessons}</p>
+            <p className="text-3xl font-bold text-green-600">{statis?.completedLessons}</p>
           </div>
           <div className="p-3 bg-green-100 rounded-lg">
             <FiCheckCircle className="w-8 h-8 text-green-600" />
@@ -47,7 +47,7 @@ const StatisBar = (
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">الدروس الملغاة</p>
-            <p className="text-3xl font-bold text-red-600">{bookings.filter(e => e.cancelled).length}</p>
+            <p className="text-3xl font-bold text-red-600">{bookings?.filter(e => e.cancelled)?.length | 0}</p>
           </div>
           <div className="p-3 bg-red-100 rounded-lg">
             <FiXCircle className="w-8 h-8 text-red-600" />
@@ -55,7 +55,7 @@ const StatisBar = (
         </div>
         <div className="mt-4 flex items-center text-sm">
           <span className="text-gray-500">معدل الإلغاء: </span>
-          <span className="text-red-600 font-medium mr-1">{(bookings.filter(e => e.cancelled).length / bookings.length * 100).toFixed(2)} || 0%</span>
+          <span className="text-red-600 font-medium mr-1">{(bookings?.filter(e => e.cancelled)?.length / bookings?.length * 100).toFixed(2) | 0}%</span>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation, Link, useNavigate } from 'react-router-dom';
 import { FiChevronDown, FiMenu, FiX, FiUser, FiCalendar, FiLogOut, FiLogIn } from 'react-icons/fi';
+import { MdDashboard } from 'react-icons/md';
 import api from '../lib/api';
 import { toast } from 'react-toastify';
 
@@ -14,13 +15,21 @@ const Navbar = () => {
     image: '',
     name: ''
   });
+  const [otherLogin,setOtherLogin] = useState(false);
 
   useEffect(() => {
 
-    const { userToken } = localStorage;
+    const { userToken,adminToken,teacherToken } = localStorage;
 
     if (!userToken) {
       setIsLogin(false);
+      if (teacherToken){
+        setOtherLogin(true);
+      }else{
+        if (adminToken){
+          setOtherLogin(true);
+        }
+      }
     } else {
       const fetchData = async () => {
         try {
@@ -153,7 +162,24 @@ const Navbar = () => {
                       <span className="text-sm">{student?.name}</span>
                       <FiChevronDown className="w-4 h-4" />
                     </button>
-                  ) : (
+                  ) : (otherLogin) ?
+                  (
+         <Link
+                to={(()=>{
+                  const {adminToken,teacherToken} = localStorage;
+                  if (adminToken){
+                    return "admin/dashboard"
+                  }else{
+                    return "teacher/dashboard"
+                  }
+                })()
+                }
+                className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-colors text-sm font-medium"
+              >
+                العودة للوحة التحكم
+              </Link>
+                  )
+                  : (
                     <button
                       onClick={() => navigate('/login')}
                       className='px-2 py-3 border rounded hover:bg-primary hover:text-white transition-all duration-150'>

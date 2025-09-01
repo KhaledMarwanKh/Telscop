@@ -240,13 +240,25 @@ const Register = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      let geo = await getGeoLocation();
-
-      console.log(geo);
-
-      setFormData((prv) => ({ ...prv, location: { coordinates: geo } }));
-    })();
+     if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords: { latitude, longitude } }) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        location:{
+                          coordinates:[longitude,latitude]
+                        }
+                      }))
+                    },
+                    (error) => {
+                        console.log(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 1000000
+                    }
+                );
+       }
   }, []);
 
 

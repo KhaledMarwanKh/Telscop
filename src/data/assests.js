@@ -201,7 +201,7 @@ export const getGeoLocation = async () => {
                 if (navigator.geolocation) {
                 let lat, lng;
 
-                await navigator.geolocation.getCurrentPosition(
+                navigator.geolocation.getCurrentPosition(
                     ({ coords: { latitude, longitude } }) => {
                         lat = latitude;
 

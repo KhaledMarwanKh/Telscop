@@ -29,7 +29,7 @@ app.use(
 // ===== CORS setup =====
 const allowedOrigins = [
   'http://localhost:3000', // Frontend local
-  'https://telescope-frontend.onrender.com' // Frontend on Render (استبدل باللينك الصحيح)
+  'https://telescope-9yz1.onrender.com' // Frontend on Render (استبدل باللينك الصحيح)
 ];
 
 app.use(cors({

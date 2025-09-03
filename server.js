@@ -20,12 +20,12 @@ dotenv.config({path : './.env'})
 //app config 
 const app = express();
 const port =process.env.PORT || 4000 ;
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000',
+//     credentials: true,
+//   })
+// );
 // ===== CORS setup =====
 const allowedOrigins = [
   'http://localhost:3000', // Frontend local

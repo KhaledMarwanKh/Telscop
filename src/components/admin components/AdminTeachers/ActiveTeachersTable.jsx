@@ -27,7 +27,7 @@ const ActiveTeachersTable = (
     ]
 
     return (
-        <div className="overflow-auto">
+        <div className="overflow-auto h-[500px]">
             <table className="w-full text-center">
                 <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>

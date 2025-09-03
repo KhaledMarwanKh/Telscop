@@ -125,7 +125,7 @@ const AdminNavbar = () => {
                                     : 'text-gray-700 hover:text-primary'
                                     }`}
                                 onClick={() => {
-
+                                    setIsMobileMenuOpen(false)
                                 }}
                             >
                                 {link.name}

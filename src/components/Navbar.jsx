@@ -231,7 +231,7 @@ const Navbar = () => {
           </div>
 
           {
-            (isLogin) ? (
+             (
               <div className="md:hidden">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -240,25 +240,20 @@ const Navbar = () => {
                   {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
                 </button>
               </div>
-            ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className='block md:hidden px-2 py-3 border rounded hover:bg-primary hover:text-white transition-all duration-150'>
-                تسجيل الدخول
-              </button>
-            )
+            ) 
           }
 
         </div>
       </div>
 
       {isMobileMenuOpen && (
-        <div className={`md:hidden show-menu bg-white border-t`}>
+        <div className={`block md:hidden show-menu bg-white border-t`}>
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
+                onClick={()=>setIsMobileMenuOpen(false)}
                 className={`block px-3 py-2 text-sm font-medium transition-colors ${isActive(link.path)
                   ? 'text-white bg-primary bg-opacity-10'
                   : 'text-gray-700 hover:text-primary'

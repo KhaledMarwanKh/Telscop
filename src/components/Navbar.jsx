@@ -15,18 +15,18 @@ const Navbar = () => {
     image: '',
     name: ''
   });
-  const [otherLogin,setOtherLogin] = useState(false);
+  const [otherLogin, setOtherLogin] = useState(false);
 
   useEffect(() => {
 
-    const { userToken,adminToken,teacherToken } = localStorage;
+    const { userToken, adminToken, teacherToken } = localStorage;
 
     if (!userToken) {
       setIsLogin(false);
-      if (teacherToken){
+      if (teacherToken) {
         setOtherLogin(true);
-      }else{
-        if (adminToken){
+      } else {
+        if (adminToken) {
           setOtherLogin(true);
         }
       }
@@ -163,29 +163,29 @@ const Navbar = () => {
                       <FiChevronDown className="w-4 h-4" />
                     </button>
                   ) : (otherLogin) ?
-                  (
-         <Link
-                to={(()=>{
-                  const {adminToken,teacherToken} = localStorage;
-                  if (adminToken){
-                    return "admin/dashboard"
-                  }else{
-                    return "teacher/dashboard"
-                  }
-                })()
-                }
-                className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-colors text-sm font-medium"
-              >
-                العودة للوحة التحكم
-              </Link>
-                  )
-                  : (
-                    <button
-                      onClick={() => navigate('/login')}
-                      className='px-2 py-3 border rounded hover:bg-primary hover:text-white transition-all duration-150'>
-                      تسجيل الدخول
-                    </button>
-                  )
+                    (
+                      <Link
+                        to={(() => {
+                          const { adminToken, teacherToken } = localStorage;
+                          if (adminToken) {
+                            return "admin/dashboard"
+                          } else {
+                            return "teacher/dashboard"
+                          }
+                        })()
+                        }
+                        className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-100 transition-colors text-sm font-medium"
+                      >
+                        العودة للوحة التحكم
+                      </Link>
+                    )
+                    : (
+                      <button
+                        onClick={() => navigate('/login')}
+                        className='px-2 py-3 border rounded hover:bg-primary hover:text-white transition-all duration-150'>
+                        تسجيل الدخول
+                      </button>
+                    )
                 }
 
                 {isProfileMenuOpen && (
@@ -231,7 +231,7 @@ const Navbar = () => {
           </div>
 
           {
-             (
+            (
               <div className="md:hidden">
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -240,7 +240,7 @@ const Navbar = () => {
                   {isMobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
                 </button>
               </div>
-            ) 
+            )
           }
 
         </div>
@@ -253,7 +253,7 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={()=>setIsMobileMenuOpen(false)}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`block px-3 py-2 text-sm font-medium transition-colors ${isActive(link.path)
                   ? 'text-white bg-primary bg-opacity-10'
                   : 'text-gray-700 hover:text-primary'
@@ -265,22 +265,22 @@ const Navbar = () => {
             <hr className="my-2" />
             {
               isLogin && (
-            <>
-                 <Link
-              to="/profile"
-              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
-              onClick={handler}
-            >
-              الملف الشخصي
-            </Link>
+                <>
                   <Link
-              to="/bookings"
-              className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
-              onClick={handler}
-            >
-              حجوزاتي
-            </Link>
-            </>)
+                    to="/profile"
+                    className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
+                    onClick={handler}
+                  >
+                    الملف الشخصي
+                  </Link>
+                  <Link
+                    to="/bookings"
+                    className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
+                    onClick={handler}
+                  >
+                    حجوزاتي
+                  </Link>
+                </>)
             }
             <Link
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
@@ -291,28 +291,28 @@ const Navbar = () => {
                     تسجيل خروج
                     <FiLogOut />
                   </div>
-                ) :(otherLogin) ? 
-              <Link
-                to={(()=>{
-                  const {adminToken,teacherToken} = localStorage;
-                  if (adminToken){
-                    return "admin/dashboard"
-                  }else{
-                    return "teacher/dashboard"
-                  }
-                })()
-                }
-                className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
-              >
-                العودة للوحة التحكم
-              </Link>
-                : (
-                  <div onClick={() => { navigate("/login"); handler() }}
-                    className="flex items-center justify-between">
-                    تسجيل الدخول
-                    <FiLogIn />
-                  </div>
-                )
+                ) : (otherLogin) ?
+                  <Link
+                    to={(() => {
+                      const { adminToken, teacherToken } = localStorage;
+                      if (adminToken) {
+                        return "admin/dashboard"
+                      } else {
+                        return "teacher/dashboard"
+                      }
+                    })()
+                    }
+                    className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
+                  >
+                    العودة للوحة التحكم
+                  </Link>
+                  : (
+                    <div onClick={() => { navigate("/login"); handler() }}
+                      className="flex items-center justify-between">
+                      تسجيل الدخول
+                      <FiLogIn />
+                    </div>
+                  )
               }
             </Link>
           </div>

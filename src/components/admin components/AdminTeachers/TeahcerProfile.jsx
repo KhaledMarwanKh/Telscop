@@ -5,7 +5,7 @@ import { formatDate } from '../../../data/assests';
 
 const TeacherProfile = ({ teacher, setShowProfile }) => {
   return (
-    <div className="w-full md:w-[900px] mx-auto bg-white shadow-xl rounded-2xl p-6 md:p-10 mt-10 space-y-6 relative">
+    <div className="w-full md:w-[900px] mx-auto bg-white shadow-xl rounded-2xl p-6 md:p-10 mt-10 space-y-6 relative h-[500px] overflow-scroll">
       <FiX className='w-5 h-5 absolute left-10 top-20 cursor-pointer' onClick={() => setShowProfile(false)} />
       {/* Header */}
       <div className="flex flex-col md:flex-row items-center gap-6">

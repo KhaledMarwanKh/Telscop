@@ -44,7 +44,7 @@ const AdminNavbar = () => {
                 localStorage.removeItem("adminToken");
                 toast.success("تم تسجيل الخروج بنجاح");
                 setTimeout(() => {
-                    navigate("/");
+                    navigate("/login");
                     window.scrollTo(0, 0);
                     window.location.reload();
                 }, 1000)

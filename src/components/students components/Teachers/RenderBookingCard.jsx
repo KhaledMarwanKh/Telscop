@@ -16,7 +16,7 @@ const RenderBookingCard = ({
             booking?.isCompleted === true ? 'border-secondary' :
                 'border-red-600'
             }`}>
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between flex-col md:flex-row">
                 <div className="flex items-start space-x-4 space-x-reverse flex-1">
                     <img
                         src={booking?.teacherId?.image}
@@ -56,7 +56,7 @@ const RenderBookingCard = ({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col space-y-2">
+                <div className="flex w-full md:w-fit justify-center gap-x-5 md:flex-col md:space-y-2 ">
                     {booking?.isCompleted === false && booking?.cancelled === false && (
                         <>
                             <button

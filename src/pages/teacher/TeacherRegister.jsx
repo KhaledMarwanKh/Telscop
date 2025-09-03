@@ -201,25 +201,25 @@ const TeacherRegister = () => {
       return;
     }
 
-         if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        location:{
-                          coordinates:[longitude,latitude]
-                        }
-                      }))
-                    },
-                    (error) => {
-                        console.log(error);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 1000000
-                    }
-                );
-       }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          setFormData(prev => ({
+            ...prev,
+            location: {
+              coordinates: [longitude, latitude]
+            }
+          }))
+        },
+        (error) => {
+          console.log(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 1000000
+        }
+      );
+    }
 
     setIsLoading(true);
 
@@ -269,7 +269,7 @@ const TeacherRegister = () => {
       }
 
     } catch (error) {
-      toast.error(error.message);
+      toast.error(e.response.data.message);
     }
 
     setIsLoading(false);
@@ -480,7 +480,7 @@ const TeacherRegister = () => {
               <p className="text-gray-600">
                 لديك حساب معلم بالفعل؟{' '}
                 <Link
-                  to="/teacher/login"
+                  to="/login"
                   className="font-bold text-emerald-600 hover:text-emerald-700 transition-colors hover:underline"
                 >
                   تسجيل الدخول

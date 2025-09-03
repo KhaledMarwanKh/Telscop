@@ -64,7 +64,7 @@ const Login = () => {
         email: '',
         password: ''
       })
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
   };
 

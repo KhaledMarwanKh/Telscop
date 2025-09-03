@@ -109,7 +109,7 @@ const Booking = () => {
       }
 
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
       if (localStorage.update) {
         localStorage.removeItem("update");
       }
@@ -169,7 +169,7 @@ const Booking = () => {
         navigate("/bookings");
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
       setIsLoading(false);
       setSelectedTime("");
     }
@@ -250,7 +250,7 @@ export const getTeacherInfo = async ({ params: { teacherId } }) => {
       return teacherInfo.data;
     }
   } catch (e) {
-    toast.error(e.message);
+    toast.error(e.response.data.message);
   }
 }
 

@@ -263,20 +263,25 @@ const Navbar = () => {
               </Link>
             ))}
             <hr className="my-2" />
-            <Link
+            {
+              isLogin && (
+            <>
+                 <Link
               to="/profile"
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
               onClick={handler}
             >
               الملف الشخصي
             </Link>
-            <Link
+                  <Link
               to="/bookings"
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
               onClick={handler}
             >
               حجوزاتي
             </Link>
+            </>)
+            }
             <Link
               className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
             >
@@ -286,7 +291,22 @@ const Navbar = () => {
                     تسجيل خروج
                     <FiLogOut />
                   </div>
-                ) : (
+                ) :(otherLogin) ? 
+              <Link
+                to={(()=>{
+                  const {adminToken,teacherToken} = localStorage;
+                  if (adminToken){
+                    return "admin/dashboard"
+                  }else{
+                    return "teacher/dashboard"
+                  }
+                })()
+                }
+                className="block px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary transition-colors"
+              >
+                العودة للوحة التحكم
+              </Link>
+                : (
                   <div onClick={() => { navigate("/login"); handler() }}
                     className="flex items-center justify-between">
                     تسجيل الدخول

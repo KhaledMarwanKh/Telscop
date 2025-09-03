@@ -22,7 +22,7 @@ const AdminPendingTeachers = () => {
     try {
       applyFilter();
     } catch (error) {
-      console.log(error);
+      toast.error(error.response.data.message);
     }
     setIsLoading(false);
   }, [subjectFilter, gradeFilter, regionFilter])
@@ -62,7 +62,7 @@ const AdminPendingTeachers = () => {
 
       setFilteredTeachers(filteredTeachers);
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data.message);
     }
   }
 
@@ -86,7 +86,7 @@ const AdminPendingTeachers = () => {
       toast.success("تم قبول طلب التدريس بنجاح");
       applyFilter();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };
@@ -111,7 +111,7 @@ const AdminPendingTeachers = () => {
       toast.success("تم رفض طلب التدريس بنجاح");
       applyFilter();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };
@@ -149,7 +149,7 @@ const AdminPendingTeachers = () => {
               </div>
             </div>
           </div>
-        ):(<></>)}
+        ) : (<></>)}
 
         {/* Filters and Search */}
 

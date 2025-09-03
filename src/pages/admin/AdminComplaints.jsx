@@ -4,7 +4,6 @@ import {
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import FilterTab from '../../components/admin components/AdminComplaints/FilterTab';
-import StatisBar from '../../components/admin components/AdminComplaints/StatisBar';
 import ComplaintsTable from '../../components/admin components/AdminComplaints/ComplaintsTable';
 import ComplaintDetailes from '../../components/admin components/AdminComplaints/ComplaintDetailes';
 import api from '../../lib/api';

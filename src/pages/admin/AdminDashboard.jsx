@@ -211,8 +211,7 @@ const AdminDashboard = () => {
       });
 
     } catch (e) {
-      toast.error(e);
-      console.log(e);
+      toast.error(e.response.data.message);
     }
 
   }
@@ -221,9 +220,8 @@ const AdminDashboard = () => {
     try {
       applyFilter();
     } catch (error) {
-      console.log(error)
+      toast.error(error.response.data.message)
     }
-    console.log(1);
   }, [filters])
 
   useEffect(() => {
@@ -232,8 +230,7 @@ const AdminDashboard = () => {
     try {
       fetchData();
     } catch (e) {
-      console.log(e);
-      toast.error(e.messege);
+      toast.error(e.response.data.message);
     }
 
     setIsLoading(false);

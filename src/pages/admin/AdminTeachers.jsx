@@ -104,7 +104,7 @@ const AdminTeachers = () => {
 
       setFilteredTeachers(filteredTeachers);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   }
@@ -129,7 +129,7 @@ const AdminTeachers = () => {
       toast.success("تم تفعيل المدرس بنجاح");
       applyFilters();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };
@@ -154,7 +154,7 @@ const AdminTeachers = () => {
       toast.success("تم الغاء تفعيل المدرس بنجاح");
       applyFilters();
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };

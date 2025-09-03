@@ -35,7 +35,7 @@ const TeacherSupport = () => {
         toast.error("حدث خطا ما");
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
 
     // Reset form

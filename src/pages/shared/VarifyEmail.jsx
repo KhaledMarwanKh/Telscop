@@ -39,7 +39,7 @@ const VarifyEmail = () => {
 
         } catch (e) {
             console.log(e)
-            toast.error(e.message);
+            toast.error(e.response.data.message);
             localStorage.removeItem("email");
         }
 

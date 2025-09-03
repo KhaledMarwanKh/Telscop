@@ -150,7 +150,7 @@ const TeacherProfile = () => {
           handleCancel();
         }
       } catch (e) {
-        toast.error(e.message);
+        toast.error(e.response.data.message);
       }
     }
 
@@ -181,7 +181,7 @@ const TeacherProfile = () => {
 
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
 
     setIsEditing(false);
@@ -333,7 +333,7 @@ export const getInfo = async () => {
         return teacherInfoRequest.data;
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
     }
   }
 

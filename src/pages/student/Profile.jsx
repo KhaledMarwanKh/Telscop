@@ -89,7 +89,7 @@ const Profile = () => {
           handleCancel();
         }
       } catch (e) {
-        toast.error(e.message);
+        toast.error(e.response.data.message);
       }
     }
 
@@ -120,7 +120,7 @@ const Profile = () => {
 
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
     setIsEditing(false);
   }
@@ -412,7 +412,7 @@ export const userInfoLoader = async () => {
       }
     }
   } catch (e) {
-    console.log(e);
+    console.log(e.response.data.message);
     return {
       name: '',
       email: '',

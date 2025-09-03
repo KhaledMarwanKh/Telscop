@@ -94,7 +94,7 @@ const Bookings = () => {
         }
       } catch (e) {
         setIsBookingsLoading(false);
-        toast.error(e.message);
+        toast.error(e.response.data.message);
       }
     }
 
@@ -152,7 +152,7 @@ const Bookings = () => {
         setActiveTab("cancelled");
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
   };
 
@@ -194,7 +194,7 @@ const Bookings = () => {
         setShowOnMap(true);
       }
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
   }
 

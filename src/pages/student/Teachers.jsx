@@ -52,7 +52,7 @@ const Teachers = () => {
           }
 
         } catch (e) {
-          toast.error(e.message);
+          toast.error(e.response.data.message);
         }
 
       }
@@ -82,7 +82,7 @@ const Teachers = () => {
       }
 
     } catch (e) {
-      console.log(e);
+      console.log(e.response.data.message);
       setDistFilter("all");
       setFilteredTeachers(allTeachers);
       setGradeFilter("all");
@@ -181,7 +181,7 @@ export const teachersLoader = async () => {
       return allTeachers.data.filter(teacher => teacher.activate);
     }
   } catch (e) {
-    toast.error(e.message);
+    toast.error(e.response.data.message);
     return [];
   }
 }

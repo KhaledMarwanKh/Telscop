@@ -209,7 +209,7 @@ const Register = () => {
       }
 
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
       resetInput();
     }
 

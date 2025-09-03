@@ -44,7 +44,7 @@ const TeacherDashboard = () => {
         navigate("/teacher/dashboard");
       }
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error.response.data.message)
     }
   };
 
@@ -69,7 +69,7 @@ const TeacherDashboard = () => {
         navigate("/teacher/dashboard")
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.message);
       console.log(error)
     }
   };
@@ -140,7 +140,7 @@ const TeacherDashboard = () => {
       }
 
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
   }
 
@@ -304,8 +304,8 @@ export const dashboardInfoLoader = async () => {
           }
         }
       }
-    } catch (e) {
-      toast.error(e.message);
+    } catch (e) { 
+      toast.error(e.response.data.message);
     }
   } else {
     window.location.href = "/login";

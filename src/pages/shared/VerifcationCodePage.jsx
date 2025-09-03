@@ -54,7 +54,7 @@ const ResetPassword = () => {
                             navigate("/reset-password");
                         }
                     } catch (e) {
-                        toast.error(e.message);
+                        toast.error(e.response.data.message);
                         setCode(new Array(6).fill(''));
                     }
                 }

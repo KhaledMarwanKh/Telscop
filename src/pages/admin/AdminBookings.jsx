@@ -7,7 +7,6 @@ import FilterTab from '../../components/admin components/AdminBookings/FilterTab
 import StatisBar from '../../components/admin components/AdminBookings/StatisBar';
 import BookingsTable from '../../components/admin components/AdminBookings/BookingsTable';
 import api from '../../lib/api';
-import { getTimeSlotId } from '../../data/assests';
 import { useNavigate } from "react-router-dom";
 
 const AdminBookings = () => {
@@ -65,7 +64,7 @@ const AdminBookings = () => {
       setFilteredBookings(bookings);
 
     } catch (error) {
-
+      toast.error(error.response.data.message)
     }
   };
 
@@ -112,7 +111,7 @@ const AdminBookings = () => {
 
       applyFilters();
     } catch (e) {
-      toast.error(e.message);
+      toast.error(e.response.data.message);
     }
   };
 

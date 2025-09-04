@@ -7,10 +7,8 @@ import FilterTab from '../../components/admin components/AdminBookings/FilterTab
 import StatisBar from '../../components/admin components/AdminBookings/StatisBar';
 import BookingsTable from '../../components/admin components/AdminBookings/BookingsTable';
 import api from '../../lib/api';
-import { useNavigate } from "react-router-dom";
 
 const AdminBookings = () => {
-  const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('all');
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [filteredBookings, setFilteredBookings] = useState([]);

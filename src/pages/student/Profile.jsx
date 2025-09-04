@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiEdit2, FiSave } from 'react-icons/fi';
 import { useLoaderData } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { city, formatDate, grades, homes } from '../../data/assests';
+import { city, grades, homes } from '../../data/assests';
 import api from '../../lib/api';
 
 const Profile = () => {

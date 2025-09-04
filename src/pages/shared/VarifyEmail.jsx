@@ -4,9 +4,6 @@ import { toast } from 'react-toastify';
 import api from '../../lib/api';
 import { useNavigate } from 'react-router-dom';
 
-// /api/user/forget-password {email}
-// /api/user/varify-reset  {email,code}
-// /api/user/resetPassword {email,password,passwordConfirm}
 const VarifyEmail = () => {
     const navigate = useNavigate();
 

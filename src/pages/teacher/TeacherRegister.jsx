@@ -6,7 +6,6 @@ import RenderStep1 from '../../components/teacher component/Register/RenderStep1
 import RenderStep2 from '../../components/teacher component/Register/RenderStep2';
 import RenderStep3 from '../../components/teacher component/Register/RenderStep3';
 import RenderStep4 from '../../components/teacher component/Register/RenderStep4';
-import { formatDate, getGeoLocation } from '../../data/assests';
 import api from '../../lib/api';
 
 const TeacherRegister = () => {

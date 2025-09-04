@@ -16,8 +16,6 @@ const AdminComplaints = () => {
   const [responseText, setResponseText] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState('all');
 
-  const [once, setOnce] = useState(true);
-
   const applyFilter = async () => {
     try {
       const { adminToken } = localStorage;

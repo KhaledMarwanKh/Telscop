@@ -174,8 +174,8 @@ export const formatDate = (dateString) => {
 }
 
 export const formatTime = (timeString) => {
-    const slot = timeSlots.find(slot => slot.value === timeString);
-    return slot ? slot.label : timeString;
+    const slot = timeSlots.filter(slot => slot.value === timeString)[0];
+    return slot ? slot?.label : timeString;
 };
 
 export const getDayInArabic = (dayNameInEnglish) => {
@@ -185,7 +185,8 @@ export const getDayInArabic = (dayNameInEnglish) => {
 }
 
 export const getTimeSlotId = (slot) => {
-    return timeSlots.filter(s => s.value === slot)[0].id;
+    const s = timeSlots.filter(s => s.value === slot)[0];
+    return s ? s.id:0 ;
 }
 
 export const getGradeNameByNumber = (gradeNum) => {

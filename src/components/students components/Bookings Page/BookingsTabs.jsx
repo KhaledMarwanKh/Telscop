@@ -4,8 +4,6 @@ const BookingsTabs = ({
     setActiveTab,
     activeTab,
     bookings,
-    setShowTodayBookings,
-    showTodayBooking
 }) => {
     const tabs = [
         { id: 'upcoming', name: 'الحجوزات القادمة' },
@@ -16,14 +14,6 @@ const BookingsTabs = ({
     return (
         <div className="mb-8">
             <nav className="flex space-x-8 space-x-reverse border-b relative">
-                {
-                    activeTab === "upcoming" && (
-                        <div className='flex items-center gap-3 absolute left-[10px] top-[50%] translate-y-[-50%]'>
-                            <input onClick={() => setShowTodayBookings(prev => !prev)} type="radio" name="yes" id="yes" checked={showTodayBooking} />
-                            <label htmlFor="yes" className='text-gray-500 text-sm hover:text-gray-700'>دروس اليوم</label>
-                        </div>
-                    )
-                }
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}

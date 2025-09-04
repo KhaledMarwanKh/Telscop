@@ -14,7 +14,7 @@ import TabsMenu from '../../components/admin components/Dashboared/TabsMenu';
 import RenderTeacherStats from '../../components/admin components/Dashboared/RenderTeacherStats';
 import RenderLessonsStats from '../../components/admin components/Dashboared/RenderLessonsStats';
 import RenderStudentsStats from '../../components/admin components/Dashboared/RenderStudentsStats';
-import { formatDate, getGradeNameByNumber, subjects } from '../../data/assests';
+import { formatDate, getGradeNameByNumber } from '../../data/assests';
 import api from '../../lib/api';
 import { toast } from 'react-toastify';
 

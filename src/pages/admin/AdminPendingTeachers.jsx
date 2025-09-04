@@ -3,28 +3,22 @@ import {
   FiUsers, FiClock
 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import StatisBar from '../../components/admin components/AdminPendingTeachers/StatisBar';
 import PendingTeachersTable from '../../components/admin components/AdminPendingTeachers/PendingTeachersTable';
 import FilterTab from '../../components/admin components/AdminTeachers/FilterTab';
 import api from '../../lib/api';
-import { useNavigate } from "react-router-dom";
 
 const AdminPendingTeachers = () => {
-  const navigate = useNavigate();
   const [subjectFilter, setSubjectFilter] = useState('all');
   const [gradeFilter, setGradeFilter] = useState("all");
   const [regionFilter, setRegionFilter] = useState("all");
   const [filteredTeachers, setFilteredTeachers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(true);
     try {
       applyFilter();
     } catch (error) {
       toast.error(error.response.data.message);
     }
-    setIsLoading(false);
   }, [subjectFilter, gradeFilter, regionFilter])
 
   const applyFilter = async () => {

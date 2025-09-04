@@ -7,25 +7,29 @@ import BookingsStat from '../../components/students components/Bookings Page/Boo
 import BookingsTabs from '../../components/students components/Bookings Page/BookingsTabs';
 import LocationMap from '../../components/students components/Bookings Page/LocationMap.jsx/LocationMap';
 import { FiX } from 'react-icons/fi';
-import { formatDate, formatTime, getGeoLocation, getStatusBadge, getTimeSlotId } from '../../data/assests';
+import { formatDate, formatTime, getDayInArabic, getDayKeyByNumber, getStatusBadge, getTimeSlotId } from '../../data/assests';
 import api from '../../lib/api';
 
 const Bookings = () => {
   const navigate = useNavigate();
 
-  const [todayBoookings, setTodayBookings] = useState([]);
-
-  const [showTodayBooking, setShowTodayBookings] = useState(false);
-
   const [bookings, setBookings] = useState([]);
 
   const [activeTab, setActiveTab] = useState('upcoming');
+
+  const [prevUpcomingBookings ,setPrevUpcomingBookings] = useState([]);
+
+  const [upcomingBookings, setUpComingBookings] = useState([]);
 
   const [showOnMap, setShowOnMap] = useState(false);
 
   const [isBookingsLoading, setIsBookingsLoading] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
+
+  const [dayFilter, setDayFilter] = useState("all");
+
+  const [timeFilter, setTimeFilter] = useState("all");
 
   const [teachGeo, setTeachGeo] = useState({
     lat: 0,
@@ -37,9 +41,53 @@ const Bookings = () => {
     lgt: 0
   })
 
+  const applyFilters = async () => {
+    if (activeTab === "upcoming") {
+      const { userToken } = localStorage;
+      let bookings = await (await api.get(
+        "/api/user/current-appointments"
+        , {
+          headers: {
+            authorization: `Bearer ${userToken}`
+          }
+        }
+      )).data;
+
+      if (dayFilter === "all" && timeFilter === "all"){
+        setPrevUpcomingBookings(bookings?.data);
+      }
+
+      setUpComingBookings(bookings?.data?.filter((booking) => {
+        if (dayFilter !== "all" && timeFilter !== "all") {
+          return getDayInArabic(getDayKeyByNumber(new Date(booking.slotDate).getDay())) === dayFilter && formatTime(booking.slotTime) === timeFilter;
+        } else if (dayFilter !== "all") {
+          return getDayInArabic(getDayKeyByNumber(new Date(booking.slotDate).getDay())) === dayFilter;
+        } else if (timeFilter !== "all") {
+          return formatTime(booking.slotTime) === timeFilter;
+        }else{
+          return true;
+        }
+      }));
+    }
+  }
+
+  useEffect(() => {
+    setIsBookingsLoading(true);
+    try {
+      applyFilters();
+    } catch (error) {
+      toast.error(error.response.data.message)
+    }
+    setIsBookingsLoading(false);
+  }, [dayFilter, timeFilter,activeTab])
+
   useEffect(() => {
     const update = async () => {
       try {
+       if (activeTab !== "upcoming"){
+         setDayFilter("all");
+
+        setTimeFilter("all");
 
         setIsBookingsLoading(true);
 
@@ -47,18 +95,7 @@ const Bookings = () => {
 
         let bookings;
 
-        if (activeTab === "upcoming") {
-
-          bookings = await (await api.get(
-            "/api/user/current-appointments"
-            , {
-              headers: {
-                authorization: `Bearer ${userToken}`
-              }
-            }
-          )).data;
-
-        } else if (activeTab === "completed") {
+        if (activeTab === "completed") {
 
           bookings = await (await api.get(
             "/api/user/completed-appointments"
@@ -85,13 +122,9 @@ const Bookings = () => {
             bookings.data
               .sort((a, b) => new Date(a.slotDate.split("T")[0]) - new Date(b.slotDate.split("T")[0]))
           );
-          setTodayBookings(
-            bookings.data
-              ?.filter(booking => booking.slotDate.split("T")[0] === formatDate(new Date().toLocaleDateString("en-US")))
-              ?.sort((a, b) => getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime))
-          );
           setIsBookingsLoading(false);
         }
+       }
       } catch (e) {
         setIsBookingsLoading(false);
         toast.error(e.response.data.message);
@@ -105,28 +138,29 @@ const Bookings = () => {
   useEffect(() => {
     const fetchLocation = async () => {
       if (isLoading) {
-             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
-                      setStudentLocation({
-                        lat:latitude,
-                        lgt:longitude
-                      })
-                    },
-                    (error) => {
-                        console.log(error);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 1000000
-                    }
-                );
-       }
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            ({ coords: { latitude, longitude } }) => {
+              setStudentLocation({
+                lat: latitude,
+                lgt: longitude
+              })
+            },
+            (error) => {
+              console.log(error);
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 1000000
+            }
+          );
+        }
       }
     }
 
     fetchLocation();
-  }, [isLoading])
+    setIsLoading(false);
+  }, [isLoading]);
 
   const handleCancelBooking = async (bookingId) => {
     const { userToken } = localStorage;
@@ -204,35 +238,102 @@ const Bookings = () => {
 
       <BookingsTabs
         activeTab={activeTab}
-        bookings={showTodayBooking ? todayBoookings : bookings}
+        bookings={bookings}
         setActiveTab={setActiveTab}
-        setShowTodayBookings={setShowTodayBookings}
-        showTodayBooking={showTodayBooking}
       />
+
+      {
+        activeTab === "upcoming" && (
+          <div className='w-full grid md:grid-cols-2 gap-5 my-5 shadow-lg bg-white px-2 py-3'>
+            <select onChange={(e) => setDayFilter(e.target.value)} className='px-2 py-3' value={dayFilter} name="day" id="">
+              <option value="all">اختر اليوم</option>
+              {
+                [...new Set(prevUpcomingBookings?.map(booking => booking.slotDate))]
+                  ?.sort((a, b) => new Date(a).getDay() - new Date(b).getDay())
+                  ?.map(date => getDayInArabic(getDayKeyByNumber(new Date(date).getDay())))
+                  ?.map(day => (
+                    <option value={day}>
+                      {day}
+                    </option>
+                  ))
+              }
+            </select>
+
+            <select onChange={(e) => setTimeFilter(e.target.value)} className='px-2 py-3' value={timeFilter} name="time" id="">
+              <option value="all">اختر الوقت</option>
+              {
+                [...new Set(prevUpcomingBookings?.map(booking => booking.slotTime))]
+                  ?.sort((a, b) => getTimeSlotId(a) - getTimeSlotId(b))
+                  ?.map(time => formatTime(time))
+                  ?.map(time => (
+                    <option value={time}>
+                      {time}
+                    </option>
+                  ))
+              }
+            </select>
+          </div>
+        )
+      }
 
       {
         !isBookingsLoading ?
           (
             <div className="space-y-6">
-              {(showTodayBooking ? todayBoookings : bookings).length === 0 ? (
-                <ActiveTabStatus showTodayBooking={showTodayBooking} activeTab={activeTab} />
-              ) : (
-                (showTodayBooking ? todayBoookings : bookings)
-                  ?.sort((a, b) => new Date(a.slotDate) - new Date(b.slotDate))
-                  ?.sort((a, b) => getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime))
-                  ?.map((booking) => (
-                    <RenderBookingCard
-                      formatDate={formatDate}
-                      formatTime={formatTime}
-                      booking={booking}
-                      statusBadge={getStatusBadge(activeTab)}
-                      handleBookAgain={handleBookAgain}
-                      handleRescheduleBooking={handleRescheduleBooking}
-                      handleCancelBooking={handleCancelBooking}
-                      handleShowLocation={handleShowLocation}
-                    />
-                  ))
-              )}
+              {
+                (activeTab === "upcoming" ? upcomingBookings : bookings).length === 0 ? (
+                  <ActiveTabStatus time={timeFilter === "all" ? "" : "الساعة" + timeFilter} day={dayFilter === "all" ? "قادمة" : dayFilter} activeTab={activeTab} />
+                ) : (
+                  <>
+                    {
+                      activeTab !== "upcoming" ? (
+                        <>
+                          {(
+                            bookings?.sort((a, b) => {
+                              if (new Date(a.slotDate) === new Date(b.slotDate)) {
+                                return getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime)
+                              } else {
+                                return new Date(a.slotDate) - new Date(b.slotDate);
+                              }
+                            })
+                              ?.map((booking) => (
+                                <RenderBookingCard
+                                  formatDate={formatDate}
+                                  formatTime={formatTime}
+                                  booking={booking}
+                                  statusBadge={getStatusBadge(activeTab)}
+                                  handleBookAgain={handleBookAgain}
+                                  handleRescheduleBooking={handleRescheduleBooking}
+                                  handleCancelBooking={handleCancelBooking}
+                                  handleShowLocation={handleShowLocation}
+                                />
+                              ))
+                          )}
+                        </>
+                      ) : (
+                        upcomingBookings?.sort((a, b) => {
+                          if (new Date(a.slotDate) === new Date(b.slotDate)) {
+                            return getTimeSlotId(a.slotTime) - getTimeSlotId(b.slotTime)
+                          } else {
+                            return new Date(a.slotDate) - new Date(b.slotDate);
+                          }
+                        })?.map((booking) => (
+                          <RenderBookingCard
+                            formatDate={formatDate}
+                            formatTime={formatTime}
+                            booking={booking}
+                            statusBadge={getStatusBadge(activeTab)}
+                            handleBookAgain={handleBookAgain}
+                            handleRescheduleBooking={handleRescheduleBooking}
+                            handleCancelBooking={handleCancelBooking}
+                            handleShowLocation={handleShowLocation}
+                          />
+                        ))
+                      )
+                    }
+                  </>
+                )
+              }
             </div>
           ) : (
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -244,8 +345,8 @@ const Bookings = () => {
           )
       }
 
-      {activeTab === 'upcoming' && bookings.length > 0 && (
-        <BookingsStat bookings={bookings} />
+      {activeTab === 'upcoming' && upcomingBookings?.length > 0 && (
+        <BookingsStat bookings={upcomingBookings} />
       )}
 
       {

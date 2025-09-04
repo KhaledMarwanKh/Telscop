@@ -7,10 +7,8 @@ import StatisBar from '../../components/admin components/AdminStudents/StatisBar
 import StudentsTable from '../../components/admin components/AdminStudents/StudentsTable';
 import FilterTab from '../../components/admin components/AdminStudents/FilterTab';
 import api from '../../lib/api';
-import { useNavigate } from 'react-router-dom';
 
 const AdminStudents = () => {
-  const navigate = useNavigate();
   const [gradeFilter, setGradeFilter] = useState('all');
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [regionFilter, setRegionFilter] = useState("all");

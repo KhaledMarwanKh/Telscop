@@ -18,10 +18,10 @@ const TeacherProfile = () => {
   const [activeTab, setActiveTab] = useState('personal');
 
   const [formData, setFormData] = useState({
-    name: teacherInfo.name,
-    email: teacherInfo.email,
-    phone: teacherInfo.phone,
-    birthDate: teacherInfo.birthDate,
+    name: teacherInfo?.name,
+    email: teacherInfo?.email,
+    phone: teacherInfo?.phone,
+    birthDate: teacherInfo?.birthDate,
     gender: teacherInfo.gender,
     address: {
       city: teacherInfo.address.city,
@@ -48,7 +48,7 @@ const TeacherProfile = () => {
     if (localStorage.getItem('activeTab')) {
       setActiveTab("schedule");
       setIsEditing(true);
-      localStorage.clear();
+      localStorage.removeItem("activeTab");
     }
   }, [])
 
@@ -328,6 +328,8 @@ export const getInfo = async () => {
           }
         }
       )).data;
+
+      console.log(teacherInfoRequest.data)
 
       if (teacherInfoRequest.success === true) {
         return teacherInfoRequest.data;

@@ -268,7 +268,7 @@ const TeacherRegister = () => {
       }
 
     } catch (error) {
-      toast.error(e.response.data.message);
+      toast.error(e.response?.data?.message);
     }
 
     setIsLoading(false);

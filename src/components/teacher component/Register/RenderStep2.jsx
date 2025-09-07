@@ -23,7 +23,7 @@ const RenderStep2 = (
                     required
                 >
                     <option value="">اختر المادة</option>
-                    {teacherSubjects.slice(1).map((subject) => (
+                    {teacherSubjects.map((subject) => (
                         <option key={subject.key} value={subject.name}>
                             {subject.name}
                         </option>

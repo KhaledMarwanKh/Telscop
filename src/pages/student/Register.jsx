@@ -210,9 +210,7 @@ const Register = () => {
 
     } catch (e) {
       toast.error(e.response.data.message);
-      resetInput();
     }
-
   };
 
   const calculateAge = (birthDate) => {
@@ -240,25 +238,25 @@ const Register = () => {
   };
 
   useEffect(() => {
-     if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        location:{
-                          coordinates:[longitude,latitude]
-                        }
-                      }))
-                    },
-                    (error) => {
-                        console.log(error);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 1000000
-                    }
-                );
-       }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          setFormData(prev => ({
+            ...prev,
+            location: {
+              coordinates: [longitude, latitude]
+            }
+          }))
+        },
+        (error) => {
+          console.log(error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 1000000
+        }
+      );
+    }
   }, []);
 
 

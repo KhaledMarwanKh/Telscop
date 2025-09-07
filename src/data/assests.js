@@ -186,7 +186,7 @@ export const getDayInArabic = (dayNameInEnglish) => {
 
 export const getTimeSlotId = (slot) => {
     const s = timeSlots.filter(s => s.value === slot)[0];
-    return s ? s.id:0 ;
+    return s ? s.id : 0;
 }
 
 export const getGradeNameByNumber = (gradeNum) => {
@@ -198,31 +198,31 @@ export const getGradeNameByNumber = (gradeNum) => {
 export const getGeoLocation = async () => {
     try {
         let x = setInterval(
-            ()=>{
+            () => {
                 if (navigator.geolocation) {
-                let lat, lng;
+                    let lat, lng;
 
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords: { latitude, longitude } }) => {
-                        lat = latitude;
+                    navigator.geolocation.getCurrentPosition(
+                        ({ coords: { latitude, longitude } }) => {
+                            lat = latitude;
 
-                        lng = longitude;
-                    },
-                    (error) => {
-                        console.log(error);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 1000000
-                    }
-                );
+                            lng = longitude;
+                        },
+                        (error) => {
+                            console.log(error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 1000000
+                        }
+                    );
 
-                clearInterval(x);
+                    clearInterval(x);
 
-                return [lng, lat];
-              }
+                    return [lng, lat];
+                }
             }
-       ,500 )
+            , 500)
     } catch (e) {
         return [];
     }

@@ -275,9 +275,6 @@ const TeacherRegister = () => {
 
   };
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
 
   const handleAddressChange = ({ target: { value, name } }) => {
     setFormData((prev) => (

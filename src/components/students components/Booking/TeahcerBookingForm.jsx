@@ -2,7 +2,7 @@ import React from 'react'
 import { FiCalendar, FiClock } from 'react-icons/fi'
 import { Link } from 'react-router-dom'
 import BookingSummary from './BookingSummary'
-import { getNextDayDate, getTime, translateDayToArabic } from '../../../data/assests'
+import { formatDate,getNextDayDate, getTime, getTimeSlotId, translateDayToArabic } from '../../../data/assests'
 
 const TeahcerBookingForm = ({
     handleBooking,
@@ -52,25 +52,28 @@ const TeahcerBookingForm = ({
                     <div className="grid grid-cols-2 gap-3">
 
                         {
-                            avTimes?.filter(e => e.day === selectedDay).map(e => e.slots).map(slot => {
-                                const fin = [];
-                                slot.forEach(slot => {
-                                    fin.push((
-                                        <button
-                                            key={slot}
-                                            type="button"
-                                            onClick={() => handleTimeSelect(slot)}
-                                            className={`p-3 ${(!slotsBooked) ? "" : (slotsBooked?.find(e => e === slot)) ? 'bg-red-100 pointer-events-none' : ''} border rounded-lg transition-colors ${selectedTime === slot
-                                                ? 'bg-primary text-white border-primary'
-                                                : 'border-gray-300 hover:bg-primary hover:text-white'
-                                                }}`}
-                                        >
-                                            {getTime(slot)}
-                                        </button>
-                                    ))
-                                });
-                                return fin
-                            })
+                            avTimes?.filter(e => e.day === selectedDay)
+                                ?.map(e => e.slots)
+                                ?.sort((a, b) => getTimeSlotId(a) - getTimeSlotId(b))
+                                ?.map(slot => {
+                                    const fin = [];
+                                    slot.forEach(slot => {
+                                        fin.push((
+                                            <button
+                                                key={slot}
+                                                type="button"
+                                                onClick={() => handleTimeSelect(slot)}
+                                                className={`p-3 ${(!slotsBooked) ? "" : (slotsBooked?.find(e => e === slot)) ? 'bg-red-100 pointer-events-none' : (parseInt(slot?.split(":")[0]) <= new Date().getHours() && formatDate(new Date(getNextDayDate(selectedDay)).toLocaleDateString("en-US")) === formatDate(new Date().toLocaleDateString("en-US")) ) ? "bg-blue-100 pointer-events-none" : ''} border rounded-lg transition-colors ${selectedTime === slot
+                                                    ? 'bg-primary text-white border-primary'
+                                                    : 'border-gray-300 hover:bg-primary hover:text-white'
+                                                    }}`}
+                                            >
+                                                {getTime(slot)}
+                                            </button>
+                                        ))
+                                    });
+                                    return fin
+                                })
                         }
                     </div>
                 </div>

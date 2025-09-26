@@ -2,13 +2,13 @@ const cron = require('node-cron');
 const Lesson = require('../models/appointmentModel');
 const Teacher = require('../models/teacherModel');
 
-cron.schedule('* * * * *', async () => {
+cron.schedule('* * * * 0', async () => {
   const now = new Date();
 
   try {
     const lessons = await Lesson.find({
       slotDate: { $lt: now },
-      isCancelled: false,
+      cancelled: false,
       isCompleted: false
     });
 

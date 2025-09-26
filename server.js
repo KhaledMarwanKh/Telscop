@@ -29,6 +29,7 @@ const port =process.env.PORT || 4000 ;
 // ===== CORS setup =====
 const allowedOrigins = [
   'http://localhost:3000', // Frontend local
+  'http://localhost:5173',
   'https://telescope-9yz1.onrender.com' // Frontend on Render (استبدل باللينك الصحيح)
 ];
 

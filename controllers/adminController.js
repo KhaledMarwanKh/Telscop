@@ -77,7 +77,6 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
     matchStage.subject = req.query.subject;
   }
   
-  // فلترة حسب الصف (grade)
   if (req.query.Class) {
     matchStage.Class = { $in: [parseInt(req.query.Class)] };
   }
@@ -85,7 +84,6 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
 
   const stats = await teacherModel.aggregate([
   { $match: matchStage },
-    //  ربط كل معلم بحجوزاته 
     {
       $lookup: {
         from: "appointments",
@@ -95,7 +93,6 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
       }
     },
 
-    // فلتر الحجوزات داخل الأستاذ حسب الشرط
     {
       $addFields: {
         filteredAppointments: {
@@ -133,7 +130,6 @@ exports.statsByTeacher = catchasync(async (req, res, next) => {
       }
     },
 
-    // حساب عدد الطلاب الفريدين
     {
       $addFields: {
         studentCount: { $size: { $setUnion: ["$studentIds", []] } }
@@ -545,7 +541,6 @@ exports.getMonthlyCounts = catchasync(async (req, res, next) => {
     aggregateByMonth(appointmentModel)
   ]);
 
-  // دمج البيانات الشهرية في نتيجة واحدة
   const allMonths = new Set([
     ...Object.keys(teachers),
     ...Object.keys(students),

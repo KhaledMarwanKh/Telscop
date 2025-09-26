@@ -167,14 +167,13 @@ console.log({
   const existing = await teacherModel.findOne({ email });
   if (existing) return next(new appError("Email already registered", 400));
 
-  // رفع الصور
   const profileImage = req.files?.image?.[0];
   const certificates = req.files?.certificates || [];
   
   const imageUrl = profileImage ? await uploadAndDelete(profileImage) : "";
   const certificateUrls = await Promise.all(certificates.map(uploadAndDelete));
 
-  // بناء بيانات المدرّس
+
   const teacherData = {
     name,
     email,

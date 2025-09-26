@@ -43,7 +43,7 @@ if (process.env.NODE_ENV === "development") {
 app.use(helmet());
 //limit request from same api
 const limiter = rateLimit({
-  max: 100, // عدد الطلبات المسموح بها لكل IP خلال 15 دقيقة
+  max: 100,
   windowMs: 15 * 60 * 1000,
   message: "Too many requests from this IP, please try again later.",
 });
